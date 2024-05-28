@@ -1,3 +1,8 @@
 ﻿Terminal_BackEnd.Core/obj
 Terminal_BackEnd.Infrastructure/obj
 Terminal_BackEnd.WebApi/obj
+.vs
+Terminal_BackEnd.Core/bin
+Terminal_BackEnd.Infrastructure/bin
+Terminal_BackEnd.Web/bin
+Terminal_BackEnd.Web/obj
