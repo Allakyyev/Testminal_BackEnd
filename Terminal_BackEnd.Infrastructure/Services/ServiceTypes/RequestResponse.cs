@@ -1,6 +1,7 @@
 ﻿using System.Runtime.Serialization;
+using Newtonsoft.Json.Linq;
 
-namespace Terminal_BackEnd.Infrastructure.Services {
+namespace Terminal_BackEnd.Infrastructure.Services.ServiceTypes {
     [DataContract]
     public class RequestResponse {
         [DataMember(Name = "status")]
@@ -13,6 +14,8 @@ namespace Terminal_BackEnd.Infrastructure.Services {
         public string? ErrorMessage { get; set; }
 
         [DataMember(Name = "result")]
-        public object? Result { get; set; }
+        public JObject? Result { get; set; }
+
+        public HttpResponseMessage? HttpResponseMessage { get; set; }
     }
 }

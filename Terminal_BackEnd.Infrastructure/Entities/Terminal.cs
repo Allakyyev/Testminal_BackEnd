@@ -4,5 +4,7 @@
         public required string TerminalId { get; set; }
         public required string Name { get; set; }
         public required string UserId { get; set; }
+        public List<Transaction>? Transactions { get; set; }
+        public ApplicationUser? ApplicationUser { get; set; }
     }
 }
