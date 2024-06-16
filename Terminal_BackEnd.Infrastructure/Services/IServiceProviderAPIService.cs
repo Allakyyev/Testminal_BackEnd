@@ -148,7 +148,7 @@ namespace Terminal_BackEnd.Infrastructure.Services
         ///'service': service_key of check destinaiton,
         ///'destination': destination
         ///}</returns>
-        Task<RequestResponse> RequestPollDestinationAsync(string key, string serviceKey, string msisdn);
+        Task<RequestResponse> RequestPollCheckDestinationAsync(string key, string serviceKey, string msisdn);
 
         /// <summary>
         /// Callback is an address on a dealer's server which will be used to inform a sender of Check Destination about it's state change in order to make system asynchronous. Dealer no more needs to POLL the processing gateway for Check Destination state.

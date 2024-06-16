@@ -11,5 +11,9 @@ namespace Terminal_BackEnd.Infrastructure.Services.APIDataContracts {
 
         [DataMember(Name = "msisdn")]
         public required string Msisdn { get; set; }
+
+        [DataMember(Name = "terminalId")]
+        public long TerminalId { get; set; }
+
     }
 }

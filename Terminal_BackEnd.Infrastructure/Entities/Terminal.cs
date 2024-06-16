@@ -6,5 +6,6 @@
         public required string UserId { get; set; }
         public List<Transaction>? Transactions { get; set; }
         public ApplicationUser? ApplicationUser { get; set; }
+        public DateTime CreatedDate { get; set; }
     }
 }

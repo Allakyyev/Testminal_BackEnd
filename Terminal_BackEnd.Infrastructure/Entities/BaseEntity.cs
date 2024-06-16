@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Terminal_BackEnd.Infrastructure.Entities {
+﻿namespace Terminal_BackEnd.Infrastructure.Entities {
     public class BaseEntity {
-        public int Id { get; set; }
+        public long Id { get; set; }
     }
 }

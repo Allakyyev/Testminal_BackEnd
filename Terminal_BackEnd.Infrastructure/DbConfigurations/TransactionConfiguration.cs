@@ -15,6 +15,7 @@ namespace Terminal_BackEnd.Infrastructure.DbConfigurations {
             builder.Property(p => p.State).IsRequired(false);
             builder.Property(p => p.Reason).IsRequired(false);
             builder.HasOne(p => p.Terminal).WithMany(p => p.Transactions).HasForeignKey(p => p.TerminalId);
+            builder.HasMany(t => t.TransactionStatuses).WithOne(ts => ts.Transaction).HasForeignKey(ts => ts.TransactionId);
         }
     }
 }

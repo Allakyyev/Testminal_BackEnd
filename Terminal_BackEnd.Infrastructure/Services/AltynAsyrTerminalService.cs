@@ -1,31 +1,41 @@
-﻿using System.Text.Json;
-using Terminal_BackEnd.Infrastructure.Services.DataContracts;
+﻿using Microsoft.Extensions.Options;
 using Terminal_BackEnd.Infrastructure.Services.ServiceTypes;
 
-namespace Terminal_BackEnd.Infrastructure.Services
-{
-    public class AltynAsyrTerminalService : IAltynAsyrTerminalService
-    {
+namespace Terminal_BackEnd.Infrastructure.Services {
+    public class AltynAsyrTerminalService : IAltynAsyrTerminalService {
         readonly IServiceProviderAPIService serviceProviderAPIService;
         readonly string dealerKey;
-        public AltynAsyrTerminalService(IServiceProviderAPIService  serviceProviderAPIService, string dealerKey) {
+        readonly TerminalSettings terminalSettings;
+        public AltynAsyrTerminalService(IServiceProviderAPIService serviceProviderAPIService, IOptions<TerminalSettings> terminalSettings) {
             this.serviceProviderAPIService = serviceProviderAPIService;
-            this.dealerKey = dealerKey;
-        }
-        public AddTransactionResponse AddTransation(string serviceKey, int amount, string msisdn) {
-            throw new NotImplementedException();
+            this.terminalSettings = terminalSettings.Value;
+            this.dealerKey = this.terminalSettings.DealerKey;
         }
 
-        public CheckDestinationAPIResponse CheckDestination(string serviceKey, string msisdn) {
-            throw new NotImplementedException();
+        public async Task<CheckTransactionStatusResponse?> CheckTransactionStatusAsync(string localTransactionId) {
+            RequestResponse result;
+            try {
+                result = await serviceProviderAPIService.RequestCheckStatusTransactionAsync(this.dealerKey, localTransactionId);
+                if(result != null && result.Status == "SUCCESS") {
+                    return result.Result?.ToObject<CheckTransactionStatusResponse>();
+                }
+                return null;
+            } catch {
+                return null;
+            }
         }
 
-        public CheckTransactionStatusResponse CheckTransactionStatus(string localTransactionId) {
-            throw new NotImplementedException();
-        }
-
-        public AddTransactionResponse ForceAddTransaction(string serviceKey, int amount, string msisdn) {
-            throw new NotImplementedException();
+        public async Task<AddTransactionResponse?> ForceAddTransactionAsync(string serviceKey, int amount, string msisdn, string localTransactionId) {
+            RequestResponse result;
+            try {
+                result = await serviceProviderAPIService.RequestForceAddTransactionAsync(this.dealerKey, localTransactionId, serviceKey, amount, msisdn);
+                if(result != null && result.Status == "SUCCESS") {
+                    return result.Result?.ToObject<AddTransactionResponse>();
+                }
+                return null;
+            } catch {
+                return null;
+            }
         }
 
         public async Task<string[]> GetServicesAsync() {
@@ -33,24 +43,64 @@ namespace Terminal_BackEnd.Infrastructure.Services
             try {
                 result = await serviceProviderAPIService.RequestGetServicesAsync(this.dealerKey);
                 if(result.HttpResponseMessage == null) return new string[0];
-
                 result.HttpResponseMessage.EnsureSuccessStatusCode();
-                return (result.Result?.ToObject<GetServicesResponse>())?.Services ?? new string[0];
+                if(result != null && result.Status == "SUCCESS") {
+                    return (result.Result?.ToObject<GetServicesResponse>())?.Services ?? new string[0];
+                } else {
+                    return new string[0];
+                }
             } catch {
                 return new string[0];
             }
-            
+
         }
 
-        public PollCheckDestinationResponse PollCheckDestination(string serviceKey, string msisdn) {
+        public async Task<CheckDestinationResonse> CheckDestinationAsync(string serviceKey, string msisdn) {
+            RequestResponse result;
+            var retryObj = new CheckDestinationResonse() {
+                Destination = msisdn,
+                Status = "RETRY-LATER"
+            };
+            try {
+                result = await serviceProviderAPIService.RequestCheckDestinationAsync(this.dealerKey, serviceKey, msisdn);
+                if(result != null && result.Status == "SUCCESS") {
+                    if(result.HttpResponseMessage == null || result.Result == null) {
+                        return retryObj;
+                    } else {
+                        return result.Result.ToObject<CheckDestinationResonse>() ?? retryObj;
+                    }
+                } else {
+                    return retryObj;
+                }
+            } catch {
+                return retryObj;
+            }
+        }
+
+        public Task<bool> RegisterAddTransactionStatusCallbackAsync(string callBack, string currentTransactionState) {
             throw new NotImplementedException();
         }
 
-        public bool RegisterAddTransactionStatusCallback(string callBack, string currentTransactionState) {
-            throw new NotImplementedException();
+        public async Task<PollCheckDestinationResponse> PollCheckDestinationAsync(string serviceKey, string msisdn) {
+            RequestResponse result;
+            var retryObj = new PollCheckDestinationResponse() {
+                Destination = msisdn,
+                Service = serviceKey,
+                State = "RETRY-LATER",
+                Status = "SUCESS"
+            };
+            try {
+                result = await serviceProviderAPIService.RequestPollCheckDestinationAsync(this.dealerKey, serviceKey, msisdn);
+                if(result != null && result.Status == "SUCCESS") {
+                    return result.Result?.ToObject<PollCheckDestinationResponse>() ?? retryObj;
+                }
+                return retryObj;
+            } catch {
+                return retryObj;
+            }
         }
 
-        public bool RegisterCheckDestinationStatusCallback(string callBackUrl, string serviceKey, string msisdn, string state) {
+        public Task<bool> RegisterCheckDestinationStatusCallbackAsync(string callBackUrl, string serviceKey, string msisdn, string state) {
             throw new NotImplementedException();
         }
     }

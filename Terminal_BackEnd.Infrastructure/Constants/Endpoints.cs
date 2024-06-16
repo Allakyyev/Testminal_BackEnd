@@ -1,14 +1,18 @@
-﻿namespace Terminal_BackEnd.Infrastructure.Constants {
+﻿using Microsoft.Extensions.Options;
+
+namespace Terminal_BackEnd.Infrastructure.Constants {
     public class Endpoints {
         public string userName;
         public string serverName;
         string callBackTransaction;
         string callBackCheckDestination;
-        public Endpoints(string userName, string serverName, string callBackTransaction, string callBackCheckDestination) {
-            this.userName = userName;
-            this.serverName = serverName;
-            this.callBackTransaction = callBackTransaction;
-            this.callBackCheckDestination = callBackCheckDestination;
+        readonly TerminalSettings settings;
+        public Endpoints(IOptions<TerminalSettings> terminalSettings) {
+            settings = terminalSettings.Value;
+            this.userName = settings.UserName;
+            this.serverName = settings.ServerName;
+            this.callBackTransaction = settings.CallBackTransaction;
+            this.callBackCheckDestination = settings.CallBackCheckDestination;
             RequestEpochTimeUrl = $"{baseUrl}/api/epoch";
             RequestDealerBalanceUrl = $"{baseUrl}/api/{this.userName}/{this.serverName}/dealer/balance";
             RequestServicesListUrl = $"{baseUrl}/api/{this.userName}/{this.serverName}/dealer/services";

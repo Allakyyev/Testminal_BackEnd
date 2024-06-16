@@ -242,11 +242,14 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
 
             modelBuilder.Entity("Terminal_BackEnd.Infrastructure.Entities.Terminal", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -267,16 +270,16 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
 
                     b.HasIndex("TerminalId");
 
-                    b.ToTable("Terminal");
+                    b.ToTable("Terminals");
                 });
 
             modelBuilder.Entity("Terminal_BackEnd.Infrastructure.Entities.Transaction", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<int>("Amount")
                         .HasColumnType("int");
@@ -284,6 +287,9 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
                     b.Property<string>("Msisdn")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PollingCallbackRegistered")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Reason")
                         .HasColumnType("nvarchar(max)");
@@ -300,14 +306,39 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TerminalId")
-                        .HasColumnType("int");
+                    b.Property<long>("TerminalId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
                     b.HasIndex("TerminalId");
 
-                    b.ToTable("Transaction");
+                    b.ToTable("Transactions");
+                });
+
+            modelBuilder.Entity("Terminal_BackEnd.Infrastructure.Entities.TransactionStatus", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TransactionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TransactionId");
+
+                    b.ToTable("TransactionStatus");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -383,6 +414,17 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
                     b.Navigation("Terminal");
                 });
 
+            modelBuilder.Entity("Terminal_BackEnd.Infrastructure.Entities.TransactionStatus", b =>
+                {
+                    b.HasOne("Terminal_BackEnd.Infrastructure.Entities.Transaction", "Transaction")
+                        .WithMany("TransactionStatuses")
+                        .HasForeignKey("TransactionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Transaction");
+                });
+
             modelBuilder.Entity("Terminal_BackEnd.Infrastructure.Entities.ApplicationUser", b =>
                 {
                     b.Navigation("Terminals");
@@ -391,6 +433,11 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
             modelBuilder.Entity("Terminal_BackEnd.Infrastructure.Entities.Terminal", b =>
                 {
                     b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("Terminal_BackEnd.Infrastructure.Entities.Transaction", b =>
+                {
+                    b.Navigation("TransactionStatuses");
                 });
 #pragma warning restore 612, 618
         }

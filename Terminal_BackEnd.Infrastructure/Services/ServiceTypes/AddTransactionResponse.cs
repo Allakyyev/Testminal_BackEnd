@@ -1,4 +1,7 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Diagnostics;
+using System.Net.NetworkInformation;
+using System.Runtime.Serialization;
+using System.Threading.Tasks;
 
 namespace Terminal_BackEnd.Infrastructure.Services.ServiceTypes {
     [DataContract]
@@ -35,6 +38,16 @@ namespace Terminal_BackEnd.Infrastructure.Services.ServiceTypes {
 
         /// <summary>
         ///  state of initial transaction
+        ///  NEW - transaction is accepted, not yet processed,
+        ///PENDING - txn amount reflected to account, waiting to be processed
+        ///PROCESSING - transaction is being processed
+        ///WAITING - waiting for result from service provider
+        ///SUCCESS - txn was successful
+        ///UNKNOWN - state for ASTU services
+        ///FAILED - txn has some errors which needs user interaction(correct, change status or reject)
+        ///ERROR - temporary error, will be retried automatically 5 times with increasing interval.
+        ///REJECTING - reject task added, will be REJECTED after task is processed
+        ///REJECTED - transaction was not accepted by a service provider, money should be refunded to account.
         /// </summary>
         [DataMember(Name = "state")]
         public string? State { get; set; }

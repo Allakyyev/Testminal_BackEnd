@@ -15,17 +15,20 @@ namespace Terminal_BackEnd.Web.API {
 
         [HttpGet("checkDestinaltion")]
         public string[] GetServices() {
-            return this.AltynAsynTerminalService.GetServicesAsync();
+            //return this.AltynAsynTerminalService.GetServicesAsync();
+            return null;
         }
 
         [HttpPost]
         public CheckDestinationAPIResponse CheckDestination(CheckDestinationRequest checkDestinationRequest) {
-            return this.AltynAsynTerminalService.CheckDestination(checkDestinationRequest.ServiceKey, checkDestinationRequest.Msisdn);
+            //return this.AltynAsynTerminalService.CheckDestination(checkDestinationRequest.ServiceKey, checkDestinationRequest.Msisdn);
+            return null;
         }
 
         [HttpPost]
         public AddTransactionResponse ForceAddTransaction(ForceAddRequest forceAddRequest) {
-            return this.AltynAsynTerminalService.ForceAddTransaction(forceAddRequest.ServiceKey, forceAddRequest.Amount, forceAddRequest.Msisdn);
-        }
+            //return this.AltynAsynTerminalService.ForceAddTransaction(forceAddRequest.ServiceKey, forceAddRequest.Amount, forceAddRequest.Msisdn);
+            return null;
+        }                
     }
 }

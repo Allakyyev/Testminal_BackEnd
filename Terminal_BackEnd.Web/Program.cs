@@ -1,11 +1,19 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
+using Terminal_BackEnd.Infrastructure;
+using Terminal_BackEnd.Infrastructure.Constants;
 using Terminal_BackEnd.Infrastructure.Data;
 using Terminal_BackEnd.Infrastructure.Entities;
+using Terminal_BackEnd.Infrastructure.Services;
+using Terminal_BackEnd.Infrastructure.Services.UserService;
+using Terminal_BackEnd.Web.Services;
 
 namespace Terminal_BackEnd.Web {
     public class Program {
-        public static void Main(string[] args) {
+        public static async Task Main(string[] args) {
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
@@ -24,7 +32,29 @@ namespace Terminal_BackEnd.Web {
                .AddDefaultTokenProviders();
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
-
+            builder.Services.Configure<TerminalSettings>(builder.Configuration.GetSection("TerminalSettings"));
+            builder.Services.AddScoped<Endpoints>();
+            builder.Services.AddScoped<IServiceProviderAPIService, ServiceProviderAPIService>();
+            builder.Services.AddScoped<IAltynAsyrTerminalService, AltynAsyrTerminalService>();
+            builder.Services.AddScoped<ITransactionControllerService, TransactionControllerService>();
+            builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
+            builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+            builder.Services.AddControllersWithViews()
+                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                .AddDataAnnotationsLocalization();
+            builder.Services.Configure<RequestLocalizationOptions>(options => {
+                var supportedCultures = new[]
+                {
+                    new CultureInfo("ru"),
+                    new CultureInfo("tk")
+                };
+                foreach(var culture in supportedCultures) {
+                    culture.NumberFormat.NumberDecimalSeparator = ".";
+                }
+                options.DefaultRequestCulture = new RequestCulture(culture: "ru", uiCulture: "ru");
+                options.SupportedCultures = supportedCultures;
+                options.SupportedUICultures = supportedCultures;
+            });
             var app = builder.Build();
             using(var scope = app.Services.CreateScope()) {
                 var services = scope.ServiceProvider;
@@ -32,29 +62,28 @@ namespace Terminal_BackEnd.Web {
                 dbContext.Database.Migrate();
                 var context = services.GetRequiredService<RoleManager<IdentityRole>>();
                 if(!context.Roles.Any()) {
-                    context.CreateAsync(new IdentityRole {
+                    await context.CreateAsync(new IdentityRole {
                         Name = "Admin"
                     });
-                    context.CreateAsync(new IdentityRole {
+                    await context.CreateAsync(new IdentityRole {
                         Name = "Standart"
                     });
                 }
                 var userContext = services.GetRequiredService<UserManager<ApplicationUser>>();
                 var admin = userContext.FindByNameAsync("Admin").GetAwaiter().GetResult();
+                if(admin != null) await userContext.DeleteAsync(admin);
+                ApplicationUser adminUser = new ApplicationUser {
+                    FirstName = "Admin",
+                    FamilyName = "Admin",
+                    Email = "allakyyev@gmail.com",
+                    UserName = "Admin",
+                    EmailConfirmed = true,
+                };
 
-                if(admin == null) {
-                    ApplicationUser adminUser = new ApplicationUser {
-                        FirstName = "Admin",
-                        FamilyName = "Admin",
-                        Email = $"allakyyev@gmail.com",
-                        UserName = "Admin",
-                        EmailConfirmed = true,
-                    };
+                var user = await userContext.CreateAsync(adminUser, "Password!1");
+                await userContext.AddToRoleAsync(adminUser, "Admin");
+                dbContext.SaveChanges();
 
-                    userContext.CreateAsync(adminUser, "Password!1");
-                    userContext.AddToRoleAsync(adminUser, "Admin");
-                    dbContext.SaveChanges();
-                }
             }
             // Configure the HTTP request pipeline.
             if(!app.Environment.IsDevelopment()) {
@@ -71,7 +100,7 @@ namespace Terminal_BackEnd.Web {
             app.UseAuthorization();
             app.MapRazorPages();
 
-            app.MapControllerRoute( 
+            app.MapControllerRoute(
                 name: "areas",
                 pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
             app.MapControllerRoute(

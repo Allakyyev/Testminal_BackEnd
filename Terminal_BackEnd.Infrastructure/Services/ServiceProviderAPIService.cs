@@ -192,7 +192,7 @@ namespace Terminal_BackEnd.Infrastructure.Services
             return await PostFormAsync(this._endPoints.RequestCheckDestinationServiceUrl, formData);
         }
 
-        public async Task<RequestResponse> RequestPollDestinationAsync(string key, string serviceKey, string msisdn) {
+        public async Task<RequestResponse> RequestPollCheckDestinationAsync(string key, string serviceKey, string msisdn) {
             long currentEpochTime = GetCurrentEpochTime();
             string message = $"{msisdn}:{serviceKey}:{currentEpochTime}:{_endPoints.userName}";
             string hMac = ComputeHMACSHA1(key, message);

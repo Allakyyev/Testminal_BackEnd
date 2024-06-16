@@ -1,6 +1,4 @@
-﻿using System.Net.NetworkInformation;
-
-namespace Terminal_BackEnd.Infrastructure.Constants {
+﻿namespace Terminal_BackEnd.Infrastructure.Constants {
     public static class StateConstants {
         public static class HttpErrorCode {
             public const int BADREQUEST = 400;
@@ -76,8 +74,9 @@ namespace Terminal_BackEnd.Infrastructure.Constants {
             /// <summary>
             /// PROCESSING - check dest is being processed
             /// </summary>
-            public const string PROCESSING = "PROCESSING ";
+            public const string PROCESSING = "PROCESSING";
 
+            public const string GWPROCESSING = "GW-PROCESSING";
             /// <summary>
             /// WAITING - waiting result from service provider
             /// </summary>
@@ -97,6 +96,8 @@ namespace Terminal_BackEnd.Infrastructure.Constants {
             /// FAILED - check dest is failed, should retry later.
             /// </summary>
             public const string FAILED = "FAILED";
+
+            public const string RETRYLATER = "RETRY-LATER";
         }
     }
 }
