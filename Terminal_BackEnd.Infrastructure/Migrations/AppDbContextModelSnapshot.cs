@@ -259,16 +259,19 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<string>("TerminalId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TerminalId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Terminals");
                 });
@@ -308,6 +311,9 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
 
                     b.Property<long>("TerminalId")
                         .HasColumnType("bigint");
+
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -396,9 +402,8 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
                 {
                     b.HasOne("Terminal_BackEnd.Infrastructure.Entities.ApplicationUser", "ApplicationUser")
                         .WithMany("Terminals")
-                        .HasForeignKey("TerminalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ApplicationUser");
                 });
@@ -408,7 +413,7 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
                     b.HasOne("Terminal_BackEnd.Infrastructure.Entities.Terminal", "Terminal")
                         .WithMany("Transactions")
                         .HasForeignKey("TerminalId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Terminal");

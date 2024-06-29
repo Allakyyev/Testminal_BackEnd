@@ -1,0 +1,153 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+@{
+    ViewData["Title"] = SharedLocalizer["Terminals"];
+    if(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin")) {
+                        <script>
+                            const isAdmin = true;
+                        </script>
+    }
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">
+                @SharedLocalizer["Terminals"]
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div id="gridContainer">
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>       
+        $(function () {
+            let url = 'api/TerminalAPI';
+            var returnUrl = '@Context.Request.Path@Context.Request.QueryString';
+            $("#gridContainer").dxDataGrid({
+                dataSource: DevExpress.data.AspNet.createStore({
+                    key: "id",
+                    loadUrl: url,
+                    insertUrl: url,
+                    updateUrl: url,
+                    deleteUrl: url,
+                    onBeforeSend: function (method, ajaxOptions) {
+                        ajaxOptions.xhrFields = { withCredentials: true };
+                    }
+                }),
+                onInitNewRow: function (e) {
+                    var url = `@Url.Action("Create", "Terminal")`;
+                    window.location = url;
+                },
+                selection: {
+                    mode: "multiple"
+                },
+                allowColumnReordering: true,
+                "export": {
+                    enabled: true,
+                    fileName: "Documents",
+                    allowExportSelectedData: true
+                },
+                filterPanel: {
+                    visible: false
+                },
+                filterRow: { visible: false },
+                remoteOperations: true,               
+                scrolling: {
+                    mode: "virtual",
+                    rowRenderingMode: "virtual"
+                },
+                paging: {
+                    pageSize: 100
+                },
+                editing: {
+                    useIcons: true,
+                    allowUpdating: true,
+                    allowDeleting: true,
+                    allowAdding: true
+                },
+                headerFilter: {
+                    visible: true
+                },
+                wordWrapEnabled: true,
+                showColumnLines: true,
+                showRowLines: true,
+                rowAlternationEnabled: true,
+                showBorders: true,
+                searchPanel: {
+                    visible: true
+                },
+
+                stateStoring: {
+                    enabled: true,
+                    type: "localStorage",
+                    storageKey: "userAdmin"
+                },
+
+                columns: [
+                    {
+                        caption: '@SharedLocalizer["TerminalId"]',
+                        dataField: "terminalId",
+                        allowHeaderFiltering: true
+                    },
+                    {
+                        caption: '@SharedLocalizer["Name"]',
+                        dataField: "name",
+                        allowHeaderFiltering: true
+                    },
+                    {
+                        caption: '@SharedLocalizer["Owner"]',
+                        dataField: "owner",
+                        allowHeaderFiltering: true,
+                    },
+                    {
+                        caption: '@SharedLocalizer["Status"]',
+                        dataField: "status",
+                        allowHeaderFiltering: true,                       
+                    },                    
+                    {
+                        type: "buttons",
+                        width: 110,
+                        buttons: [
+                            {
+                                hint: '@SharedLocalizer["Edit"]',
+                                icon: "edit",
+                                onClick: function (e) {
+                                    if (isAdmin) {
+                                        var idString = e.row.data.id;
+                                        var url = `@Url.Action("Edit", "Terminal")`;
+                                        window.location = url + '?id=' + idString;
+                                    }else {
+                                        alert("Do not have permission!!");
+                                    }
+                                }
+                            },
+                            {
+                                hint: '@SharedLocalizer["Get encrypted code"]',
+                                icon: "key",
+                                onClick: function (e) {
+                                    if (isAdmin) {
+                                        var idString = e.row.data.id;
+                                        var url = `@Url.Action("GetPasswordEncrypt", "Terminal")`;
+                                        window.location = url + '?id=' + idString;
+                                    } else {
+                                        alert("Do not have permission!!");
+                                    }
+                                }
+                            },
+                            "delete"
+                        ]
+                    }
+                ]
+            });
+
+        });
+    </script>
+}

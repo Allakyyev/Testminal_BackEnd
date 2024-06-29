@@ -10,7 +10,8 @@ namespace Terminal_BackEnd.Infrastructure.DbConfigurations {
             builder.Property(p => p.TerminalId).IsRequired(true);
             builder.Property(p => p.Name).IsRequired(true);
             builder.Property(p => p.Password).IsRequired(true);
-            builder.HasOne(p => p.ApplicationUser).WithMany(p => p.Terminals).HasForeignKey(p => p.TerminalId);
+            builder.HasOne(p => p.ApplicationUser).WithMany(p => p.Terminals).HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasMany(p => p.Transactions).WithOne(p => p.Terminal).HasForeignKey(p => p.TerminalId).OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

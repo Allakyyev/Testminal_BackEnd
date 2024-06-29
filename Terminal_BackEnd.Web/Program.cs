@@ -1,4 +1,5 @@
 using System.Globalization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -8,6 +9,7 @@ using Terminal_BackEnd.Infrastructure.Constants;
 using Terminal_BackEnd.Infrastructure.Data;
 using Terminal_BackEnd.Infrastructure.Entities;
 using Terminal_BackEnd.Infrastructure.Services;
+using Terminal_BackEnd.Infrastructure.Services.TerminalService;
 using Terminal_BackEnd.Infrastructure.Services.UserService;
 using Terminal_BackEnd.Web.Services;
 
@@ -30,15 +32,20 @@ namespace Terminal_BackEnd.Web {
                .AddRoles<IdentityRole>()
                .AddEntityFrameworkStores<AppDbContext>()
                .AddDefaultTokenProviders();
+            builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
             builder.Services.Configure<TerminalSettings>(builder.Configuration.GetSection("TerminalSettings"));
             builder.Services.AddScoped<Endpoints>();
+            builder.Services.AddAutoMapper(typeof(Program));
             builder.Services.AddScoped<IServiceProviderAPIService, ServiceProviderAPIService>();
             builder.Services.AddScoped<IAltynAsyrTerminalService, AltynAsyrTerminalService>();
             builder.Services.AddScoped<ITransactionControllerService, TransactionControllerService>();
             builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
+            builder.Services.AddScoped<ITerminalService, TerminalService>();
+            builder.Services.AddScoped<ISecurityService, SecurityService>();
             builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+            
             builder.Services.AddControllersWithViews()
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization();
@@ -68,6 +75,19 @@ namespace Terminal_BackEnd.Web {
                     await context.CreateAsync(new IdentityRole {
                         Name = "Standart"
                     });
+                }else {
+                    var adminRole = context.Roles.FirstOrDefault(r => !String.IsNullOrEmpty(r.Name) && (r.Name.Contains(ConstantsCommon.Role.Admin)));
+                    if(adminRole == null) {
+                        await context.CreateAsync(new IdentityRole {
+                            Name = "Admin"
+                        });
+                    }
+                    var standartRole = context.Roles.FirstOrDefault(r => !String.IsNullOrEmpty(r.Name) && (r.Name.Contains(ConstantsCommon.Role.Standart)));
+                    if(standartRole == null) {
+                        await context.CreateAsync(new IdentityRole {
+                            Name = "Standart"
+                        });
+                    }
                 }
                 var userContext = services.GetRequiredService<UserManager<ApplicationUser>>();
                 var admin = userContext.FindByNameAsync("Admin").GetAwaiter().GetResult();

@@ -18,7 +18,7 @@ namespace Terminal_BackEnd.Web.Services {
 
     public interface ITransactionControllerService {
         public Task<AddTransactionResponseClient> ForceAddTransactionAsync(ForceAddRequest forceAddRequest);
-        public CheckDestinationResponseClient CheckDestination(CheckDestinationRequest checkDestinationRequest, int retryCount);
+        public Task<CheckDestinationResponseClient> CheckDestination(CheckDestinationRequest checkDestinationRequest, int retryCount = 3);
         public Task<string[]> GetServicesAsync();
     }
 }

@@ -143,7 +143,7 @@
                                 icon: "edit",
                                 onClick: function (e) {
                                     var idString = e.row.data.id;
-                                    var url = `@Url.Action("Edit", "ApplicationUser", new { Area = "Admin" })`;
+                                    var url = `@Url.Action("Edit", "ApplicationUser")`;
                                     window.location = url + '?id=' + idString;
                                 }
                             },
@@ -152,7 +152,7 @@
                                 icon: "key",
                                 onClick: function (e) {
                                     var idString = e.row.data.id;
-                                    var url = `@Url.Action("ChangePassword", "ApplicationUser", new { Area = "Admin" })`;
+                                    var url = `@Url.Action("ChangePassword", "ApplicationUser")`;
                                     window.location = url + '?id=' + idString;
                                 }
                             },

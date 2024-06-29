@@ -12,7 +12,7 @@ namespace Terminal_BackEnd.Web.Services {
             this.altynAsyrTerminalService = altynAsyrTerminal;
             this.appDbContext = appDbContext;
         }
-        public CheckDestinationResponseClient CheckDestination(CheckDestinationRequest checkDestinationRequest, int retryCount = 0) {
+        public async Task<CheckDestinationResponseClient> CheckDestinationAsync(CheckDestinationRequest checkDestinationRequest, int retryCount = 0) {
             var failResponseObj = new CheckDestinationResponseClient() {
                 Destination = checkDestinationRequest.Msisdn,
                 Success = false
@@ -20,7 +20,7 @@ namespace Terminal_BackEnd.Web.Services {
             if(retryCount > 3) {
                 return failResponseObj;
             }
-            var result = altynAsyrTerminalService.CheckDestinationAsync(checkDestinationRequest.ServiceKey, checkDestinationRequest.Msisdn).GetAwaiter().GetResult();
+            var result = await altynAsyrTerminalService.CheckDestinationAsync(checkDestinationRequest.ServiceKey, checkDestinationRequest.Msisdn);
             if(result.Status != "SUCCESS") {
                 return failResponseObj;
             } else {
@@ -33,7 +33,7 @@ namespace Terminal_BackEnd.Web.Services {
                     result.State == StateConstants.CheckDestinationState.PROCESSING ||
                     result.State == StateConstants.CheckDestinationState.RETRYLATER) {
                     Thread.Sleep(1000);
-                    return CheckDestination(checkDestinationRequest, retryCount + 1);
+                    return await CheckDestinationAsync(checkDestinationRequest, retryCount + 1);
                 }else if(result.State == StateConstants.CheckDestinationState.OK) {
                     return new CheckDestinationResponseClient() {
                         Destination = checkDestinationRequest.Msisdn,
@@ -82,7 +82,7 @@ namespace Terminal_BackEnd.Web.Services {
                     TransactionId = tnx.Id,
                     UpdatedDate = DateTime.UtcNow,
                 };
-                appDbContext.Add<TransactionStatus>(tnxStatusChange);
+                appDbContext.TransactionStatuses.Add(tnxStatusChange);
                 appDbContext.SaveChanges();
             }
             return responseObj;

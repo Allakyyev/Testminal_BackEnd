@@ -8,6 +8,8 @@ namespace Terminal_BackEnd.Infrastructure.Data {
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Terminal> Terminals { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<TransactionStatus> TransactionStatuses { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder builder) {            
             builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
             base.OnModelCreating(builder);

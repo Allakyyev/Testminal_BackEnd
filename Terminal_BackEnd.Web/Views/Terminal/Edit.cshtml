@@ -1,0 +1,104 @@
+﻿@using Terminal_BackEnd.Infrastructure.Services.UserService.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DevExtreme.AspNet.Data
+@using DevExtreme.AspNet.Mvc
+@model Terminal_BackEnd.Infrastructure.Entities.Terminal
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+@{
+    ViewData["Title"] = SharedLocalizer["Edit Terminal"];
+}
+
+<div class="container-fluid">
+
+    <div class="col-lg-12">
+        <div class="row">
+            <h1 class="page-header">
+                @SharedLocalizer["Edit Terminal"]
+            </h1>
+        </div>
+    </div>
+    <div id="gridContainer">
+        <form asp-action="Edit" id="form" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Password" value="@Model.Password" />
+            <input type="hidden" asp-for="Id" value="@Model.Id" />            
+            <div class="col-md-12">
+                <div class="form-row">
+                    <div class="col-md-8">
+                        <h1 class="page-header">
+                            @SharedLocalizer["Data"]
+                        </h1>
+
+                        <div class="form-group">
+                            <label>@SharedLocalizer["Terminal name"] *</label>
+                            <input type="text" class="form-control" asp-for="Name" value="@(string.IsNullOrEmpty(Model.Name)?"":Model.Name)" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label>@SharedLocalizer["Terminal id"] *</label>
+                            <input type="text" class="form-control" asp-for="TerminalId" value="@(string.IsNullOrEmpty(Model.TerminalId)?"":Model.TerminalId)" disabled />
+                        </div>
+                        <div class="form-group">
+                            <label>@SharedLocalizer["Terminal status"]</label>
+                            <div id="statusSelection"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>@SharedLocalizer["Terminal owner"]</label>
+                            <div id="userSelection"></div>
+                        </div>
+
+                        <div class="dx-fieldset form-group">
+                            <div id="summary"></div>
+                            <div id="button"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/js/CustomStore.js"></script>
+    <script>        
+        $(function () {
+            $("#userSelection").dxSelectBox({
+                dataSource: getUsers,
+                isRequired: true,
+                placeholder: 'Select terminal owner',
+                displayExpr: "familyName",
+                valueExpr: "id",
+                name: 'UserId',
+                value: @Html.Raw(Json.Serialize(Model.UserId)),
+                searchEnabled: true,
+                itemTemplate: function (itemData, itemIndex, itemElement) {
+                return $("<div />").append(
+                        $("<span />").text(itemData.familyName + " " + itemData.firstName + " " + itemData.companyName)
+                    );
+                }
+            });
+
+            var statuses = [{ status: 0, displayText: "Active" }, { status: 1, displayText: "InActive" }]
+
+            $("#statusSelection").dxSelectBox({
+                dataSource: statuses,
+                isRequired: true,
+                placeholder: 'Select status...',
+                displayExpr: "displayText",
+                valueExpr: "status",
+                value: @Html.Raw(Json.Serialize(Model.Status)),
+                name: 'Status'                
+            });
+
+            $("#button").dxButton({
+                text: '@SharedLocalizer["Add"]',
+                type: "success",
+                useSubmitBehavior: true,
+            });
+            $("#summary").dxValidationSummary({});
+
+        });        
+    </script>
+}

@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.Net.NetworkInformation;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
+﻿using System.Runtime.Serialization;
 
 namespace Terminal_BackEnd.Infrastructure.Services.ServiceTypes {
     [DataContract]

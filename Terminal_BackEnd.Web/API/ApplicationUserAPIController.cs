@@ -1,4 +1,5 @@
 ﻿using DevExtreme.AspNet.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Terminal_BackEnd.Infrastructure.Constants;
@@ -9,7 +10,7 @@ using Terminal_BackEnd.Infrastructure.Services.UserService;
 
 namespace Terminal_BackEnd.Web.API {
     [Route("api/[controller]")]
-    //[Authorize(Roles = Roles.Admin)]
+    [Authorize(Roles = "Admin")]
     [ApiController]
     public class ApplicationUserAPIController : ControllerBase {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -24,14 +25,8 @@ namespace Terminal_BackEnd.Web.API {
 
         // GET: api/ApplicationUserAPI
         [HttpGet]
-        public async Task<object?> Get(DataSourceLoadOptions loadOptions) {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return null;
-            var selectedRoleNames = await _userManager.GetRolesAsync(user);
-            if(selectedRoleNames.Contains(ConstantsCommon.Role.Admin))
-                return DataSourceLoader.Load<ApplicationUser>(_userService.GetAllUsers().AsQueryable(), loadOptions);
-            else return null;
-
+        public async Task<object?> Get(DataSourceLoadOptions loadOptions) {            
+            return DataSourceLoader.Load<ApplicationUser>(_userService.GetAllUsers().AsQueryable(), loadOptions);            
         }
         // DELETE: api/CallBacksAPI/5
         [HttpDelete("{id}")]
