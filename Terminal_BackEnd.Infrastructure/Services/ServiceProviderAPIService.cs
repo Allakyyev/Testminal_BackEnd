@@ -24,7 +24,7 @@ namespace Terminal_BackEnd.Infrastructure.Services
 
         private static string ComputeHMACSHA1(string key, string message) {
             // Convert the key and message into byte arrays
-            byte[] keyBytes = Encoding.UTF8.GetBytes(key);
+            byte[] keyBytes = Convert.FromBase64String(key);
             byte[] messageBytes = Encoding.UTF8.GetBytes(message);
 
             // Initialize the HMACSHA1 with the key
@@ -32,18 +32,18 @@ namespace Terminal_BackEnd.Infrastructure.Services
                 // Compute the hash
                 byte[] hashBytes = hmacsha1.ComputeHash(messageBytes);
 
-                // Convert the hash to a hexadecimal string
-                StringBuilder sb = new StringBuilder();
-                for(int i = 0; i < hashBytes.Length; i++) {
-                    sb.Append(hashBytes[i].ToString("x2"));
-                }
+                //// Convert the hash to a hexadecimal string
+                //StringBuilder sb = new StringBuilder();
+                //for(int i = 0; i < hashBytes.Length; i++) {
+                //    sb.Append(hashBytes[i].ToString("x2"));
+                //}
 
-                return sb.ToString();
+                return Convert.ToBase64String(hashBytes);
             }
         }
 
 
-        private async Task<RequestResponse> PostFormAsync(string url, Dictionary<string, string> formData) {
+        private async Task<RequestResponse> PostFormAsync(string url, IEnumerable<KeyValuePair<string, string>> formData) {
             var content = new FormUrlEncodedContent(formData);
             HttpResponseMessage response = await _httpClient.PostAsync(url, content);
             string responseBody = await response.Content.ReadAsStringAsync();            
@@ -86,11 +86,15 @@ namespace Terminal_BackEnd.Infrastructure.Services
             long currentEpochTime = GetCurrentEpochTime();
             string message = $"{currentEpochTime}:{_endPoints.userName}";
             string hMac = ComputeHMACSHA1(key, message);
+            var fd = new[] {
+                new KeyValuePair<string, string>("ts", currentEpochTime.ToString()),
+                new KeyValuePair<string, string>("hmac", hMac),
+            };
             var formData = new Dictionary<string, string>() {
                 { "ts", $"{currentEpochTime}" },
                 { "hmac", hMac }
             };
-            Func<Task<RequestResponse>> request = async () => await PostFormAsync(this._endPoints.RequestServicesListUrl, formData);
+            Func<Task<RequestResponse>> request = async () => await PostFormAsync(this._endPoints.RequestServicesListUrl, fd);
             return await PostWithRentryAsync(request, RetryCount);
         }
 

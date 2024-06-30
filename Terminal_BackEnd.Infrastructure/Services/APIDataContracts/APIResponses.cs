@@ -7,4 +7,7 @@ namespace Terminal_BackEnd.Infrastructure.Services.DataContracts {
 
     [DataContract]
     public class ForceAddAPIResponse : APIResponseBase { }
+
+    [DataContract]
+    public class AddEnchargementAPIResponse : APIResponseBase { }
 }

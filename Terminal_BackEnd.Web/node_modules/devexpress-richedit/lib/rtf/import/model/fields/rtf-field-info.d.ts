@@ -1,0 +1,20 @@
+import { CheckBoxProperties } from '../../../../core/model/fields/check-box-properties';
+import { FormFieldProperties } from '../../../../core/model/fields/form-field-properties';
+import { RunBase } from '../../../../core/model/runs/run-base';
+export declare class RtfFieldInfo {
+    startPos: number;
+    separatorPos: number;
+    endPos: number;
+    startRun: RunBase;
+    separatorRun: RunBase;
+    endRun: RunBase;
+    locked: boolean;
+    isHyperlink: boolean;
+    isShapeField: boolean;
+    isCodeView: boolean;
+    insertInstructionBeforeFieldCode: boolean;
+    formFieldProperties: FormFieldProperties;
+    checkBoxProperties: CheckBoxProperties;
+    instruction: string;
+}
+//# sourceMappingURL=rtf-field-info.d.ts.map

@@ -9,7 +9,8 @@ namespace Terminal_BackEnd.Infrastructure.Data {
         public DbSet<Terminal> Terminals { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<TransactionStatus> TransactionStatuses { get; set; }
-        
+        public DbSet<Encashment> Encashments { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder) {            
             builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
             base.OnModelCreating(builder);

@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Terminal_BackEnd.Infrastructure.Services;
+using Terminal_BackEnd.Infrastructure.Entities;
 using Terminal_BackEnd.Infrastructure.Services.APIDataContracts;
 using Terminal_BackEnd.Infrastructure.Services.DataContracts;
-using Terminal_BackEnd.Infrastructure.Services.ServiceTypes;
 using Terminal_BackEnd.Web.Services;
 
 namespace Terminal_BackEnd.Web.API {
@@ -16,40 +15,53 @@ namespace Terminal_BackEnd.Web.API {
             this.securityService = securityService;
         }
 
-        [HttpGet("checkDestinaltion")]
-        public string[] GetServices(APIRequestBase requestBase) {
-            //return this.AltynAsynTerminalService.GetServicesAsync();
-            return null;
+        [HttpGet("get-services")]
+        public async Task<string[]> GetServices() {
+            return await this.transactionController.GetServicesAsync();
+
         }
 
-        [HttpPost]
-        public async Task<CheckDestinationAPIResponse> CheckDestination(CheckDestinationRequest checkDestinationRequest) {  
+        [HttpPost("check-destination")]
+        public async Task<CheckDestinationAPIResponse> CheckDestination(CheckDestinationRequest checkDestinationRequest) {
             var failResponse = new CheckDestinationAPIResponse() { Success = true };
             if(checkDestinationRequest == null) return failResponse;
-
-            if(this.securityService.TryValidateMsisdn(checkDestinationRequest?.MsisdnEncrypted ?? "", out string msisdn) && 
-                this.securityService.TryValidateTerminalId(checkDestinationRequest?.TerminalIdEncrypted ?? "", out long terminalId)) {
-                checkDestinationRequest.Msisdn = msisdn;
-                var result = await this.transactionController.CheckDestinationAsync(checkDestinationRequest);
-                return new CheckDestinationAPIResponse() { Success = result.Success };
-                
+            if(this.securityService.TryValidateTerminalId(checkDestinationRequest?.TerminalIdEncrypted ?? "", out Terminal terminal)) {
+                if(this.securityService.TryValidateMsisdn(checkDestinationRequest?.MsisdnEncrypted ?? "", terminal.Password, out string msisdn)) {
+                    checkDestinationRequest.Msisdn = msisdn;
+                    var result = await this.transactionController.CheckDestinationAsync(checkDestinationRequest);
+                    return new CheckDestinationAPIResponse() { Success = result.Success };
+                }
             }
-            return new CheckDestinationAPIResponse() { Success = false };            
+            return failResponse;
         }
 
-        [HttpPost]
+        [HttpPost("force-add")]
         public async Task<ForceAddAPIResponse> ForceAddTransaction(ForceAddRequest forceAddRequest) {
             var failResponse = new ForceAddAPIResponse() { Success = false };
             if(forceAddRequest == null)
                 return failResponse;
-            if(this.securityService.TryValidateMsisdn(forceAddRequest?.MsisdnEncrypted ?? "", out string msisdn) &&
-                this.securityService.TryValidateTerminalId(forceAddRequest?.TerminalIdEncrypted ?? "", out long terminalId)) {
-                forceAddRequest.Msisdn = msisdn;
-                forceAddRequest.TerminalId = terminalId;
-                var result = await this.transactionController.ForceAddTransactionAsync(forceAddRequest);
-
+            if(this.securityService.TryValidateTerminalId(forceAddRequest?.TerminalIdEncrypted ?? "", out Terminal terminal)) {
+                if(this.securityService.TryValidateMsisdn(forceAddRequest?.MsisdnEncrypted ?? "", terminal.Password, out string msisdn)) {
+                    forceAddRequest.Msisdn = msisdn;
+                    forceAddRequest.TerminalId = terminal.Id;
+                    var result = await this.transactionController.ForceAddTransactionAsync(forceAddRequest);
+                    return new ForceAddAPIResponse { Success = result.Success };
+                }
             }
             return failResponse;
-        }                
+        }
+
+        [HttpPost("add-enchargement")]
+        public async Task<AddEnchargementAPIResponse> AddEnchargement(CreateEncashementRequest encashementRequest) {
+            var failObj = new AddEnchargementAPIResponse() { Success = false };
+            if(encashementRequest == null) return failObj;
+            if(this.securityService.TryValidateTerminalId(encashementRequest?.TerminalIdEncrypted ?? "", out Terminal terminal)) {
+                if(this.securityService.ValidateCheckSum(encashementRequest.CheckSum, encashementRequest.CheckSumEncrypted, terminal.Password)) {
+                    var result = await this.transactionController.CreateEncashment(terminal.Id);
+                    return new AddEnchargementAPIResponse { Success = result.Success };
+                }
+            }
+            return failObj;
+        }
     }
 }

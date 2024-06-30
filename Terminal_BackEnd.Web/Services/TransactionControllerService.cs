@@ -1,4 +1,5 @@
-﻿using Terminal_BackEnd.Infrastructure.Constants;
+﻿using Microsoft.EntityFrameworkCore;
+using Terminal_BackEnd.Infrastructure.Constants;
 using Terminal_BackEnd.Infrastructure.Data;
 using Terminal_BackEnd.Infrastructure.Entities;
 using Terminal_BackEnd.Infrastructure.Services;
@@ -28,13 +29,13 @@ namespace Terminal_BackEnd.Web.Services {
                    result.State == StateConstants.CheckDestinationState.DECLINED ||
                    result.State == StateConstants.CheckDestinationState.NOTAVAILABLE) {
                     return failResponseObj;
-                }else if(result.State == StateConstants.CheckDestinationState.NEW ||
+                } else if(result.State == StateConstants.CheckDestinationState.NEW ||
                     result.State == StateConstants.CheckDestinationState.GWPROCESSING ||
                     result.State == StateConstants.CheckDestinationState.PROCESSING ||
                     result.State == StateConstants.CheckDestinationState.RETRYLATER) {
                     Thread.Sleep(1000);
                     return await CheckDestinationAsync(checkDestinationRequest, retryCount + 1);
-                }else if(result.State == StateConstants.CheckDestinationState.OK) {
+                } else if(result.State == StateConstants.CheckDestinationState.OK) {
                     return new CheckDestinationResponseClient() {
                         Destination = checkDestinationRequest.Msisdn,
                         Success = true
@@ -44,7 +45,39 @@ namespace Terminal_BackEnd.Web.Services {
             return failResponseObj;
         }
 
-        public async Task<AddTransactionResponseClient> ForceAddTransactionAsync(ForceAddRequest forceAddRequest) {            
+        public Task<EncashementResponse> CreateEncashment(long terminalId) {
+            try {
+                var terminal = appDbContext.Terminals.Include(p => p.Encashments).FirstOrDefault(x => x.Id == terminalId);
+                List<Transaction> transactions = new List<Transaction>();
+                if(terminal != null) {
+                    if(terminal.Encashments != null && terminal.Encashments.Any()) {
+                        var lastEnchargementDate = terminal.Encashments.OrderByDescending(p => p.EncashmentDate).First().EncashmentDate;
+                        transactions = appDbContext.Transactions.Include(t => t.Encashment).Where(p => p.TransactionDate > lastEnchargementDate && p.TerminalId == terminalId && p.Encashment == null).ToList();
+                    } else {
+                        transactions = appDbContext.Transactions.Where(p => p.TerminalId == terminalId).ToList();
+                    }
+                    long sum = transactions.Sum(t => t.Amount);
+                    var enchargement = new Encashment() {
+                        EncashmentDate = DateTime.Now,
+                        TerminalId = terminalId,
+                        EncashmentSum = sum
+                    };
+                    appDbContext.Encashments.Add(enchargement);
+                    appDbContext.SaveChanges();
+                    foreach(var item in transactions) {
+                        item.EncharchmentId = enchargement.Id;
+                        appDbContext.Transactions.Update(item);
+                    }
+                    appDbContext.SaveChanges();
+                    return Task.FromResult(new EncashementResponse() { Success = true, TerminalId = terminal.TerminalId });
+                }                
+            } catch {
+                Task.FromResult(new EncashementResponse() { Success = false });
+            }
+            return Task.FromResult(new EncashementResponse() { Success = false });
+        }
+
+        public async Task<AddTransactionResponseClient> ForceAddTransactionAsync(ForceAddRequest forceAddRequest) {
             Transaction tnx = new Transaction() {
                 Msisdn = forceAddRequest.Msisdn,
                 TerminalId = forceAddRequest.TerminalId,
@@ -53,9 +86,9 @@ namespace Terminal_BackEnd.Web.Services {
                 Service = forceAddRequest.ServiceKey,
                 Status = StateConstants.TransactionState.NEW
             };
-            appDbContext.Add<Transaction>(tnx);
+            appDbContext.Transactions.Add(tnx);
             appDbContext.SaveChanges();
-            
+
             TransactionStatus tnxStatus = new TransactionStatus() {
                 Status = tnx.Status,
                 TransactionId = tnx.Id,
@@ -84,6 +117,7 @@ namespace Terminal_BackEnd.Web.Services {
                 };
                 appDbContext.TransactionStatuses.Add(tnxStatusChange);
                 appDbContext.SaveChanges();
+                appDbContext.Transactions.Update(tnx);
             }
             return responseObj;
         }

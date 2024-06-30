@@ -1,0 +1,71 @@
+import { boolToInt } from '@devexpress/utils/lib/utils/common';
+import { MaskedParagraphProperties } from '../../paragraph/paragraph-properties';
+import { JSONParagraphFormattingProperty } from '../enums/json-paragraph-enums';
+import { JSONBorderInfoConverter } from './json-border-info-converter';
+import { JSONShadingInfoConverter } from './json-shading-info-converter';
+export class JSONMaskedParagraphPropertiesConverter {
+    static convertFromJSON(obj, colorModelInfoCache, shadingInfoCache) {
+        var result = new MaskedParagraphProperties();
+        result.alignment = obj[JSONParagraphFormattingProperty.Alignment];
+        result.firstLineIndent = obj[JSONParagraphFormattingProperty.FirstLineIndent];
+        result.firstLineIndentType = obj[JSONParagraphFormattingProperty.FirstLineIndentType];
+        result.leftIndent = obj[JSONParagraphFormattingProperty.LeftIndent];
+        result.lineSpacing = obj[JSONParagraphFormattingProperty.LineSpacing];
+        result.lineSpacingType = obj[JSONParagraphFormattingProperty.LineSpacingType];
+        result.rightIndent = obj[JSONParagraphFormattingProperty.RightIndent];
+        result.spacingBefore = obj[JSONParagraphFormattingProperty.SpacingBefore];
+        result.spacingAfter = obj[JSONParagraphFormattingProperty.SpacingAfter];
+        result.suppressHyphenation = !!obj[JSONParagraphFormattingProperty.SuppressHyphenation];
+        result.suppressLineNumbers = !!obj[JSONParagraphFormattingProperty.SuppressLineNumbers];
+        result.contextualSpacing = !!obj[JSONParagraphFormattingProperty.ContextualSpacing];
+        result.pageBreakBefore = !!obj[JSONParagraphFormattingProperty.PageBreakBefore];
+        result.beforeAutoSpacing = !!obj[JSONParagraphFormattingProperty.BeforeAutoSpacing];
+        result.afterAutoSpacing = !!obj[JSONParagraphFormattingProperty.AfterAutoSpacing];
+        result.keepWithNext = !!obj[JSONParagraphFormattingProperty.KeepWithNext];
+        result.keepLinesTogether = !!obj[JSONParagraphFormattingProperty.KeepLinesTogether];
+        result.widowOrphanControl = !!obj[JSONParagraphFormattingProperty.WidowOrphanControl];
+        result.outlineLevel = obj[JSONParagraphFormattingProperty.OutlineLevel];
+        result.shadingInfo = shadingInfoCache.getItemByJsonKey(obj[JSONParagraphFormattingProperty.ShadingInfoIndex]);
+        result.leftBorder = JSONBorderInfoConverter.convertFromJSON(obj[JSONParagraphFormattingProperty.LeftBorder], colorModelInfoCache);
+        result.rightBorder = JSONBorderInfoConverter.convertFromJSON(obj[JSONParagraphFormattingProperty.RightBorder], colorModelInfoCache);
+        result.topBorder = JSONBorderInfoConverter.convertFromJSON(obj[JSONParagraphFormattingProperty.TopBorder], colorModelInfoCache);
+        result.bottomBorder = JSONBorderInfoConverter.convertFromJSON(obj[JSONParagraphFormattingProperty.BottomBorder], colorModelInfoCache);
+        result.betweenBorder = JSONBorderInfoConverter.convertFromJSON(obj[JSONParagraphFormattingProperty.BetweenBorder], colorModelInfoCache);
+        result.divId = obj[JSONParagraphFormattingProperty.DivId];
+        result.rightToLeft = obj[JSONParagraphFormattingProperty.RightToLeft];
+        result.useValue = obj[JSONParagraphFormattingProperty.UseValue];
+        return result;
+    }
+    static convertToJSON(source) {
+        var result = {};
+        result[JSONParagraphFormattingProperty.Alignment] = source.alignment;
+        result[JSONParagraphFormattingProperty.FirstLineIndent] = source.firstLineIndent;
+        result[JSONParagraphFormattingProperty.FirstLineIndentType] = source.firstLineIndentType;
+        result[JSONParagraphFormattingProperty.LeftIndent] = source.leftIndent;
+        result[JSONParagraphFormattingProperty.LineSpacing] = source.lineSpacing;
+        result[JSONParagraphFormattingProperty.LineSpacingType] = source.lineSpacingType;
+        result[JSONParagraphFormattingProperty.RightIndent] = source.rightIndent;
+        result[JSONParagraphFormattingProperty.SpacingBefore] = source.spacingBefore;
+        result[JSONParagraphFormattingProperty.SpacingAfter] = source.spacingAfter;
+        result[JSONParagraphFormattingProperty.SuppressHyphenation] = boolToInt(source.suppressHyphenation);
+        result[JSONParagraphFormattingProperty.SuppressLineNumbers] = boolToInt(source.suppressLineNumbers);
+        result[JSONParagraphFormattingProperty.ContextualSpacing] = boolToInt(source.contextualSpacing);
+        result[JSONParagraphFormattingProperty.PageBreakBefore] = boolToInt(source.pageBreakBefore);
+        result[JSONParagraphFormattingProperty.BeforeAutoSpacing] = boolToInt(source.beforeAutoSpacing);
+        result[JSONParagraphFormattingProperty.AfterAutoSpacing] = boolToInt(source.afterAutoSpacing);
+        result[JSONParagraphFormattingProperty.KeepWithNext] = boolToInt(source.keepWithNext);
+        result[JSONParagraphFormattingProperty.KeepLinesTogether] = boolToInt(source.keepLinesTogether);
+        result[JSONParagraphFormattingProperty.WidowOrphanControl] = boolToInt(source.widowOrphanControl);
+        result[JSONParagraphFormattingProperty.OutlineLevel] = source.outlineLevel;
+        result[JSONParagraphFormattingProperty.ShadingInfo] = JSONShadingInfoConverter.convertToJSON(source.shadingInfo);
+        result[JSONParagraphFormattingProperty.LeftBorder] = JSONBorderInfoConverter.convertToJSON(source.leftBorder);
+        result[JSONParagraphFormattingProperty.RightBorder] = JSONBorderInfoConverter.convertToJSON(source.rightBorder);
+        result[JSONParagraphFormattingProperty.TopBorder] = JSONBorderInfoConverter.convertToJSON(source.topBorder);
+        result[JSONParagraphFormattingProperty.BottomBorder] = JSONBorderInfoConverter.convertToJSON(source.bottomBorder);
+        result[JSONParagraphFormattingProperty.BetweenBorder] = JSONBorderInfoConverter.convertToJSON(source.betweenBorder);
+        result[JSONParagraphFormattingProperty.DivId] = source.divId;
+        result[JSONParagraphFormattingProperty.RightToLeft] = boolToInt(source.rightToLeft);
+        result[JSONParagraphFormattingProperty.UseValue] = source.useValue;
+        return result;
+    }
+}

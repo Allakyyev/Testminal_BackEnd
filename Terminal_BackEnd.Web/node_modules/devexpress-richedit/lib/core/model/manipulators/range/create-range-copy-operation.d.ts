@@ -1,0 +1,64 @@
+import { FixedInterval } from '@devexpress/utils/lib/intervals/fixed';
+import { Chunk } from '../../chunk';
+import { DocumentModel } from '../../document-model';
+import { Paragraph } from '../../paragraph/paragraph';
+import { ParagraphStyle } from '../../paragraph/paragraph-style';
+import { RunBase } from '../../runs/run-base';
+import { Section } from '../../section/section';
+import { SubDocument, SubDocumentIntervals, SubDocumentPosition } from '../../sub-document';
+import { Table } from '../../tables/main-structures/table';
+import { ModelManipulator } from '../model-manipulator';
+import { SelectedTableInfo } from '../../../selection/selected-cells-engine';
+import { ISizeUpdater } from '../picture-manipulator/loader/picture-loader';
+export declare class CreateRangeCopyOperation {
+    private readonly subDocument;
+    private readonly numberingListCache;
+    private readonly abstractNumberingListCache;
+    private oldCurrentChunk;
+    private oldCurrentParagraph;
+    private oldCurrentSection;
+    private oldFieldStartIndex;
+    private newCurrentChunk;
+    private newCurrentSection;
+    private newCurrentParagraph;
+    private newOffsetAtStartChunk;
+    private additionalParagraphRunPositions;
+    private mapSourceTableIndexToTarget;
+    private get documentModel();
+    constructor(subDocument: SubDocument, abstractNumberingListCache: Record<number, number>, numberingListCache: Record<number, number>);
+    private copyStyles;
+    execute(intervals: FixedInterval[]): RangeCopy;
+    protected copyMainContent(interval: FixedInterval, newDocumentModel: DocumentModel, currIntervalOffset: number): void;
+    protected appendField(newSubDocument: SubDocument, oldCurrentRun: RunBase, globalOffset: number): void;
+    protected appendParagraphMarkInTheEnd(newSubDocument: SubDocument, position: number, sectionEnd: boolean): void;
+    protected appendNewChunk(newSubDocument: SubDocument): Chunk;
+    protected appendNewSection(newSubDocument: SubDocument): Section;
+    copyToCore(targetStyle: ParagraphStyle, oldStyle: ParagraphStyle, newSubDocument: SubDocument): void;
+    copyPropertiesTo(targetStyle: ParagraphStyle, oldStyle: ParagraphStyle, newSubDocument: SubDocument): void;
+    protected appendNewParagraph(newSubDocument: SubDocument): Paragraph;
+    static getNewNumberingListIndex(oldmodel: DocumentModel, oldNumberingListIndex: number, newSubDocument: SubDocument, abstractNumberingListCache?: Record<number, number>, numberingListCache?: Record<number, number>): number;
+    protected tryAppendAdditionalParagraphRunInTheEnd(newSubDocument: SubDocument, sectionEnd: boolean): boolean;
+    protected initNewDocumentModel(): DocumentModel;
+    private getNestedLevel;
+    protected copyTables(newSubDocument: SubDocument, intervals: FixedInterval[]): void;
+    protected appendWholeTable(newSubDocument: SubDocument, table: Table, positionDelta: number, newNestedLevel: number): void;
+    private appendParticallyTable;
+    private canCopyParticallyTable;
+    private cloneTableCell;
+    private createTable;
+    private getSelectedCells;
+}
+export declare class RangeCopy {
+    model: DocumentModel;
+    addedUselessParagraphMarkInEnd: boolean;
+    private readonly numberingListCache;
+    private readonly abstractNumberingListCache;
+    private readonly pictureSizeUpdater;
+    constructor(model: DocumentModel, addedUselessParagraphMarkInEnd: boolean, abstractNumberingListCache?: Record<number, number>, numberingListCache?: Record<number, number>, pictureSizeUpdater?: ISizeUpdater);
+    insertTo(modelManipulator: ModelManipulator, subDocPosition: SubDocumentPosition, overlapTableCellContent?: boolean): FixedInterval;
+    insertToTable(modelManipulator: ModelManipulator, insertPosition: SubDocumentPosition, targetTableInfo: SelectedTableInfo): FixedInterval;
+    overlapTableContent(modelManipulator: ModelManipulator, sourceTable: Table, targetTableInfo: SelectedTableInfo): FixedInterval;
+    overlapTableCellContent(modelManipulator: ModelManipulator, sourceTable: Table, targetTableInfo: SelectedTableInfo, rowIndex: number, columnIndex: number): void;
+    static create(subDocIntervals: SubDocumentIntervals): RangeCopy;
+}
+//# sourceMappingURL=create-range-copy-operation.d.ts.map

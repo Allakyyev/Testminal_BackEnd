@@ -3,11 +3,11 @@ using System.Text;
 
 namespace Terminal_BackEnd.Infrastructure.Services {
     public static class AesEncryptionHelper {
-        static string keyString = "ydWrBMNlIId//Vtgg5QTLxxui+rQyEvTjXPVRe+Ij0I=";
+        const string keyString = "ydWrBMNlIId//Vtgg5QTLxxui+rQyEvTjXPVRe+Ij0I=";
         static string ivString = "GzXbLE8myHcZSXqtyHsYrQ==";
-        public static string EncryptString(string plainText) {
+        public static string EncryptString(string plainText, string k = keyString) {
             // Convert key and IV from strings to byte arrays
-            byte[] key = Encoding.UTF8.GetBytes(keyString);
+            byte[] key = Encoding.UTF8.GetBytes(k);
             byte[] iv = Encoding.UTF8.GetBytes(ivString);
 
             // Ensure the key and IV are the correct size
@@ -39,9 +39,9 @@ namespace Terminal_BackEnd.Infrastructure.Services {
             }
         }
 
-        public static string DecryptString(string cipherText) {
+        public static string DecryptString(string cipherText, string k = keyString) {
             // Convert key and IV from strings to byte arrays
-            byte[] key = Encoding.UTF8.GetBytes(keyString);
+            byte[] key = Encoding.UTF8.GetBytes(k);
             byte[] iv = Encoding.UTF8.GetBytes(ivString);
 
             // Ensure the key and IV are the correct size

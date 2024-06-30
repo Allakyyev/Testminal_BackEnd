@@ -21,6 +21,7 @@
     </div>
     <div id="gridContainer">
         <form asp-action="Create" id="form" enctype="multipart/form-data">
+            <input type="hidden" asp-for="TerminalId" value="@Model.TerminalId" />
             <div class="col-md-12">
                 <div class="form-row">
                     <div class="col-md-8">
@@ -35,7 +36,7 @@
 
                         <div class="form-group">
                             <label>@SharedLocalizer["Terminal id"] *</label>
-                            <input type="text" class="form-control" asp-for="TerminalId" value="@(string.IsNullOrEmpty(Model.TerminalId)?"":Model.TerminalId)" required />
+                            <input type="text" class="form-control" asp-for="TerminalId" value="@(string.IsNullOrEmpty(Model.TerminalId)?"":Model.TerminalId)" disabled />
                         </div>
                         <div class="form-group">
                             <label>@SharedLocalizer["Terminal status"]</label>

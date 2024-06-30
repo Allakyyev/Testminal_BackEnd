@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security.Cryptography;
+using System.Text;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Terminal_BackEnd.Infrastructure.Data;
@@ -10,6 +11,7 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
         List<Terminal> GetAllTerminals();
         List<Terminal> GetAllTerminalsByUser(string userName);
         Terminal? GetAllTerminalById(long terminalId);
+        long GetTerminalCurrenTotal(long terminalId);
         void UpdateTerminal(Terminal terminal);
         void CreateTerminal(CreateTerminalModel terminalModel);
         void DeleteTerminalById(long terminalId);
@@ -24,7 +26,12 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
         }
         public void CreateTerminal(CreateTerminalModel terminalModel) {
             Terminal newTerminal = mapper.Map<Terminal>(terminalModel);
-            newTerminal.Password = AesEncryptionHelper.EncryptString(Guid.NewGuid().ToString());
+            string password = String.Empty;
+            using(Aes aes = Aes.Create()) {
+                aes.GenerateKey();
+                password = Convert.ToBase64String(aes.Key);
+            }
+            newTerminal.Password = AesEncryptionHelper.EncryptString(password);
             newTerminal.CreatedDate = DateTime.Now;
             _dbContex.Terminals.Add(newTerminal);
             _dbContex.SaveChanges();
@@ -54,9 +61,19 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
             var terminal = _dbContex.Terminals.Include(p => p.ApplicationUser).FirstOrDefault(t => t.Id == terminalId);
             if(terminal != null) {
                 string password = terminal.Password;
-                return (Encoding.UTF8.GetBytes(password), $"{terminal.Name} {terminal.ApplicationUser?.FamilyName}.txt");
+                string terminalSecrets = $"TerminalId: {terminal.TerminalId}\nTerminalKey: {password}";
+                return (Encoding.UTF8.GetBytes(terminalSecrets), $"{terminal.Name} {terminal.ApplicationUser?.FamilyName}.txt");
             }
             return (new byte[0], "NotAuthorized.txt");
+        }
+
+        public long GetTerminalCurrenTotal(long terminalId) {
+            var result = _dbContex.Terminals.Where(t => t.Id == terminalId).Include(p => p.Transactions).ToList();
+            if(result.Any()) {
+                long sum = result.First().Transactions?.Where(t => t.EncharchmentId <= 0).Sum(p => p.Amount) ?? 0;
+                return sum;
+            }
+            return 0;
         }
 
         public void UpdateTerminal(Terminal terminal) {

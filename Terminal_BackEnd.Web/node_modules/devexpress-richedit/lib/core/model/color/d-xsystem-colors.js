@@ -1,0 +1,33 @@
+import { ColorUtils } from '@devexpress/utils/lib/utils/color';
+export class DXSystemColors {
+}
+DXSystemColors.control = ColorUtils.fromArgbNumber(255, 240, 240, 240);
+DXSystemColors.controlDark = ColorUtils.fromArgbNumber(255, 160, 160, 160);
+DXSystemColors.window = ColorUtils.fromArgbNumber(255, 255, 255, 255);
+DXSystemColors.activeBorder = ColorUtils.fromArgbNumber(255, 180, 180, 180);
+DXSystemColors.activeCaption = ColorUtils.fromArgbNumber(255, 153, 180, 209);
+DXSystemColors.activeCaptionText = ColorUtils.fromArgbNumber(255, 0, 0, 0);
+DXSystemColors.appWorkspace = ColorUtils.fromArgbNumber(255, 171, 171, 171);
+DXSystemColors.controlDarkDark = ColorUtils.fromArgbNumber(255, 105, 105, 105);
+DXSystemColors.controlLight = ColorUtils.fromArgbNumber(255, 227, 227, 227);
+DXSystemColors.controlLightLight = ColorUtils.fromArgbNumber(255, 255, 255, 255);
+DXSystemColors.controlText = ColorUtils.fromArgbNumber(255, 0, 0, 0);
+DXSystemColors.desktop = ColorUtils.fromArgbNumber(255, 0, 0, 0);
+DXSystemColors.grayText = ColorUtils.fromArgbNumber(255, 109, 109, 109);
+DXSystemColors.highlight = ColorUtils.fromArgbNumber(255, 0, 120, 215);
+DXSystemColors.highlightText = ColorUtils.fromArgbNumber(255, 255, 255, 255);
+DXSystemColors.hotTrack = ColorUtils.fromArgbNumber(255, 0, 102, 204);
+DXSystemColors.inactiveBorder = ColorUtils.fromArgbNumber(255, 244, 247, 252);
+DXSystemColors.inactiveCaption = ColorUtils.fromArgbNumber(255, 191, 205, 219);
+DXSystemColors.inactiveCaptionText = ColorUtils.fromArgbNumber(255, 0, 0, 0);
+DXSystemColors.info = ColorUtils.fromArgbNumber(255, 255, 255, 225);
+DXSystemColors.infoText = ColorUtils.fromArgbNumber(255, 0, 0, 0);
+DXSystemColors.menu = ColorUtils.fromArgbNumber(255, 240, 240, 240);
+DXSystemColors.menuText = ColorUtils.fromArgbNumber(255, 0, 0, 0);
+DXSystemColors.scrollBar = ColorUtils.fromArgbNumber(255, 200, 200, 200);
+DXSystemColors.windowFrame = ColorUtils.fromArgbNumber(255, 100, 100, 100);
+DXSystemColors.windowText = ColorUtils.fromArgbNumber(255, 0, 0, 0);
+DXSystemColors.gradientActiveCaption = ColorUtils.fromArgbNumber(255, 185, 209, 234);
+DXSystemColors.gradientInactiveCaption = ColorUtils.fromArgbNumber(255, 215, 228, 242);
+DXSystemColors.menuBar = ColorUtils.fromArgbNumber(255, 240, 240, 240);
+DXSystemColors.menuHighlight = ColorUtils.fromArgbNumber(255, 51, 153, 255);

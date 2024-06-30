@@ -240,6 +240,30 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Terminal_BackEnd.Infrastructure.Entities.Encashment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("EncashmentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("EncashmentSum")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TerminalId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TerminalId");
+
+                    b.ToTable("Encashments");
+                });
+
             modelBuilder.Entity("Terminal_BackEnd.Infrastructure.Entities.Terminal", b =>
                 {
                     b.Property<long>("Id")
@@ -287,6 +311,9 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
                     b.Property<int>("Amount")
                         .HasColumnType("int");
 
+                    b.Property<long?>("EncharchmentId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Msisdn")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -317,6 +344,8 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EncharchmentId");
+
                     b.HasIndex("TerminalId");
 
                     b.ToTable("Transactions");
@@ -344,7 +373,7 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
 
                     b.HasIndex("TransactionId");
 
-                    b.ToTable("TransactionStatus");
+                    b.ToTable("TransactionStatuses");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -398,6 +427,17 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Terminal_BackEnd.Infrastructure.Entities.Encashment", b =>
+                {
+                    b.HasOne("Terminal_BackEnd.Infrastructure.Entities.Terminal", "Terminal")
+                        .WithMany("Encashments")
+                        .HasForeignKey("TerminalId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Terminal");
+                });
+
             modelBuilder.Entity("Terminal_BackEnd.Infrastructure.Entities.Terminal", b =>
                 {
                     b.HasOne("Terminal_BackEnd.Infrastructure.Entities.ApplicationUser", "ApplicationUser")
@@ -410,11 +450,18 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
 
             modelBuilder.Entity("Terminal_BackEnd.Infrastructure.Entities.Transaction", b =>
                 {
+                    b.HasOne("Terminal_BackEnd.Infrastructure.Entities.Encashment", "Encashment")
+                        .WithMany("Transactions")
+                        .HasForeignKey("EncharchmentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Terminal_BackEnd.Infrastructure.Entities.Terminal", "Terminal")
                         .WithMany("Transactions")
                         .HasForeignKey("TerminalId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Encashment");
 
                     b.Navigation("Terminal");
                 });
@@ -435,8 +482,15 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
                     b.Navigation("Terminals");
                 });
 
+            modelBuilder.Entity("Terminal_BackEnd.Infrastructure.Entities.Encashment", b =>
+                {
+                    b.Navigation("Transactions");
+                });
+
             modelBuilder.Entity("Terminal_BackEnd.Infrastructure.Entities.Terminal", b =>
                 {
+                    b.Navigation("Encashments");
+
                     b.Navigation("Transactions");
                 });
 

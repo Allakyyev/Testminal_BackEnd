@@ -1,9 +1,13 @@
 using System.Globalization;
+using DevExpress.AspNetCore;
+using DevExpress.DashboardAspNetCore;
+using DevExpress.DashboardWeb;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Terminal_BackEnd.Infrastructure;
 using Terminal_BackEnd.Infrastructure.Constants;
 using Terminal_BackEnd.Infrastructure.Data;
@@ -11,13 +15,15 @@ using Terminal_BackEnd.Infrastructure.Entities;
 using Terminal_BackEnd.Infrastructure.Services;
 using Terminal_BackEnd.Infrastructure.Services.TerminalService;
 using Terminal_BackEnd.Infrastructure.Services.UserService;
+using Terminal_BackEnd.Web.Jobs;
 using Terminal_BackEnd.Web.Services;
 
 namespace Terminal_BackEnd.Web {
     public class Program {
         public static async Task Main(string[] args) {
             var builder = WebApplication.CreateBuilder(args);
-
+            IFileProvider? fileProvider = builder.Environment.ContentRootFileProvider;
+            IConfiguration? configuration = builder.Configuration;
             // Add services to the container.
             builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddDefaultIdentity<ApplicationUser>(options => {
@@ -44,8 +50,15 @@ namespace Terminal_BackEnd.Web {
             builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
             builder.Services.AddScoped<ITerminalService, TerminalService>();
             builder.Services.AddScoped<ISecurityService, SecurityService>();
+            builder.Services.AddHostedService<TransactionStatusesUpdateJob>();
             builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
-            
+            builder.Services.AddDevExpressControls();
+            builder.Services.AddScoped<DashboardConfigurator>((IServiceProvider serviceProvider) => {
+                DashboardConfigurator configurator = new DashboardConfigurator();
+                configurator.SetDashboardStorage(new DashboardFileRepository(fileProvider.GetFileInfo("Data/Dashboards").PhysicalPath));
+                configurator.SetConnectionStringsProvider(new DashboardConnectionStringsProvider(configuration));
+                return configurator;
+            });            
             builder.Services.AddControllersWithViews()
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization();
@@ -62,7 +75,7 @@ namespace Terminal_BackEnd.Web {
                 options.SupportedCultures = supportedCultures;
                 options.SupportedUICultures = supportedCultures;
             });
-            var app = builder.Build();
+            var app = builder.Build();            
             using(var scope = app.Services.CreateScope()) {
                 var services = scope.ServiceProvider;
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -111,13 +124,14 @@ namespace Terminal_BackEnd.Web {
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
+            
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            app.UseDevExpressControls();
             app.UseRouting();
             app.UseAuthentication();  // Ensure that authentication is added
             app.UseAuthorization();
+            app.MapDashboardRoute("api/dashboard", "DefaultDashboard");
             app.MapRazorPages();
 
             app.MapControllerRoute(
@@ -126,7 +140,6 @@ namespace Terminal_BackEnd.Web {
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
-
             app.Run();
         }
     }

@@ -16,9 +16,18 @@ namespace Terminal_BackEnd.Web.Services {
         public bool Success { get; set; }
     }
 
+    public class  EncashementResponse
+    {
+        [DataMember(Name = "terminalId")]
+        public string? TerminalId { get; set; }
+        [DataMember(Name = "success")]
+        public bool Success { get; set; }
+    }
+
     public interface ITransactionControllerService {
         public Task<AddTransactionResponseClient> ForceAddTransactionAsync(ForceAddRequest forceAddRequest);
-        public Task<CheckDestinationResponseClient> CheckDestination(CheckDestinationRequest checkDestinationRequest, int retryCount = 3);
+        public Task<CheckDestinationResponseClient> CheckDestinationAsync(CheckDestinationRequest checkDestinationRequest, int retryCount = 3);
+        public Task<EncashementResponse> CreateEncashment(long terminalId);
         public Task<string[]> GetServicesAsync();
     }
 }

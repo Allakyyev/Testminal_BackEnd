@@ -1,6 +1,5 @@
 ﻿using DevExtreme.AspNet.Data;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Terminal_BackEnd.Infrastructure.Entities;
 using Terminal_BackEnd.Infrastructure.Services.TerminalService;
@@ -28,7 +27,7 @@ namespace Terminal_BackEnd.Web.API {
         }
 
         [HttpDelete()]
-        public void Delete([FromForm]long key) {
+        public void Delete([FromForm] long key) {
             terminalService.DeleteTerminalById(key);
         }
 
@@ -40,7 +39,8 @@ namespace Terminal_BackEnd.Web.API {
                     Name = terminal.Name,
                     TerminalId = terminal.TerminalId,
                     Status = terminal.Status == TerminalStatus.Active ? "Active" : "Inactive",
-                    Owner = $"{terminal.ApplicationUser?.CompanyName}  {terminal.ApplicationUser?.FamilyName} {terminal.ApplicationUser?.FirstName}"
+                    Owner = $"{terminal.ApplicationUser?.CompanyName}  {terminal.ApplicationUser?.FamilyName} {terminal.ApplicationUser?.FirstName}",
+                    CurrentTotal = terminalService.GetTerminalCurrenTotal(terminal.Id)
                 };
                 terminalsViewModel.Add(terminalViewModel);
             }
