@@ -28,13 +28,21 @@
   {
     "outputFileName": "wwwroot/js/site.min.js",
     "inputFiles": [
-      //"node_modules/jquery/dist/jquery.min.js",
+      "node_modules/devextreme1/js/jquery.min.js",
       "node_modules/knockout/build/output/knockout-latest.js",
       "node_modules/ace-builds/src-min-noconflict/ace.js",
       "node_modules/ace-builds/src-min-noconflict/ext-language_tools.js",
       "node_modules/ace-builds/src-min-noconflict/theme-dreamweaver.js",
       "node_modules/ace-builds/src-min-noconflict/theme-ambiance.js",
+
+      //"node_modules/devextreme/dist/js/dx.all.js",
+      //"node_modules/devextreme-dist/js/dx.all.js",
       "node_modules/devextreme-dist/js/dx.all.js",
+      "node_modules/devextreme-dist/js/FileSaver.js",
+
+      "node_modules/devextreme1/js/dx.aspnet.data.js",
+      "node_modules/devextreme1/js/dx.aspnet.mvc.js",
+      //"node_modules/devextreme-dist/js/dx.aspnet.mvc.js",
       "node_modules/@devexpress/analytics-core/dist/js/dx-analytics-core.min.js",
       "node_modules/@devexpress/analytics-core/dist/js/dx-querybuilder.min.js",
       "node_modules/devexpress-dashboard/dist/js/dx-dashboard.min.js"

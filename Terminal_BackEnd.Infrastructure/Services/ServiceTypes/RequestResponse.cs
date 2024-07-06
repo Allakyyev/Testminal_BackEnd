@@ -16,6 +16,7 @@ namespace Terminal_BackEnd.Infrastructure.Services.ServiceTypes {
         [DataMember(Name = "result")]
         public JObject? Result { get; set; }
 
-        public HttpResponseMessage? HttpResponseMessage { get; set; }
+        public HttpResponseMessage HttpResponseMessage { get; set; }
+        public IEnumerable<KeyValuePair<string, string>> FormData { get; set; }
     }
 }

@@ -1,11 +1,11 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
+using Microsoft.SqlServer.Server;
+using Newtonsoft.Json;
 using Terminal_BackEnd.Infrastructure.Constants;
 using Terminal_BackEnd.Infrastructure.Services.ServiceTypes;
 
-namespace Terminal_BackEnd.Infrastructure.Services
-{
+namespace Terminal_BackEnd.Infrastructure.Services {
     public class ServiceProviderAPIService : IServiceProviderAPIService {
         private readonly HttpClient _httpClient;
         private readonly Endpoints _endPoints;
@@ -46,9 +46,11 @@ namespace Terminal_BackEnd.Infrastructure.Services
         private async Task<RequestResponse> PostFormAsync(string url, IEnumerable<KeyValuePair<string, string>> formData) {
             var content = new FormUrlEncodedContent(formData);
             HttpResponseMessage response = await _httpClient.PostAsync(url, content);
-            string responseBody = await response.Content.ReadAsStringAsync();            
-            RequestResponse requestResponse = JsonSerializer.Deserialize<RequestResponse>(responseBody) ?? new RequestResponse();
-            requestResponse.HttpResponseMessage= response;
+            string responseBody = await response.Content.ReadAsStringAsync();
+            RequestResponse requestResponse = JsonConvert.DeserializeObject<RequestResponse>(responseBody) ?? new RequestResponse();
+            requestResponse.FormData = formData;
+            //dynamic jsonObject = JsonConvert.DeserializeObject<dynamic>(responseBody);
+            requestResponse.HttpResponseMessage = response;
             return requestResponse;
         }
 
@@ -151,11 +153,12 @@ namespace Terminal_BackEnd.Infrastructure.Services
             return await PostFormAsync(this._endPoints.RequestChangeServiceDeclinedTransactionUrl, formData);
         }
 
-        public async Task<RequestResponse> RequestForceAddTransactionAsync(string key, string localTransactionId, string serviceKey, int amount, string msisdn) {
-            long currentEpochTime = GetCurrentEpochTime();
-            string message = $"{localTransactionId}:{serviceKey}:{amount}:{msisdn}:{currentEpochTime - 10}:{currentEpochTime}:{_endPoints.userName}";
-            string hMac = ComputeHMACSHA1(key, message);
-            var formData = new Dictionary<string, string>() {
+        public async Task<RequestResponse> RequestForceAddTransactionAsync(string key, string localTransactionId, string serviceKey, int amount, string msisdn, Dictionary<string, string>? _formData = null) {
+            if(_formData == null) {
+                long currentEpochTime = GetCurrentEpochTime();
+                string message = $"{localTransactionId}:{serviceKey}:{amount}:{msisdn}:{currentEpochTime - 10}:{currentEpochTime}:{_endPoints.userName}";
+                string hMac = ComputeHMACSHA1(key, message);
+                var formData = new Dictionary<string, string>() {
                 { "local-id", $"{localTransactionId}" },
                 { "service", $"{serviceKey}" },
                 { "amount", $"{amount}" },
@@ -163,8 +166,11 @@ namespace Terminal_BackEnd.Infrastructure.Services
                 { "txn-ts", $"{currentEpochTime-10}" },
                 { "ts", $"{currentEpochTime}" },
                 { "hmac", hMac }
-            };
-            return await PostFormAsync(this._endPoints.RequestForceAddTransactionUrl, formData);
+                };
+                return await PostFormAsync(this._endPoints.RequestForceAddTransactionUrl, formData);
+            }else {
+                return await PostFormAsync(this._endPoints.RequestForceAddTransactionUrl, _formData);
+            }
         }
 
         public async Task<RequestResponse> RequestRegisterTransactionStateCallbackAsync(string key, string callBackUrl, string server_label, string localTransactionId, string state, string action = "txn-state") {

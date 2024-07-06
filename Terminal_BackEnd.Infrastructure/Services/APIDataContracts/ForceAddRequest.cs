@@ -13,6 +13,7 @@ namespace Terminal_BackEnd.Infrastructure.Services.APIDataContracts {
         public required string MsisdnEncrypted { get; set; }
         
         public required string Msisdn { get; set; }
-        public required long TerminalId { get; set; }
+        public long TerminalId { get; set; }
+
     }
 }

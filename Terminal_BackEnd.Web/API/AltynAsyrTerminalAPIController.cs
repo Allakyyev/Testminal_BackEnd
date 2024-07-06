@@ -42,8 +42,9 @@ namespace Terminal_BackEnd.Web.API {
                 return failResponse;
             if(this.securityService.TryValidateTerminalId(forceAddRequest?.TerminalIdEncrypted ?? "", out Terminal terminal)) {
                 if(this.securityService.TryValidateMsisdn(forceAddRequest?.MsisdnEncrypted ?? "", terminal.Password, out string msisdn)) {
-                    forceAddRequest.Msisdn = msisdn;
+                    forceAddRequest.Msisdn = msisdn.Replace("993", "");
                     forceAddRequest.TerminalId = terminal.Id;
+
                     var result = await this.transactionController.ForceAddTransactionAsync(forceAddRequest);
                     return new ForceAddAPIResponse { Success = result.Success };
                 }

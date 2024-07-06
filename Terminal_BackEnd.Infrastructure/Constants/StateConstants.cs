@@ -54,6 +54,31 @@
             /// REJECTED - transaction rejected at the gateway, finish.Money should be returned to subscriber}
             /// </summary>
             public const string REJECTED = "REJECTED";
+
+            /// <summary>
+            /// txn amount reflected to account, waiting to be processed
+            /// </summary>
+            public const string PENDING = "PENDING";
+
+            /// <summary>
+            /// waiting for result from service provider
+            /// </summary>
+            public const string WAITING = "WAITING";
+            
+            /// <summary>
+            /// temporary error, will be retried automatically 5 times with increasing interval.
+            /// </summary>
+            public const string ERROR = "ERROR";
+            
+            /// <summary>
+            /// reject task added, will be REJECTED after task is processed
+            /// </summary>
+            public const string REJECTING = "REJECTING";
+            
+            /// <summary>
+            /// state for ASTU services
+            /// </summary>
+            public const string UNKNOWN = "UNKNOWN";
         }
         public static class CheckDestinationState {
             /// <summary>

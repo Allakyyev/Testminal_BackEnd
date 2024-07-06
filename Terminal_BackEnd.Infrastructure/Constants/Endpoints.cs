@@ -26,7 +26,7 @@ namespace Terminal_BackEnd.Infrastructure.Constants {
             RequestPollCheckDestinationServiceUrl = $"{baseUrl}/api/{this.userName}/{this.serverName}/cd/poll";
             RequestRegisterCheckDestinationCallBackUrl = $"{baseUrl}/{this.callBackCheckDestination}";
         }
-        public const string baseUrl = "https://garynja.altynasyr.info/";
+        public const string baseUrl = "https://gyrat.altynasyr.info/";
         public readonly string RequestEpochTimeUrl;
         public readonly string RequestDealerBalanceUrl;
         public readonly string RequestServicesListUrl;

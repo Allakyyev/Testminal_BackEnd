@@ -10,6 +10,6 @@ namespace Terminal_BackEnd.Infrastructure.Services {
         Task<CheckTransactionStatusResponse?> CheckTransactionStatusAsync(string localTransactionId);
         Task<PollCheckDestinationResponse> PollCheckDestinationAsync(string serviceKey, string msisdn);
         Task<bool> RegisterCheckDestinationStatusCallbackAsync(string callBackUrl, string serviceKey, string msisdn, string state);
-        Task<AddTransactionResponse?> ForceAddTransactionAsync(string serviceKey, int amount, string msisdn, string localTransactionId);
+        Task<AddTransactionResponse> ForceAddTransactionAsync(string serviceKey, int amount, string msisdn, string localTransactionId, Dictionary<string, string>? _formData);
     }
 }

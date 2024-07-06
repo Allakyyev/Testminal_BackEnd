@@ -5,9 +5,9 @@
 @{
     ViewData["Title"] = SharedLocalizer["Terminals"];
     if(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin")) {
-                        <script>
-                            const isAdmin = true;
-                        </script>
+                                <script>
+                                    const isAdmin = true;
+                                </script>
     }
 }
 
@@ -49,6 +49,11 @@
                 selection: {
                     mode: "multiple"
                 },
+                onRowDblClick: (e) => {
+                    var idString = e.data.id;
+                    var url = `/Terminal/TerminalDetails`;
+                    window.location = url + '?terminalId=' + idString;
+                },
                 allowColumnReordering: true,
                 "export": {
                     enabled: true,
@@ -64,6 +69,7 @@
                     mode: "virtual",
                     rowRenderingMode: "virtual"
                 },
+                allowColumnResizing: true,
                 paging: {
                     pageSize: 100
                 },
@@ -95,6 +101,7 @@
                     {
                         caption: '@SharedLocalizer["TerminalId"]',
                         dataField: "terminalId",
+                        dataType: 'string',
                         allowHeaderFiltering: true
                     },
                     {

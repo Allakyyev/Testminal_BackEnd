@@ -1,0 +1,153 @@
+﻿@model Terminal_BackEnd.Web.Services.Model.TransactionViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+@{
+    ViewData["Title"] = SharedLocalizer["Transaction Details"];
+}
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@SharedLocalizer["Transaction Details"]: <strong>ID @Model.Id</strong></h5>
+                    <form class="row g-3">
+                        <div class="col-md-4">
+                            <label for="validationDefault01" class="form-label">@SharedLocalizer["Phone Number"]</label>
+                            <input type="text" class="form-control" id="validationDefault01" value="+993@(Model.Msisdn)" required disabled>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="validationDefault02" class="form-label">@SharedLocalizer["Amount"]</label>
+                            <input type="text" class="form-control" id="validationDefault02" value="@(Model.Amount) TMT" required disabled>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="validationDefault02" class="form-label">@SharedLocalizer["TransactionDate"]</label>
+                            <input type="text" class="form-control" id="validationDefault02" value="@(Model.TransactionDate)" required disabled>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="validationDefault02" class="form-label">@SharedLocalizer["Status"]</label>
+                            @if(Model.Status == "SUCCESS") {
+                                <input type="text" style="background-color: green; color: white" class="form-control" id="validationDefault02" value="@(Model.Status)" required disabled>
+                            } else {
+                                <input type="text" class="form-control" id="validationDefault02" value="@(Model.Status)" required disabled>
+                            }
+                        </div>
+                        <div class="col-md-4">
+                            <label for="validationDefault02" class="form-label">@SharedLocalizer["State"]</label>
+                            @if(Model.State == "SUCCESS") {
+                                <input type="text" style="background-color: green; color: white" class="form-control" id="validationDefault02" value="@(Model.State)" required disabled>
+                            } else {
+                                <input type="text" class="form-control" id="validationDefault02" value="@(Model.State)" required disabled>
+                            }
+                        </div>
+                        <div class="col-md-4">
+                            <label for="validationDefault02" class="form-label">@SharedLocalizer["Terminal Name"]</label>
+                            <input type="text" class="form-control" id="validationDefault02" value="@(Model.TermianlName)" required disabled>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="validationDefault02" class="form-label">@SharedLocalizer["Owner Name"]</label>
+                            <input type="text" class="form-control" id="validationDefault02" value="@(Model.OwnerName)" required disabled>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@SharedLocalizer["Transaction State Updates"]</h5>
+                    <div id="gridContainer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts {
+    <script>
+        console.log(window.location.origin);
+        $(function () {
+            let url = window.location.origin + '/' + 'api/TransactionsAPI/Statuses/' + '@(Model.Id)';
+            var returnUrl = '@Context.Request.Path@Context.Request.QueryString';
+            $("#gridContainer").dxDataGrid({
+                dataSource: DevExpress.data.AspNet.createStore({
+                    key: "id",
+                    loadUrl: url,
+                    insertUrl: url,
+                    updateUrl: url,
+                    deleteUrl: url,
+                    onBeforeSend: function (method, ajaxOptions) {
+                        ajaxOptions.xhrFields = { withCredentials: true };
+                    }
+                }),
+                onInitNewRow: function (e) {
+                    var url = `@Url.Action("Create", "Terminal")`;
+                    window.location = url;
+                },
+                selection: {
+                    mode: "multiple"
+                },
+                allowColumnReordering: true,
+                allowColumnResizing: true,
+                filterPanel: {
+                    visible: false
+                },
+                filterRow: { visible: false },
+                remoteOperations: true,
+                scrolling: {
+                    mode: "virtual",
+                    rowRenderingMode: "virtual"
+                },
+                paging: {
+                    pageSize: 100
+                },
+                editing: {
+                    useIcons: true,
+                    allowUpdating: false,
+                    allowDeleting: false,
+                    allowAdding: false
+                },
+                headerFilter: {
+                    visible: true
+                },
+                wordWrapEnabled: true,
+                showColumnLines: true,
+                showRowLines: true,
+                rowAlternationEnabled: true,
+                showBorders: true,
+                searchPanel: {
+                    visible: true
+                },
+
+                stateStoring: {
+                    enabled: true,
+                    type: "localStorage",
+                    storageKey: "userAdmin"
+                },
+
+                columns: [
+                    {
+                        caption: '@SharedLocalizer["Transaction Status Id"]',
+                        dataField: "id",
+                        allowHeaderFiltering: true
+                    },
+                    {
+                        caption: '@SharedLocalizer["State Update Date"]',
+                        dataField: "updatedDate",
+                        dataType: 'date',
+                        allowHeaderFiltering: true,
+                    },
+                    {
+                        caption: '@SharedLocalizer["Status"]',
+                        dataField: "status",
+                        allowHeaderFiltering: true,
+                    }
+                ]
+            });
+
+        });
+    </script>
+}
+

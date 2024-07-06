@@ -106,7 +106,7 @@ namespace Terminal_BackEnd.Infrastructure.Services
         ///'received-ts': unix time when txn was received,
         ///'txn-ts': unix time sent by client
         ///}</returns>
-        Task<RequestResponse> RequestForceAddTransactionAsync(string key, string localTransactionId, string serviceKey, int amount, string msisdn);
+        Task<RequestResponse> RequestForceAddTransactionAsync(string key, string localTransactionId, string serviceKey, int amount, string msisdn, Dictionary<string, string>? _formData);
 
         /// <summary>
         /// Callback is an address on a dealer's server which will be used to inform a sender of transaction about it's state change in order to make system asynchronous. Dealer no more needs to POLL the processing gateway for transaction state.

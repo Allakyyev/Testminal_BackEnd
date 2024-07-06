@@ -27,8 +27,10 @@ namespace Terminal_BackEnd.Web.API {
         }
 
         [HttpDelete()]
-        public void Delete([FromForm] long key) {
+        public IActionResult Delete([FromForm] long key) {
+            if(!User.IsInRole("Admin")) return BadRequest();
             terminalService.DeleteTerminalById(key);
+            return Ok();
         }
 
         List<TerminalViewModel> MapToViewModel(List<Terminal> terminals) {

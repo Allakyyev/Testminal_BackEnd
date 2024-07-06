@@ -61,6 +61,7 @@
                 },
                 filterRow: { visible: false },
                 remoteOperations: true,
+                allowColumnResizing: true,
                 onRowUpdating: function (e) {
                     e.newData = Object.assign(e.oldData, e.newData)
                 },
@@ -106,8 +107,7 @@
                         caption: '@SharedLocalizer["Name"]',
                         dataField: "firstName",
                           allowHeaderFiltering: false,
-                          cellTemplate: function (container, options) {
-                              console.log(options);
+                          cellTemplate: function (container, options) {                              
                               $("<div>")
                                   .text(options.data.firstName )
                                   .appendTo(container);

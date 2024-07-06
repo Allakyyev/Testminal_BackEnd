@@ -4,7 +4,7 @@ namespace Terminal_BackEnd.Infrastructure.Services.ServiceTypes {
     [DataContract]
     public class AddTransactionResponse {
         /// <summary>
-        /// 'DUPLICATE'
+        /// 'DUPLICATE' || 'SUCCESS'
         /// </summary>
         [DataMember(Name = "status")]
         public required string Status { get; set; }
@@ -54,5 +54,9 @@ namespace Terminal_BackEnd.Infrastructure.Services.ServiceTypes {
         /// </summary>
         [DataMember(Name = "reason")]
         public string? Reason { get; set; }
+
+        public bool ConnectionError { get;set; }
+        public string? Message { get; set; }
+        public IEnumerable<KeyValuePair<string, string>>? FormData { get; set; }
     }
 }

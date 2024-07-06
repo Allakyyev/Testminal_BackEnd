@@ -70,8 +70,8 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
         public long GetTerminalCurrenTotal(long terminalId) {
             var result = _dbContex.Terminals.Where(t => t.Id == terminalId).Include(p => p.Transactions).ToList();
             if(result.Any()) {
-                long sum = result.First().Transactions?.Where(t => t.EncharchmentId <= 0).Sum(p => p.Amount) ?? 0;
-                return sum;
+                long sum = result.First().Transactions?.Where(t => t.EncharchmentId == null || t.EncharchmentId <= 0).Sum(p => p.Amount) ?? 0;
+                return sum / 100;
             }
             return 0;
         }

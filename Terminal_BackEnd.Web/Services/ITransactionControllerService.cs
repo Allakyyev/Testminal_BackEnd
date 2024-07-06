@@ -1,5 +1,7 @@
 ﻿using System.Runtime.Serialization;
+using Terminal_BackEnd.Infrastructure.Entities;
 using Terminal_BackEnd.Infrastructure.Services.APIDataContracts;
+using Terminal_BackEnd.Web.Services.Model;
 
 namespace Terminal_BackEnd.Web.Services {
     [DataContract]
@@ -29,5 +31,9 @@ namespace Terminal_BackEnd.Web.Services {
         public Task<CheckDestinationResponseClient> CheckDestinationAsync(CheckDestinationRequest checkDestinationRequest, int retryCount = 3);
         public Task<EncashementResponse> CreateEncashment(long terminalId);
         public Task<string[]> GetServicesAsync();
+        public List<Transaction> GetAllTransactions();
+        public List<Transaction> GetAllTransactions(string userId);
+        public TransactionViewModel GetTransactionViewModel(long transactionId);
+        public List<TransactionStatus> GetTransactionStatuses(long transactionId);
     }
 }

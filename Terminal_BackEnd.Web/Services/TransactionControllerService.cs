@@ -4,8 +4,14 @@ using Terminal_BackEnd.Infrastructure.Data;
 using Terminal_BackEnd.Infrastructure.Entities;
 using Terminal_BackEnd.Infrastructure.Services;
 using Terminal_BackEnd.Infrastructure.Services.APIDataContracts;
+using Terminal_BackEnd.Web.Services.Model;
 
 namespace Terminal_BackEnd.Web.Services {
+    public enum RequestState {
+        OK,
+        RequestAgain,
+        Fail
+    }
     public class TransactionControllerService : ITransactionControllerService {
         readonly IAltynAsyrTerminalService altynAsyrTerminalService;
         readonly AppDbContext appDbContext;
@@ -18,6 +24,10 @@ namespace Terminal_BackEnd.Web.Services {
                 Destination = checkDestinationRequest.Msisdn,
                 Success = false
             };
+            var successObj = new CheckDestinationResponseClient() {
+                Destination = checkDestinationRequest.Msisdn,
+                Success = true
+            };
             if(retryCount > 3) {
                 return failResponseObj;
             }
@@ -25,21 +35,27 @@ namespace Terminal_BackEnd.Web.Services {
             if(result.Status != "SUCCESS") {
                 return failResponseObj;
             } else {
-                if(result.State == StateConstants.CheckDestinationState.NOTALLOWED ||
-                   result.State == StateConstants.CheckDestinationState.DECLINED ||
-                   result.State == StateConstants.CheckDestinationState.NOTAVAILABLE) {
+                var currentState = GetRequestState(result.State ?? "");
+                if(currentState == RequestState.Fail) {
                     return failResponseObj;
-                } else if(result.State == StateConstants.CheckDestinationState.NEW ||
-                    result.State == StateConstants.CheckDestinationState.GWPROCESSING ||
-                    result.State == StateConstants.CheckDestinationState.PROCESSING ||
-                    result.State == StateConstants.CheckDestinationState.RETRYLATER) {
-                    Thread.Sleep(1000);
-                    return await CheckDestinationAsync(checkDestinationRequest, retryCount + 1);
-                } else if(result.State == StateConstants.CheckDestinationState.OK) {
-                    return new CheckDestinationResponseClient() {
-                        Destination = checkDestinationRequest.Msisdn,
-                        Success = true
-                    };
+                } else if(currentState == RequestState.RequestAgain) {
+                    while(retryCount <= 3) {
+                        Thread.Sleep(1000);
+                        var pollingResult = await altynAsyrTerminalService.PollCheckDestinationAsync(checkDestinationRequest.ServiceKey, checkDestinationRequest.Msisdn);
+                        if(pollingResult.Status == "SUCCESS") {
+                            var pollingState = GetRequestState(pollingResult.State);
+                            if(pollingState == RequestState.OK)
+                                return successObj;
+                            else if(pollingState == RequestState.Fail)
+                                return failResponseObj;
+                            else retryCount++;
+                        } else {
+                            return failResponseObj;
+                        }
+                    }
+
+                } else if(currentState == RequestState.OK) {
+                    return successObj;
                 }
             }
             return failResponseObj;
@@ -70,7 +86,7 @@ namespace Terminal_BackEnd.Web.Services {
                     }
                     appDbContext.SaveChanges();
                     return Task.FromResult(new EncashementResponse() { Success = true, TerminalId = terminal.TerminalId });
-                }                
+                }
             } catch {
                 Task.FromResult(new EncashementResponse() { Success = false });
             }
@@ -102,28 +118,128 @@ namespace Terminal_BackEnd.Web.Services {
                 TransactionId = tnx.Id,
                 Success = true
             };
-            var result = await this.altynAsyrTerminalService.ForceAddTransactionAsync(forceAddRequest.ServiceKey, forceAddRequest.Amount, forceAddRequest.Msisdn, tnx.Id.ToString());
-            if(result == null || result.Status == StateConstants.TransactionState.DECLINED) {
-                responseObj.Success = false;
+            var result = await this.altynAsyrTerminalService.ForceAddTransactionAsync(forceAddRequest.ServiceKey, forceAddRequest.Amount, forceAddRequest.Msisdn, tnx.Id.ToString(), null);
+            tnx.State = result.State;
+            tnx.Status = result.Status;
+            tnx.Reason = result.Reason;
+            var kvp = result.FormData?.FirstOrDefault(f => f.Key == "ts");
+            var tnxDate = DateTime.Now;
+            if(kvp != null && !string.IsNullOrEmpty(kvp.Value.Value)) {
+                string tnx1 = kvp.Value.Value;
+                tnxDate = DateTimeOffset.FromUnixTimeSeconds(long.Parse(tnx1)).DateTime;
+
             }
-            if(result != null) {
-                tnx.Status = result.Status;
-                tnx.State = result.State;
-                tnx.Reason = result.Reason;
+            tnx.TransactionDate = tnxDate;
+            appDbContext.Transactions.Update(tnx);
+            appDbContext.SaveChanges();
+            if(result.ConnectionError) {
+                int retryCount = 0;
+                bool continueRetry = true;
+                while(retryCount < 5 && continueRetry) {
+                    Thread.Sleep(1000);
+                    result = await this.altynAsyrTerminalService.ForceAddTransactionAsync(forceAddRequest.ServiceKey, forceAddRequest.Amount, forceAddRequest.Msisdn, tnx.Id.ToString(), result.FormData?.ToDictionary());
+                    continueRetry = result.ConnectionError;
+                    TransactionStatus statusChange = new TransactionStatus() {
+                        Status = $"Retried. Status={result.Status} Message: {result.Message}",
+                        TransactionId = tnx.Id,
+                        UpdatedDate = DateTime.UtcNow,
+                    };
+                    appDbContext.TransactionStatuses.Add(statusChange);
+                    appDbContext.SaveChanges();
+                }
+                responseObj.Success = !continueRetry;
+                return responseObj;
+            } else {
+                //if(result.Status == StateConstants.TransactionState.NEW ||
+                //    //NEW, PENDING, PROCESSING, WAITING, ERROR, REJECTING, UNKNOWN
+                //    result.Status == StateConstants.TransactionState.NEW ||
+                //    result.Status == StateConstants.TransactionState.PENDING ||
+                //    result.Status == StateConstants.TransactionState.PROCESSING ||
+                //    result.Status == StateConstants.TransactionState.WAITING ||
+                //    result.Status == StateConstants.TransactionState.ERROR ||
+                //    result.Status == StateConstants.TransactionState.REJECTING ||
+                //    result.Status == StateConstants.TransactionState.REJECTED ||
+                //    result.Status == StateConstants.TransactionState.UNKNOWN) {}               
+
                 TransactionStatus tnxStatusChange = new TransactionStatus() {
-                    Status = tnx.Status,
+                    Status = tnx.State,
                     TransactionId = tnx.Id,
                     UpdatedDate = DateTime.UtcNow,
                 };
                 appDbContext.TransactionStatuses.Add(tnxStatusChange);
                 appDbContext.SaveChanges();
-                appDbContext.Transactions.Update(tnx);
+                return responseObj;
             }
-            return responseObj;
+        }
+
+        public List<Transaction> GetAllTransactions() {
+            return appDbContext.Transactions.Include(p => p.TransactionStatuses)
+                .Include(t => t.Terminal).ThenInclude(terminal => terminal.ApplicationUser)
+                .Where(t => t.Terminal != null && t.Terminal.ApplicationUser != null)
+                .ToList();
+        }
+
+        public List<Transaction> GetAllTransactions(string userId) {
+            return appDbContext.Transactions.Include(p => p.TransactionStatuses)
+                .Include(t => t.Terminal).ThenInclude(terminal => terminal.ApplicationUser)
+                .Where(t => t.Terminal != null && t.Terminal.ApplicationUser != null && t.Terminal.UserId == userId)
+                .ToList();
+        }
+
+        public List<TransactionStatus> GetTransactionStatuses(long transactionId) {
+            return appDbContext.TransactionStatuses
+                .Where(ts => ts.TransactionId == transactionId)
+                .ToList();
         }
 
         public async Task<string[]> GetServicesAsync() {
             return await altynAsyrTerminalService.GetServicesAsync();
+        }
+
+        public TransactionViewModel GetTransactionViewModel(long transactionId) {
+            var transactions = appDbContext.Transactions.Where(t => t.Id == transactionId).Include(p => p.TransactionStatuses)
+                .Include(t => t.Terminal).ThenInclude(terminal => terminal.ApplicationUser)
+                .Where(t => t.Terminal != null && t.Terminal.ApplicationUser != null);
+            if(transactions.Any()) {
+                return MapTransactionToViewModel(transactions.First());
+            } else return null;
+        }
+        string GetOwnerName(ApplicationUser user) {
+            if(user == null) return String.Empty;
+            return $"{user.FirstName} {user.FamilyName} - {user.CompanyName}";
+        }
+        TransactionViewModel MapTransactionToViewModel(Transaction transaction) {
+            return new TransactionViewModel() {
+                Id = transaction.Id,
+                Msisdn = transaction.Msisdn,
+                Amount = (transaction.Amount / 100),
+                RefNum = transaction.RefNum,
+                State = transaction.State,
+                Status = transaction.Status,
+                Reason = transaction.Reason,
+                TerminalId = transaction.TerminalId,
+                EncharchmentId = transaction.EncharchmentId,
+                TransactionDate = transaction.TransactionDate,
+                TermianlName = transaction.Terminal?.Name ?? "",
+                OwnerName = GetOwnerName(transaction.Terminal?.ApplicationUser)
+            };
+        }
+
+        RequestState GetRequestState(string state) {
+            if(state == StateConstants.CheckDestinationState.NOTALLOWED ||
+                state == StateConstants.CheckDestinationState.DECLINED ||
+                state == StateConstants.CheckDestinationState.NOTAVAILABLE) {
+                return RequestState.Fail;
+            } else if(state == StateConstants.CheckDestinationState.NEW ||
+                state == StateConstants.CheckDestinationState.GWPROCESSING ||
+                state == StateConstants.CheckDestinationState.PROCESSING ||
+                state == StateConstants.CheckDestinationState.RETRYLATER ||
+                state == StateConstants.CheckDestinationState.WAITING) {
+                return RequestState.RequestAgain;
+            } else if(state == StateConstants.CheckDestinationState.OK) {
+                return RequestState.OK;
+            }
+            return RequestState.Fail;
         }
     }
 }

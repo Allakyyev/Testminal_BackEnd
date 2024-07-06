@@ -25,16 +25,49 @@ namespace Terminal_BackEnd.Infrastructure.Services {
             }
         }
 
-        public async Task<AddTransactionResponse?> ForceAddTransactionAsync(string serviceKey, int amount, string msisdn, string localTransactionId) {
+        public async Task<AddTransactionResponse> ForceAddTransactionAsync(string serviceKey, int amount, string msisdn, string localTransactionId, Dictionary<string, string>? _formData) {
             RequestResponse result;
+            Dictionary<string, string> requestedFormData = null;
             try {
-                result = await serviceProviderAPIService.RequestForceAddTransactionAsync(this.dealerKey, localTransactionId, serviceKey, amount, msisdn);
+                result = await serviceProviderAPIService.RequestForceAddTransactionAsync(this.dealerKey, localTransactionId, serviceKey, amount, msisdn, _formData);
                 if(result != null && result.Status == "SUCCESS") {
-                    return result.Result?.ToObject<AddTransactionResponse>();
+                    var successResult = result.Result?.ToObject<AddTransactionResponse>();
+                    if(successResult != null) {
+                        successResult.ConnectionError = false;
+                        successResult.FormData = result.FormData;
+                        return successResult;
+                    }
                 }
-                return null;
-            } catch {
-                return null;
+                string message = String.Empty;
+                string status = String.Empty;
+                if(result != null) {
+                    requestedFormData = result.FormData.ToDictionary();
+                    if(!result.HttpResponseMessage.IsSuccessStatusCode) {
+                        message = $"Request error: {result.HttpResponseMessage.ReasonPhrase}, HTTPResponseCode: {result.HttpResponseMessage.StatusCode}";
+                        status = "RequestFailed";
+                    } else {
+                        message = $"Request Reached: ResultStatus: {result.Status}, ErrorCode={result?.ErrorCode}, ErrorMessage: {result?.ErrorMessage}";
+                        status = result.Status ?? "";
+                    }
+                } else {
+                    message = $"Request Failed with NULL Respose";
+                    status = "NullResponse";
+                }
+                return new AddTransactionResponse() {
+                    Message = message,
+                    ConnectionError = true,
+                    Status = status ?? "",
+                    RefNum = 0,
+                    FormData = result?.FormData
+                };
+            } catch(Exception e) {
+                return new AddTransactionResponse() {
+                    Message = e.Message,
+                    ConnectionError = true,
+                    Status = "RequestFailed",
+                    RefNum = 0,
+                    FormData = requestedFormData
+                };
             }
         }
 
