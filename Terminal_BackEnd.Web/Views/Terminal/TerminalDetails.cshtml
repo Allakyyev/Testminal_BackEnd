@@ -1,0 +1,261 @@
+﻿@model Terminal_BackEnd.Infrastructure.Entities.Terminal
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+@{
+    ViewData["Title"] = SharedLocalizer["Transaction Details"];
+}
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@SharedLocalizer["Terminal Details"]: <strong>ID @Model.Id</strong></h5>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@SharedLocalizer["Transactions"]</h5>
+                    <div id="gridContainer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div
+     <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@SharedLocalizer["Enchargements"]</h5>
+                    <div id="gridEnchargements">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts {
+    <script>
+        $(function () {
+            let url = window.location.origin + '/' + 'api/TransactionsAPI/Terminal/' + @(Model.Id);
+            var returnUrl = '@Context.Request.Path@Context.Request.QueryString';
+            $("#gridContainer").dxDataGrid({
+                dataSource: DevExpress.data.AspNet.createStore({
+                    key: "id",
+                    loadUrl: url,
+                    insertUrl: url,
+                    updateUrl: url,
+                    deleteUrl: url,
+                    onBeforeSend: function (method, ajaxOptions) {
+                        ajaxOptions.xhrFields = { withCredentials: true };
+                    }
+                }),
+                onInitNewRow: function (e) {
+                    var url = `@Url.Action("Create", "Terminal")`;
+                    window.location = url;
+                },
+                selection: {
+                    mode: "multiple"
+                },
+                allowColumnReordering: true,
+                "export": {
+                    enabled: true,
+                    fileName: "Documents",
+                    allowExportSelectedData: true
+                },
+                filterPanel: {
+                    visible: false
+                },
+                filterRow: { visible: false },
+                remoteOperations: true,
+                scrolling: {
+                    mode: "virtual",
+                    rowRenderingMode: "virtual"
+                },
+                paging: {
+                    pageSize: 100
+                },
+                editing: {
+                    useIcons: true,
+                    allowUpdating: false,
+                    allowDeleting: false,
+                    allowAdding: false
+                },
+                headerFilter: {
+                    visible: true
+                },
+                wordWrapEnabled: true,
+                showColumnLines: true,
+                showRowLines: true,
+                rowAlternationEnabled: true,
+                showBorders: true,
+                searchPanel: {
+                    visible: true
+                },
+
+                stateStoring: {
+                    enabled: true,
+                    type: "localStorage",
+                    storageKey: "userAdmin"
+                },
+
+                columns: [
+                    {
+                        caption: '@SharedLocalizer["Transaction Id"]',
+                        dataField: "id",
+                        allowHeaderFiltering: true
+                    },
+                    {
+                        caption: '@SharedLocalizer["Phone number"]',
+                        dataField: "msisdn",
+                        allowHeaderFiltering: true
+                    },
+                    {
+                        caption: '@SharedLocalizer["Amount(TMT)"]',
+                        dataField: "amount",
+                        allowHeaderFiltering: true,
+                    },
+                    {
+                        caption: '@SharedLocalizer["Transaction Date"]',
+                        dataField: "transactionDate",
+                        dataType: 'date',
+                        allowHeaderFiltering: true,
+                    },
+                    {
+                        caption: '@SharedLocalizer["RefNum"]',
+                        dataField: "refNum",
+                        allowHeaderFiltering: true,
+                    },
+                    {
+                        caption: '@SharedLocalizer["Status"]',
+                        dataField: "status",
+                        allowHeaderFiltering: true,
+                    },
+                    {
+                        caption: '@SharedLocalizer["State"]',
+                        dataField: "state",
+                        allowHeaderFiltering: true,
+                    },
+                    {
+                        caption: '@SharedLocalizer["Reason"]',
+                        dataField: "reason",
+                        allowHeaderFiltering: true,
+                    },
+                    {
+                        caption: '@SharedLocalizer["Terminal Id"]',
+                        dataField: "terminalId",
+                        allowHeaderFiltering: true,
+                    },
+                    {
+                        caption: '@SharedLocalizer["Termianl Name"]',
+                        dataField: "termianlName",
+                        allowHeaderFiltering: true,
+                    },
+                    {
+                        caption: '@SharedLocalizer["Owner Name"]',
+                        dataField: "ownerName",
+                        allowHeaderFiltering: true,
+                    },
+                    {
+                        type: "buttons",
+                        width: 110,
+                        buttons: [
+                            {
+                                hint: '@SharedLocalizer["Show details"]',
+                                icon: "info",
+                                onClick: function (e) {
+                                    var idString = e.row.data.id;
+                                    var url = `@Url.Action("TransactionDetails", "Transaction")`;
+                                    window.location = url + '?id=' + idString;
+                                }
+                            }
+                        ]
+                    }
+                ]
+            });
+
+            let enchUrl = window.location.origin + '/' + 'api/TransactionsAPI/TerminalEnchargements/' + @(Model.Id);
+            $("#gridEnchargements").dxDataGrid({
+                dataSource: DevExpress.data.AspNet.createStore({
+                    key: "id",
+                    loadUrl: enchUrl,
+                    insertUrl: enchUrl,
+                    updateUrl: enchUrl,
+                    deleteUrl: enchUrl,
+                    onBeforeSend: function (method, ajaxOptions) {
+                        ajaxOptions.xhrFields = { withCredentials: true };
+                    }
+                }),                
+                selection: {
+                    mode: "multiple"
+                },
+                allowColumnReordering: true,
+                "export": {
+                    enabled: true,
+                    fileName: "Documents",
+                    allowExportSelectedData: true
+                },
+                filterPanel: {
+                    visible: false
+                },
+                filterRow: { visible: false },
+                remoteOperations: true,
+                scrolling: {
+                    mode: "virtual",
+                    rowRenderingMode: "virtual"
+                },
+                paging: {
+                    pageSize: 100
+                },
+                editing: {
+                    useIcons: true,
+                    allowUpdating: false,
+                    allowDeleting: false,
+                    allowAdding: false
+                },
+                headerFilter: {
+                    visible: true
+                },
+                wordWrapEnabled: true,
+                showColumnLines: true,
+                showRowLines: true,
+                rowAlternationEnabled: true,
+                showBorders: true,
+                searchPanel: {
+                    visible: true
+                },
+
+                stateStoring: {
+                    enabled: true,
+                    type: "localStorage",
+                    storageKey: "userAdmin"
+                },
+
+                columns: [
+                    {
+                        caption: '@SharedLocalizer["Enchargement Id"]',
+                        dataField: "id",
+                        allowHeaderFiltering: true
+                    },
+                    {
+                        caption: '@SharedLocalizer["Enchargement Date"]',
+                        dataField: "EncashmentDate",
+                        dataType: 'date',
+                        allowHeaderFiltering: true
+                    },
+                    {
+                        caption: '@SharedLocalizer["Total Encharged (TMT)"]',
+                        dataField: "encashmentSum",
+                        allowHeaderFiltering: true,
+                    }                   
+                ]
+            });
+        });
+    </script>
+}
+

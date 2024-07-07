@@ -1,6 +1,7 @@
 {  
   "devDependencies": {
     "devextreme-dist": "23.2.7",
+    "devextreme": "23.2.7",
     "@devexpress/analytics-core": "23.2.7",
     "devexpress-dashboard": "23.2.7"
   }

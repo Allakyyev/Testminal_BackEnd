@@ -1,0 +1,50 @@
+<Dashboard>
+  <Title Text="New Dashboard" />
+  <DataSources>
+    <SqlDataSource Name="Terminals" ComponentName="sqlDataSource1">
+      <Connection Name="DashboardConnection" FromAppConfig="true" />
+      <Query Type="SelectQuery" Name="Terminals">
+        <Tables>
+          <Table Name="Terminals" />
+        </Tables>
+        <Columns>
+          <Column Table="Terminals" Name="Id" />
+          <Column Table="Terminals" Name="Password" />
+          <Column Table="Terminals" Name="TerminalId" />
+          <Column Table="Terminals" Name="Name" />
+          <Column Table="Terminals" Name="UserId" />
+          <Column Table="Terminals" Name="CreatedDate" />
+          <Column Table="Terminals" Name="Status" />
+        </Columns>
+      </Query>
+      <ConnectionOptions CloseConnection="true" />
+    </SqlDataSource>
+  </DataSources>
+  <Items>
+    <Grid ComponentName="gridDashboardItem1" Name="Grid 1" DataSource="sqlDataSource1" DataMember="Terminals">
+      <DataItems>
+        <Dimension DataMember="CreatedDate" DefaultId="DataItem0" />
+        <Dimension DataMember="TerminalId" DefaultId="DataItem1" />
+        <Measure DataMember="Status" DefaultId="DataItem2" />
+      </DataItems>
+      <GridColumns>
+        <GridDimensionColumn>
+          <Dimension DefaultId="DataItem0" />
+        </GridDimensionColumn>
+        <GridDimensionColumn>
+          <Dimension DefaultId="DataItem1" />
+        </GridDimensionColumn>
+        <GridMeasureColumn>
+          <Measure DefaultId="DataItem2" />
+        </GridMeasureColumn>
+      </GridColumns>
+      <GridOptions />
+      <ColumnFilterOptions />
+    </Grid>
+  </Items>
+  <LayoutTree>
+    <LayoutGroup>
+      <LayoutItem DashboardItem="gridDashboardItem1" />
+    </LayoutGroup>
+  </LayoutTree>
+</Dashboard>

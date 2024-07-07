@@ -49,7 +49,7 @@ namespace Terminal_BackEnd.Web.Controllers {
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public IActionResult Edit(long id) {
-            var terminal = terminalService.GetAllTerminalById(id);
+            var terminal = terminalService.GetTerminalById(id);
             if(terminal != null) {
                 return View(terminal);
             }
@@ -65,6 +65,15 @@ namespace Terminal_BackEnd.Web.Controllers {
             }
             return RedirectToAction("Index");
         }
+
+        public IActionResult TerminalDetails([FromQuery] long terminalId) {
+            var termianl = terminalService.GetTerminalById(terminalId);
+            if( termianl != null) { 
+                return View(termianl);
+            }
+            return RedirectToAction("Index");
+        }
+
 
         [HttpDelete]
         public IActionResult Delete(string id) {

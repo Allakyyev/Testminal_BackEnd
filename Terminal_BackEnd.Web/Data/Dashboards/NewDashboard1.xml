@@ -1,0 +1,69 @@
+<Dashboard>
+  <Title Text="Terminals" />
+  <DataSources>
+    <SqlDataSource Name="Terminals" ComponentName="sqlDataSource1">
+      <Connection Name="DashboardConnection" FromAppConfig="true" />
+      <Query Type="SelectQuery" Name="Terminals">
+        <Tables>
+          <Table Name="Terminals" />
+          <Table Name="Transactions" />
+          <Table Name="TransactionStatuses" />
+          <Table Name="Encashments" />
+          <Relation Type="Inner" Parent="Terminals" Nested="Transactions">
+            <KeyColumn Parent="Id" Nested="TerminalId" />
+          </Relation>
+          <Relation Type="Inner" Parent="Transactions" Nested="TransactionStatuses">
+            <KeyColumn Parent="Id" Nested="TransactionId" />
+          </Relation>
+          <Relation Type="Inner" Parent="Terminals" Nested="Encashments">
+            <KeyColumn Parent="Id" Nested="TerminalId" />
+          </Relation>
+          <Relation Type="Inner" Parent="Transactions" Nested="Encashments">
+            <KeyColumn Parent="EncharchmentId" Nested="Id" />
+          </Relation>
+        </Tables>
+        <Columns>
+          <Column Table="Terminals" Name="Id" />
+          <Column Table="Terminals" Name="Password" />
+          <Column Table="Terminals" Name="TerminalId" />
+          <Column Table="Terminals" Name="Name" />
+          <Column Table="Terminals" Name="UserId" />
+          <Column Table="Terminals" Name="CreatedDate" />
+          <Column Table="Terminals" Name="Status" />
+          <Column Table="Transactions" Name="Id" Alias="Transactions_Id" />
+          <Column Table="Transactions" Name="Msisdn" />
+          <Column Table="Transactions" Name="Amount" />
+          <Column Table="Transactions" Name="Status" Alias="Transactions_Status" />
+          <Column Table="Transactions" Name="RefNum" />
+          <Column Table="Transactions" Name="Service" />
+          <Column Table="Transactions" Name="State" />
+          <Column Table="Transactions" Name="Reason" />
+          <Column Table="Transactions" Name="TerminalId" Alias="Transactions_TerminalId" />
+          <Column Table="Transactions" Name="PollingCallbackRegistered" />
+          <Column Table="Transactions" Name="TransactionDate" />
+          <Column Table="Transactions" Name="EncharchmentId" />
+          <Column Table="TransactionStatuses" Name="Id" Alias="TransactionStatuses_Id" />
+          <Column Table="TransactionStatuses" Name="Status" Alias="TransactionStatuses_Status" />
+          <Column Table="TransactionStatuses" Name="TransactionId" />
+          <Column Table="TransactionStatuses" Name="UpdatedDate" />
+          <Column Table="Encashments" Name="Id" Alias="Encashments_Id" />
+          <Column Table="Encashments" Name="EncashmentDate" />
+          <Column Table="Encashments" Name="TerminalId" Alias="Encashments_TerminalId" />
+          <Column Table="Encashments" Name="EncashmentSum" />
+        </Columns>
+      </Query>
+      <ConnectionOptions CloseConnection="true" />
+    </SqlDataSource>
+  </DataSources>
+  <Items>
+    <Grid ComponentName="gridDashboardItem1" Name="Grid 1" DataSource="sqlDataSource1" DataMember="Terminals">
+      <GridOptions />
+      <ColumnFilterOptions />
+    </Grid>
+  </Items>
+  <LayoutTree>
+    <LayoutGroup>
+      <LayoutItem DashboardItem="gridDashboardItem1" />
+    </LayoutGroup>
+  </LayoutTree>
+</Dashboard>

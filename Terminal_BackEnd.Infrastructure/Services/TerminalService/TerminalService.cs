@@ -10,7 +10,7 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
     public interface ITerminalService {
         List<Terminal> GetAllTerminals();
         List<Terminal> GetAllTerminalsByUser(string userName);
-        Terminal? GetAllTerminalById(long terminalId);
+        Terminal? GetTerminalById(long terminalId);
         long GetTerminalCurrenTotal(long terminalId);
         void UpdateTerminal(Terminal terminal);
         void CreateTerminal(CreateTerminalModel terminalModel);
@@ -45,7 +45,7 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
             }
         }
 
-        public Terminal? GetAllTerminalById(long terminalId) {
+        public Terminal? GetTerminalById(long terminalId) {
             return _dbContex.Terminals.Find(terminalId);
         }
 

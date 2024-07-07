@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using DevExtreme.AspNet.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Terminal_BackEnd.Infrastructure.Entities;
 using Terminal_BackEnd.Web.Services;
@@ -8,6 +9,7 @@ using Terminal_BackEnd.Web.Services.Model;
 namespace Terminal_BackEnd.Web.API {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TransactionsAPIController : ControllerBase {
         readonly ITransactionControllerService _transactionControllerService;
         public TransactionsAPIController(ITransactionControllerService transactionControllerService) {
@@ -27,10 +29,58 @@ namespace Terminal_BackEnd.Web.API {
             return Unauthorized();
         }
 
+        [HttpGet("Terminal/{id}")]
+        public async Task<object?> Terminal(long id, DataSourceLoadOptions loadOptions) {
+            if(User.Identity != null && User.Identity.IsAuthenticated) {
+                var transactions = _transactionControllerService.GetAllTransactionsById(id);
+                if(User.IsInRole("Admin")) {
+                    return DataSourceLoader.Load<TransactionViewModel>(MapToViewModel(transactions), loadOptions);
+                } else {
+                    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    return DataSourceLoader.Load<TransactionViewModel>(MapToViewModel(transactions.Where(t => t.Terminal != null && t.Terminal.UserId == userId).ToList()), loadOptions);
+                }
+            }
+            return Unauthorized();
+        }
+
         [HttpGet("Statuses/{id}")]
         public async Task<object?> Statuses(long id, DataSourceLoadOptions loadOptions) {
             if(User.Identity != null && User.Identity.IsAuthenticated) {
-                return _transactionControllerService.GetTransactionStatuses(id);                
+                return _transactionControllerService.GetTransactionStatuses(id);
+            }
+            return Unauthorized();
+        }
+
+        [HttpGet("Enchargement")]
+        public async Task<object?> Enchargement(DataSourceLoadOptions loadOptions) {
+            if(User.Identity != null && User.Identity.IsAuthenticated) {
+                var enchargement = _transactionControllerService.GetAllEncashment();
+                if(User.IsInRole("Admin")) {
+                    return DataSourceLoader.Load<Encashment>(enchargement, loadOptions);
+                } else if(enchargement.Any()){
+                    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    var filteredEnchargement = enchargement.Where(e => e.Terminal != null && e.Terminal.UserId == userId);
+                    return DataSourceLoader.Load<Encashment>(filteredEnchargement, loadOptions);
+                } else {
+                    return DataSourceLoader.Load<Encashment>(enchargement, loadOptions);
+                }
+            }
+            return Unauthorized();
+        }
+
+        [HttpGet("TerminalEnchargements/{id}")]
+        public async Task<object?> TerminalEnchargements(long id, DataSourceLoadOptions loadOptions) {
+            if(User.Identity != null && User.Identity.IsAuthenticated) {
+                var enchargement = _transactionControllerService.GetEncashmentsByTerminal(id);
+                if(User.IsInRole("Admin")) {
+                    return DataSourceLoader.Load<Encashment>(enchargement, loadOptions);
+                } else if(enchargement.Any()) {
+                    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    var filteredEnchargement = enchargement.Where(e => e.Terminal != null && e.Terminal.UserId == userId);
+                    return DataSourceLoader.Load<Encashment>(filteredEnchargement, loadOptions);
+                } else {
+                    return DataSourceLoader.Load<Encashment>(enchargement, loadOptions);
+                }
             }
             return Unauthorized();
         }

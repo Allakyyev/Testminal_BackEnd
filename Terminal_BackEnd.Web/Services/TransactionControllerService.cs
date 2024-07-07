@@ -76,7 +76,7 @@ namespace Terminal_BackEnd.Web.Services {
                     var enchargement = new Encashment() {
                         EncashmentDate = DateTime.Now,
                         TerminalId = terminalId,
-                        EncashmentSum = sum
+                        EncashmentSum = sum > 0 ? sum/100 : sum
                     };
                     appDbContext.Encashments.Add(enchargement);
                     appDbContext.SaveChanges();
@@ -186,6 +186,13 @@ namespace Terminal_BackEnd.Web.Services {
                 .ToList();
         }
 
+        public List<Transaction> GetAllTransactionsById(long terminalId) {
+            return appDbContext.Transactions.Include(p => p.TransactionStatuses)
+                .Include(t => t.Terminal).ThenInclude(terminal => terminal.ApplicationUser)
+                .Where(t => t.Terminal != null && t.Terminal.ApplicationUser != null && t.Terminal.Id == terminalId)
+                .ToList();
+        }
+
         public List<TransactionStatus> GetTransactionStatuses(long transactionId) {
             return appDbContext.TransactionStatuses
                 .Where(ts => ts.TransactionId == transactionId)
@@ -240,6 +247,14 @@ namespace Terminal_BackEnd.Web.Services {
                 return RequestState.OK;
             }
             return RequestState.Fail;
+        }
+
+        public List<Encashment> GetAllEncashment() {
+            return appDbContext.Encashments.Include(e => e.Transactions).ToList();
+        }
+
+        public List<Encashment> GetEncashmentsByTerminal(long terminalId) {
+            return appDbContext.Encashments.Where(e => e.TerminalId == terminalId).ToList();
         }
     }
 }

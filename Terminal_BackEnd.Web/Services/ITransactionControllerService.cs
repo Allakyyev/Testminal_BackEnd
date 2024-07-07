@@ -35,5 +35,8 @@ namespace Terminal_BackEnd.Web.Services {
         public List<Transaction> GetAllTransactions(string userId);
         public TransactionViewModel GetTransactionViewModel(long transactionId);
         public List<TransactionStatus> GetTransactionStatuses(long transactionId);
+        public List<Transaction> GetAllTransactionsById(long terminalId);
+        public List<Encashment> GetAllEncashment();
+        public List<Encashment> GetEncashmentsByTerminal(long terminalId);
     }
 }
