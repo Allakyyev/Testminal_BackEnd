@@ -56,13 +56,13 @@ namespace Terminal_BackEnd.Web.API {
             if(User.Identity != null && User.Identity.IsAuthenticated) {
                 var enchargement = _transactionControllerService.GetAllEncashment();
                 if(User.IsInRole("Admin")) {
-                    return DataSourceLoader.Load<Encashment>(enchargement, loadOptions);
-                } else if(enchargement.Any()){
+                    return DataSourceLoader.Load<EncashmentViewModel>(MapToEncachmentViewModel(enchargement), loadOptions);
+                } else if(enchargement.Any()) {
                     var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     var filteredEnchargement = enchargement.Where(e => e.Terminal != null && e.Terminal.UserId == userId);
-                    return DataSourceLoader.Load<Encashment>(filteredEnchargement, loadOptions);
+                    return DataSourceLoader.Load<EncashmentViewModel>(MapToEncachmentViewModel(filteredEnchargement.ToList()), loadOptions);
                 } else {
-                    return DataSourceLoader.Load<Encashment>(enchargement, loadOptions);
+                    return DataSourceLoader.Load<EncashmentViewModel>(MapToEncachmentViewModel(enchargement), loadOptions);
                 }
             }
             return Unauthorized();
@@ -85,6 +85,30 @@ namespace Terminal_BackEnd.Web.API {
             return Unauthorized();
         }
 
+        [HttpGet("EncashmentTransactions/{id}")]
+        public async Task<object?> EncashmentTransactions(long id, DataSourceLoadOptions loadOptions) {
+            if(User.Identity != null && User.Identity.IsAuthenticated) {
+                var transactions = _transactionControllerService.GetEncashmentTransactions(id);
+                foreach (var item in transactions)
+                {
+                    item.Amount = item.Amount > 0 ? item.Amount / 100 : item.Amount;
+                }
+                if (User.IsInRole("Admin")) {
+                    return DataSourceLoader.Load<Transaction>(transactions, loadOptions);
+                } else if(transactions.Any()) {
+                    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    var encashment = _transactionControllerService.GetEncashmentById(id);
+                    if(encashment != null && encashment.Terminal != null && encashment.Terminal.UserId == userId) {                                                
+                        return DataSourceLoader.Load<Transaction>(transactions, loadOptions);
+
+                    }
+                } else {
+                    return DataSourceLoader.Load<Transaction>(transactions, loadOptions);
+                }
+            }
+            return Unauthorized();
+        }
+
         List<TransactionViewModel> MapToViewModel(List<Transaction> transactions) {
             var transactionsViewModels = new List<TransactionViewModel>();
             foreach(var transaction in transactions) {
@@ -97,7 +121,7 @@ namespace Terminal_BackEnd.Web.API {
                     Status = transaction.Status,
                     Reason = transaction.Reason,
                     TerminalId = transaction.TerminalId,
-                    EncharchmentId = transaction.EncharchmentId,
+                    EncargementId = transaction.EncargementId,
                     TransactionDate = transaction.TransactionDate,
                     TermianlName = transaction.Terminal?.Name ?? "",
                     OwnerName = GetOwnerName(transaction.Terminal?.ApplicationUser)
@@ -105,6 +129,23 @@ namespace Terminal_BackEnd.Web.API {
                 transactionsViewModels.Add(terminalViewModel);
             }
             return transactionsViewModels;
+        }
+
+        List<EncashmentViewModel> MapToEncachmentViewModel(List<Encashment> encashments) {
+            List<EncashmentViewModel> result = new List<EncashmentViewModel>();
+            foreach(var item in encashments) {
+                var terminal = item.Terminal;
+                EncashmentViewModel enchargementViewModel = new EncashmentViewModel() {
+                    Id = item.Id,
+                    EncashmentDate = item.EncashmentDate,
+                    EncashmentSum = item.EncashmentSum,
+                    TerminalId = item.TerminalId,
+                    TerminalName = terminal?.Name ?? String.Empty,
+                    TerminalOwner = $"{terminal.ApplicationUser?.FamilyName ?? String.Empty} {terminal.ApplicationUser?.CompanyName ?? String.Empty}"
+                };
+                result.Add(enchargementViewModel);
+            }
+            return result;
         }
 
         string GetOwnerName(ApplicationUser user) {

@@ -31,6 +31,7 @@ namespace Terminal_BackEnd.Web.Controllers {
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create(CreateTerminalModel model) {
             if(ModelState.IsValid) {
                 terminalService.CreateTerminal(model);
@@ -41,6 +42,7 @@ namespace Terminal_BackEnd.Web.Controllers {
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetPasswordEncrypt([FromQuery] long id) {
             (byte[] passwordEncrypted, string fileName) = terminalService.GetPasswordEncrypt(id);
             return File(passwordEncrypted, "text/plain", fileName);

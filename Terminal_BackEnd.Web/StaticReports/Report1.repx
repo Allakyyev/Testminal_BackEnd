@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<XtraReportsLayoutSerializer SerializerVersion="23.2.7.0" Ref="1" ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v23.2, Version=23.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Name="Report" DisplayName="Report1" PageWidth="850" PageHeight="1100" Version="23.2" DataMember="Encashments" DataSource="#Ref-0">
+  <Extensions>
+    <Item1 Ref="2" Key="DataSerializationExtension" Value="DevExpress.XtraReports.Web.ReportDesigner.DefaultDataSerializer" />
+  </Extensions>
+  <Bands>
+    <Item1 Ref="3" ControlType="TopMarginBand" Name="TopMargin1" />
+    <Item2 Ref="4" ControlType="DetailBand" Name="Detail1">
+      <Controls>
+        <Item1 Ref="5" ControlType="XRTable" Name="table1" SizeF="650,23" LocationFloat="0,32.291664">
+          <Rows>
+            <Item1 Ref="6" ControlType="XRTableRow" Name="tableRow1" Weight="1">
+              <Cells>
+                <Item1 Ref="7" ControlType="XRTableCell" Name="tableCell1" Weight="1" Multiline="true" Text="tableCell1">
+                  <ExpressionBindings>
+                    <Item1 Ref="8" EventName="BeforePrint" PropertyName="Text" Expression="[Transactions.Amount]" />
+                  </ExpressionBindings>
+                </Item1>
+                <Item2 Ref="9" ControlType="XRTableCell" Name="tableCell2" Weight="1" Multiline="true" Text="tableCell2">
+                  <ExpressionBindings>
+                    <Item1 Ref="10" EventName="BeforePrint" PropertyName="Text" Expression="[Transactions.EncargementId]" />
+                  </ExpressionBindings>
+                </Item2>
+                <Item3 Ref="11" ControlType="XRTableCell" Name="tableCell3" Weight="1" Multiline="true" Text="tableCell3">
+                  <ExpressionBindings>
+                    <Item1 Ref="12" EventName="BeforePrint" PropertyName="Text" Expression="[Transactions.Id]" />
+                  </ExpressionBindings>
+                </Item3>
+                <Item4 Ref="13" ControlType="XRTableCell" Name="tableCell4" Weight="1" Multiline="true" Text="tableCell4">
+                  <ExpressionBindings>
+                    <Item1 Ref="14" EventName="BeforePrint" PropertyName="Text" Expression="[Transactions.Msisdn]" />
+                  </ExpressionBindings>
+                </Item4>
+                <Item5 Ref="15" ControlType="XRTableCell" Name="tableCell5" Weight="1" Multiline="true" Text="tableCell5">
+                  <ExpressionBindings>
+                    <Item1 Ref="16" EventName="BeforePrint" PropertyName="Text" Expression="[Transactions.PollingCallbackRegistered]" />
+                  </ExpressionBindings>
+                </Item5>
+                <Item6 Ref="17" ControlType="XRTableCell" Name="tableCell6" Weight="1" Multiline="true" Text="tableCell6">
+                  <ExpressionBindings>
+                    <Item1 Ref="18" EventName="BeforePrint" PropertyName="Text" Expression="[Transactions.Reason]" />
+                  </ExpressionBindings>
+                </Item6>
+                <Item7 Ref="19" ControlType="XRTableCell" Name="tableCell7" Weight="1" Multiline="true" Text="tableCell7">
+                  <ExpressionBindings>
+                    <Item1 Ref="20" EventName="BeforePrint" PropertyName="Text" Expression="[Transactions.RefNum]" />
+                  </ExpressionBindings>
+                </Item7>
+                <Item8 Ref="21" ControlType="XRTableCell" Name="tableCell8" Weight="1" Multiline="true" Text="tableCell8">
+                  <ExpressionBindings>
+                    <Item1 Ref="22" EventName="BeforePrint" PropertyName="Text" Expression="[Transactions.Service]" />
+                  </ExpressionBindings>
+                </Item8>
+                <Item9 Ref="23" ControlType="XRTableCell" Name="tableCell9" Weight="1" Multiline="true" Text="tableCell9">
+                  <ExpressionBindings>
+                    <Item1 Ref="24" EventName="BeforePrint" PropertyName="Text" Expression="[Transactions.State]" />
+                  </ExpressionBindings>
+                </Item9>
+                <Item10 Ref="25" ControlType="XRTableCell" Name="tableCell10" Weight="1" Multiline="true" Text="tableCell10">
+                  <ExpressionBindings>
+                    <Item1 Ref="26" EventName="BeforePrint" PropertyName="Text" Expression="[Transactions.Status]" />
+                  </ExpressionBindings>
+                </Item10>
+                <Item11 Ref="27" ControlType="XRTableCell" Name="tableCell11" Weight="1" Multiline="true" Text="tableCell11">
+                  <ExpressionBindings>
+                    <Item1 Ref="28" EventName="BeforePrint" PropertyName="Text" Expression="[Transactions.TerminalId]" />
+                  </ExpressionBindings>
+                </Item11>
+                <Item12 Ref="29" ControlType="XRTableCell" Name="tableCell12" Weight="1" Multiline="true" Text="tableCell12">
+                  <ExpressionBindings>
+                    <Item1 Ref="30" EventName="BeforePrint" PropertyName="Text" Expression="[Transactions.TransactionDate]" />
+                  </ExpressionBindings>
+                </Item12>
+              </Cells>
+            </Item1>
+          </Rows>
+        </Item1>
+      </Controls>
+    </Item2>
+    <Item3 Ref="31" ControlType="BottomMarginBand" Name="BottomMargin1" />
+  </Bands>
+  <ComponentStorage>
+    <Item1 Ref="0" ObjectType="DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v23.2" Name="sqlDataSource1" Base64="PFNxbERhdGFTb3VyY2UgTmFtZT0ic3FsRGF0YVNvdXJjZTEiPjxDb25uZWN0aW9uIE5hbWU9IkRhc2hib2FyZENvbm5lY3Rpb24iIEZyb21BcHBDb25maWc9InRydWUiIC8+PFF1ZXJ5IFR5cGU9IlNlbGVjdFF1ZXJ5IiBOYW1lPSJFbmNhc2htZW50cyI+PFRhYmxlcz48VGFibGUgTmFtZT0iRW5jYXNobWVudHMiIC8+PC9UYWJsZXM+PENvbHVtbnM+PENvbHVtbiBUYWJsZT0iRW5jYXNobWVudHMiIE5hbWU9IklkIiAvPjxDb2x1bW4gVGFibGU9IkVuY2FzaG1lbnRzIiBOYW1lPSJFbmNhc2htZW50RGF0ZSIgLz48Q29sdW1uIFRhYmxlPSJFbmNhc2htZW50cyIgTmFtZT0iVGVybWluYWxJZCIgLz48Q29sdW1uIFRhYmxlPSJFbmNhc2htZW50cyIgTmFtZT0iRW5jYXNobWVudFN1bSIgLz48L0NvbHVtbnM+PC9RdWVyeT48UXVlcnkgVHlwZT0iU2VsZWN0UXVlcnkiIE5hbWU9IlRlcm1pbmFscyI+PFRhYmxlcz48VGFibGUgTmFtZT0iVGVybWluYWxzIiAvPjwvVGFibGVzPjxDb2x1bW5zPjxDb2x1bW4gVGFibGU9IlRlcm1pbmFscyIgTmFtZT0iSWQiIC8+PENvbHVtbiBUYWJsZT0iVGVybWluYWxzIiBOYW1lPSJQYXNzd29yZCIgLz48Q29sdW1uIFRhYmxlPSJUZXJtaW5hbHMiIE5hbWU9IlRlcm1pbmFsSWQiIC8+PENvbHVtbiBUYWJsZT0iVGVybWluYWxzIiBOYW1lPSJOYW1lIiAvPjxDb2x1bW4gVGFibGU9IlRlcm1pbmFscyIgTmFtZT0iVXNlcklkIiAvPjxDb2x1bW4gVGFibGU9IlRlcm1pbmFscyIgTmFtZT0iQ3JlYXRlZERhdGUiIC8+PENvbHVtbiBUYWJsZT0iVGVybWluYWxzIiBOYW1lPSJTdGF0dXMiIC8+PC9Db2x1bW5zPjwvUXVlcnk+PFF1ZXJ5IFR5cGU9IlNlbGVjdFF1ZXJ5IiBOYW1lPSJUcmFuc2FjdGlvbnMiPjxUYWJsZXM+PFRhYmxlIE5hbWU9IlRyYW5zYWN0aW9ucyIgLz48L1RhYmxlcz48Q29sdW1ucz48Q29sdW1uIFRhYmxlPSJUcmFuc2FjdGlvbnMiIE5hbWU9IklkIiAvPjxDb2x1bW4gVGFibGU9IlRyYW5zYWN0aW9ucyIgTmFtZT0iTXNpc2RuIiAvPjxDb2x1bW4gVGFibGU9IlRyYW5zYWN0aW9ucyIgTmFtZT0iQW1vdW50IiAvPjxDb2x1bW4gVGFibGU9IlRyYW5zYWN0aW9ucyIgTmFtZT0iU3RhdHVzIiAvPjxDb2x1bW4gVGFibGU9IlRyYW5zYWN0aW9ucyIgTmFtZT0iUmVmTnVtIiAvPjxDb2x1bW4gVGFibGU9IlRyYW5zYWN0aW9ucyIgTmFtZT0iU2VydmljZSIgLz48Q29sdW1uIFRhYmxlPSJUcmFuc2FjdGlvbnMiIE5hbWU9IlN0YXRlIiAvPjxDb2x1bW4gVGFibGU9IlRyYW5zYWN0aW9ucyIgTmFtZT0iUmVhc29uIiAvPjxDb2x1bW4gVGFibGU9IlRyYW5zYWN0aW9ucyIgTmFtZT0iVGVybWluYWxJZCIgLz48Q29sdW1uIFRhYmxlPSJUcmFuc2FjdGlvbnMiIE5hbWU9IlBvbGxpbmdDYWxsYmFja1JlZ2lzdGVyZWQiIC8+PENvbHVtbiBUYWJsZT0iVHJhbnNhY3Rpb25zIiBOYW1lPSJUcmFuc2FjdGlvbkRhdGUiIC8+PENvbHVtbiBUYWJsZT0iVHJhbnNhY3Rpb25zIiBOYW1lPSJFbmNhcmdlbWVudElkIiAvPjwvQ29sdW1ucz48L1F1ZXJ5PjxRdWVyeSBUeXBlPSJTZWxlY3RRdWVyeSIgTmFtZT0iVHJhbnNhY3Rpb25TdGF0dXNlcyI+PFRhYmxlcz48VGFibGUgTmFtZT0iVHJhbnNhY3Rpb25TdGF0dXNlcyIgLz48L1RhYmxlcz48Q29sdW1ucz48Q29sdW1uIFRhYmxlPSJUcmFuc2FjdGlvblN0YXR1c2VzIiBOYW1lPSJJZCIgLz48Q29sdW1uIFRhYmxlPSJUcmFuc2FjdGlvblN0YXR1c2VzIiBOYW1lPSJTdGF0dXMiIC8+PENvbHVtbiBUYWJsZT0iVHJhbnNhY3Rpb25TdGF0dXNlcyIgTmFtZT0iVHJhbnNhY3Rpb25JZCIgLz48Q29sdW1uIFRhYmxlPSJUcmFuc2FjdGlvblN0YXR1c2VzIiBOYW1lPSJVcGRhdGVkRGF0ZSIgLz48L0NvbHVtbnM+PC9RdWVyeT48UmVzdWx0U2NoZW1hPjxEYXRhU2V0IE5hbWU9InNxbERhdGFTb3VyY2UxIj48VmlldyBOYW1lPSJFbmNhc2htZW50cyI+PEZpZWxkIE5hbWU9IklkIiBUeXBlPSJJbnQ2NCIgLz48RmllbGQgTmFtZT0iRW5jYXNobWVudERhdGUiIFR5cGU9IkRhdGVUaW1lIiAvPjxGaWVsZCBOYW1lPSJUZXJtaW5hbElkIiBUeXBlPSJJbnQ2NCIgLz48RmllbGQgTmFtZT0iRW5jYXNobWVudFN1bSIgVHlwZT0iSW50NjQiIC8+PC9WaWV3PjxWaWV3IE5hbWU9IlRlcm1pbmFscyI+PEZpZWxkIE5hbWU9IklkIiBUeXBlPSJJbnQ2NCIgLz48RmllbGQgTmFtZT0iUGFzc3dvcmQiIFR5cGU9IlN0cmluZyIgLz48RmllbGQgTmFtZT0iVGVybWluYWxJZCIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJOYW1lIiBUeXBlPSJTdHJpbmciIC8+PEZpZWxkIE5hbWU9IlVzZXJJZCIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJDcmVhdGVkRGF0ZSIgVHlwZT0iRGF0ZVRpbWUiIC8+PEZpZWxkIE5hbWU9IlN0YXR1cyIgVHlwZT0iSW50MzIiIC8+PC9WaWV3PjxWaWV3IE5hbWU9IlRyYW5zYWN0aW9ucyI+PEZpZWxkIE5hbWU9IklkIiBUeXBlPSJJbnQ2NCIgLz48RmllbGQgTmFtZT0iTXNpc2RuIiBUeXBlPSJTdHJpbmciIC8+PEZpZWxkIE5hbWU9IkFtb3VudCIgVHlwZT0iSW50MzIiIC8+PEZpZWxkIE5hbWU9IlN0YXR1cyIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJSZWZOdW0iIFR5cGU9IkludDY0IiAvPjxGaWVsZCBOYW1lPSJTZXJ2aWNlIiBUeXBlPSJTdHJpbmciIC8+PEZpZWxkIE5hbWU9IlN0YXRlIiBUeXBlPSJTdHJpbmciIC8+PEZpZWxkIE5hbWU9IlJlYXNvbiIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJUZXJtaW5hbElkIiBUeXBlPSJJbnQ2NCIgLz48RmllbGQgTmFtZT0iUG9sbGluZ0NhbGxiYWNrUmVnaXN0ZXJlZCIgVHlwZT0iQm9vbGVhbiIgLz48RmllbGQgTmFtZT0iVHJhbnNhY3Rpb25EYXRlIiBUeXBlPSJEYXRlVGltZSIgLz48RmllbGQgTmFtZT0iRW5jYXJnZW1lbnRJZCIgVHlwZT0iSW50NjQiIC8+PC9WaWV3PjxWaWV3IE5hbWU9IlRyYW5zYWN0aW9uU3RhdHVzZXMiPjxGaWVsZCBOYW1lPSJJZCIgVHlwZT0iSW50NjQiIC8+PEZpZWxkIE5hbWU9IlN0YXR1cyIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJUcmFuc2FjdGlvbklkIiBUeXBlPSJJbnQ2NCIgLz48RmllbGQgTmFtZT0iVXBkYXRlZERhdGUiIFR5cGU9IkRhdGVUaW1lIiAvPjwvVmlldz48L0RhdGFTZXQ+PC9SZXN1bHRTY2hlbWE+PENvbm5lY3Rpb25PcHRpb25zIENsb3NlQ29ubmVjdGlvbj0idHJ1ZSIgLz48L1NxbERhdGFTb3VyY2U+" />
+  </ComponentStorage>
+</XtraReportsLayoutSerializer>

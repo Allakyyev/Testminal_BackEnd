@@ -1,13 +1,18 @@
 using System.Globalization;
 using DevExpress.AspNetCore;
+using DevExpress.AspNetCore.Reporting;
 using DevExpress.DashboardAspNetCore;
 using DevExpress.DashboardWeb;
-using Microsoft.AspNetCore.Hosting;
+using DevExpress.XtraCharts;
+using DevExpress.XtraReports.Web.Extensions;
+using DevExpress.XtraReports.Web.WebDocumentViewer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting.Internal;
 using Terminal_BackEnd.Infrastructure;
 using Terminal_BackEnd.Infrastructure.Constants;
 using Terminal_BackEnd.Infrastructure.Data;
@@ -58,10 +63,27 @@ namespace Terminal_BackEnd.Web {
                 configurator.SetDashboardStorage(new DashboardFileRepository(fileProvider.GetFileInfo("Data/Dashboards").PhysicalPath));
                 configurator.SetConnectionStringsProvider(new DashboardConnectionStringsProvider(configuration));
                 return configurator;
-            });            
+            });
+            builder.Services.AddMvc();
             builder.Services.AddControllersWithViews()
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization();
+
+            builder.Services.ConfigureReportingServices(configurator => {
+                if(builder.Environment.IsDevelopment()) {
+                    configurator.UseDevelopmentMode();
+                }
+                configurator.ConfigureReportDesigner(designerConfigurator => {
+                    designerConfigurator.RegisterDataSourceWizardConfigFileConnectionStringsProvider();
+                });
+                configurator.ConfigureWebDocumentViewer(viewerConfigurator => {
+                    viewerConfigurator.UseFileDocumentStorage(Path.Combine(builder.Environment.ContentRootPath, "ReportDocuments"), StorageSynchronizationMode.InterProcess);
+                    viewerConfigurator.UseFileReportStorage(Path.Combine(builder.Environment.ContentRootPath, "PreviewedReports"), StorageSynchronizationMode.InterProcess);
+                    viewerConfigurator.UseFileExportedDocumentStorage(Path.Combine(builder.Environment.ContentRootPath, "ExportedDocuments"), StorageSynchronizationMode.InterProcess);
+                    viewerConfigurator.UseCachedReportSourceBuilder();
+                });
+            });
+            builder.Services.AddSingleton<ReportStorageWebExtension, CustomReportStorageWebExtension>();
             builder.Services.Configure<RequestLocalizationOptions>(options => {
                 var supportedCultures = new[]
                 {
@@ -75,7 +97,7 @@ namespace Terminal_BackEnd.Web {
                 options.SupportedCultures = supportedCultures;
                 options.SupportedUICultures = supportedCultures;
             });
-            var app = builder.Build();            
+            var app = builder.Build();
             using(var scope = app.Services.CreateScope()) {
                 var services = scope.ServiceProvider;
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -88,7 +110,7 @@ namespace Terminal_BackEnd.Web {
                     await context.CreateAsync(new IdentityRole {
                         Name = "Standart"
                     });
-                }else {
+                } else {
                     var adminRole = context.Roles.FirstOrDefault(r => !String.IsNullOrEmpty(r.Name) && (r.Name.Contains(ConstantsCommon.Role.Admin)));
                     if(adminRole == null) {
                         await context.CreateAsync(new IdentityRole {
@@ -124,7 +146,7 @@ namespace Terminal_BackEnd.Web {
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseDevExpressControls();

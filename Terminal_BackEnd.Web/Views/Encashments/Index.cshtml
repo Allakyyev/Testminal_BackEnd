@@ -1,0 +1,153 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+@{
+    ViewData["Title"] = SharedLocalizer["Encashments"];
+    if(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin")) {
+        <script>
+            const isAdmin = true;
+        </script>
+    }
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">
+                @SharedLocalizer["Enchargement"]
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div id="gridContainer">
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            let url = 'api/TransactionsAPI/Enchargement';
+            var returnUrl = '@Context.Request.Path@Context.Request.QueryString';
+            $("#gridContainer").dxDataGrid({
+                dataSource: DevExpress.data.AspNet.createStore({
+                    key: "id",
+                    loadUrl: url,
+                    insertUrl: url,
+                    updateUrl: url,
+                    deleteUrl: url,
+                    onBeforeSend: function (method, ajaxOptions) {
+                        ajaxOptions.xhrFields = { withCredentials: true };
+                    }
+                }),
+                onExporting: function (e) {
+                    var workbook = new ExcelJS.Workbook();
+                    var worksheet = workbook.addWorksheet('Main sheet');
+                    DevExpress.excelExporter.exportDataGrid({
+                        worksheet: worksheet,
+                        component: e.component,
+                        customizeCell: function (options) {
+                            options.excelCell.font = { name: 'Arial', size: 12 };
+                            options.excelCell.alignment = { horizontal: 'left' };
+                        }
+                    }).then(function () {
+                        workbook.xlsx.writeBuffer().then(function (buffer) {
+                            saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'DataGrid.xlsx');
+                        });
+                    });
+                },
+                selection: {
+                    mode: "multiple"
+                },
+                allowColumnReordering: true,
+                "export": {
+                    enabled: true,
+                    fileName: "Documents",
+                    allowExportSelectedData: true
+                },
+                filterPanel: {
+                    visible: false
+                },
+                filterRow: { visible: false },
+                remoteOperations: true,
+                allowColumnResizing: true,
+                scrolling: {
+                    mode: "virtual",
+                    rowRenderingMode: "virtual"
+                },
+                paging: {
+                    pageSize: 100
+                },
+                editing: {
+                    useIcons: true,
+                    allowUpdating: false,
+                    allowDeleting: false,
+                    allowAdding: false
+                },
+                headerFilter: {
+                    visible: true
+                },
+                wordWrapEnabled: true,
+                showColumnLines: true,
+                showRowLines: true,
+                rowAlternationEnabled: true,
+                showBorders: true,
+                searchPanel: {
+                    visible: true
+                },
+
+                stateStoring: {
+                    enabled: true,
+                    type: "localStorage",
+                    storageKey: "userAdmin"
+                },
+
+                columns: [
+                    {
+                        caption: '@SharedLocalizer["Encashment Id"]',
+                        dataField: "id",
+                        allowHeaderFiltering: true
+                    },
+                    {
+                        caption: '@SharedLocalizer["Encashment Date"]',
+                        dataField: "encashmentDate",
+                        dataType: 'date',
+                        allowHeaderFiltering: true
+                    },
+                    {
+                        caption: '@SharedLocalizer["Encashment Sum(TMT)"]',
+                        dataField: "encashmentSum",
+                        allowHeaderFiltering: true,
+                    },
+                    {
+                        caption: '@SharedLocalizer["Terminal Name"]',
+                        dataField: "terminalName",
+                        allowHeaderFiltering: true,
+                    },
+                    {
+                        caption: '@SharedLocalizer["Terminal Owner"]',
+                        dataField: "terminalOwner",
+                        allowHeaderFiltering: true,
+                    },                    
+                    {
+                        type: "buttons",
+                        width: 110,
+                        buttons: [
+                            {
+                                hint: '@SharedLocalizer["Show details"]',
+                                icon: "info",
+                                onClick: function (e) {
+                                    var idString = e.row.data.id;
+                                    var url = `@Url.Action("EncashmentDetails", "Encashments")`;
+                                    window.location = url + '?id=' + idString;
+                                }
+                            }
+                        ]
+                    }
+                ]
+            });
+
+        });
+    </script>
+}

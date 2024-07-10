@@ -275,6 +275,9 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("EncashmenPassCode")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -311,7 +314,7 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
                     b.Property<int>("Amount")
                         .HasColumnType("int");
 
-                    b.Property<long?>("EncharchmentId")
+                    b.Property<long?>("EncargementId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Msisdn")
@@ -344,7 +347,7 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EncharchmentId");
+                    b.HasIndex("EncargementId");
 
                     b.HasIndex("TerminalId");
 
@@ -452,7 +455,7 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
                 {
                     b.HasOne("Terminal_BackEnd.Infrastructure.Entities.Encashment", "Encashment")
                         .WithMany("Transactions")
-                        .HasForeignKey("EncharchmentId")
+                        .HasForeignKey("EncargementId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Terminal_BackEnd.Infrastructure.Entities.Terminal", "Terminal")

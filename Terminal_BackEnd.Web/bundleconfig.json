@@ -6,7 +6,9 @@
       "node_modules/@devexpress/analytics-core/dist/css/dx-analytics.common.css",
       "node_modules/@devexpress/analytics-core/dist/css/dx-analytics.light.css",
       "node_modules/@devexpress/analytics-core/dist/css/dx-querybuilder.css",
-      "node_modules/devexpress-dashboard/dist/css/dx-dashboard.light.min.css"
+      "node_modules/devexpress-dashboard/dist/css/dx-dashboard.light.min.css",
+      "node_modules/devexpress-reporting/dist/css/dx-reportdesigner.css",
+      "node_modules/devexpress-reporting/dist/css/dx-webdocumentviewer.css"
     ],
     "minify": {
       "enabled": false,
@@ -28,24 +30,29 @@
   {
     "outputFileName": "wwwroot/js/site.min.js",
     "inputFiles": [
-      "node_modules/devextreme1/js/jquery.min.js",
+
+      "node_modules/devextreme2/jquery.min.js",
+
       "node_modules/knockout/build/output/knockout-latest.js",
       "node_modules/ace-builds/src-min-noconflict/ace.js",
       "node_modules/ace-builds/src-min-noconflict/ext-language_tools.js",
       "node_modules/ace-builds/src-min-noconflict/theme-dreamweaver.js",
       "node_modules/ace-builds/src-min-noconflict/theme-ambiance.js",
-
+      "node_modules/ace-builds/src-min-noconflict/snippets/text.js",
       //"node_modules/devextreme/dist/js/dx.all.js",
       //"node_modules/devextreme-dist/js/dx.all.js",
-      "node_modules/devextreme-dist/js/dx.all.js",
-      "node_modules/devextreme-dist/js/FileSaver.js",
+      "node_modules/devextreme2/dx.all.js",
 
-      "node_modules/devextreme1/js/dx.aspnet.data.js",
-      "node_modules/devextreme1/js/dx.aspnet.mvc.js",
+      //"node_modules/devextreme1/js/dx.aspnet.data.js",
+      //"node_modules/devextreme1/js/dx.aspnet.mvc.js",
       //"node_modules/devextreme-dist/js/dx.aspnet.mvc.js",
+      "node_modules/devextreme2/aspnet/dx.aspnet.data.js",
+      "node_modules/devextreme2/aspnet/dx.aspnet.mvc.js",
       "node_modules/@devexpress/analytics-core/dist/js/dx-analytics-core.min.js",
       "node_modules/@devexpress/analytics-core/dist/js/dx-querybuilder.min.js",
-      "node_modules/devexpress-dashboard/dist/js/dx-dashboard.min.js"
+      "node_modules/devexpress-dashboard/dist/js/dx-dashboard.min.js",
+      "node_modules/devexpress-reporting/dist/js/dx-webdocumentviewer.min.js",
+      "node_modules/devexpress-reporting/dist/js/dx-reportdesigner.min.js"
     ],
     "minify": {
       "enabled": false

@@ -28,9 +28,10 @@ namespace Terminal_BackEnd.Web.Areas.Identity.Pages.Account
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
+            returnUrl = Request.Form["returnUrl"];
             if (returnUrl != null)
             {
-                return LocalRedirect(returnUrl);
+                return Redirect(returnUrl);
             }
             else
             {

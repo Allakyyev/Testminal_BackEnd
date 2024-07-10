@@ -1,16 +1,18 @@
 ﻿@page
 @model LogoutModel
 @{
-    ViewData["Title"] = "Log out";
+    ViewData["Title"] = "Log out from your account";    
 }
 
 <header>
     <h1>@ViewData["Title"]</h1>
+    
     @{
         if (User.Identity?.IsAuthenticated ?? false)
         {
-            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
-                <button type="submit" class="nav-link btn btn-link text-dark">Click here to Logout</button>
+            <form id="formLogOut" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index","Home")" method="post">
+                <input type="hidden" id="returnUrl" name="returnUrl" />                
+                <div id="button"></div>
             </form>
         }
         else
@@ -19,3 +21,17 @@
         }
     }
 </header>
+<script type="text/javascript">
+    $(function () {
+        $("#button").dxButton({
+            text: "Log out",
+            type: "success",
+            stylingMode: "outlined",
+            icon: "runner",
+            onClick: function () {
+                document.getElementById("formLogOut").submit();
+            }
+        });
+    });
+    document.getElementById('returnUrl').value = window.location.origin;
+</script>

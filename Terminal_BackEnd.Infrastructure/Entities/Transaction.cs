@@ -8,7 +8,7 @@
         public string? State { get; set; }
         public string? Reason { get; set; }
         public required long TerminalId { get; set; }
-        public long? EncharchmentId { get; set; }
+        public long? EncargementId { get; set; }
         public DateTime TransactionDate { get; set; }
         public bool PollingCallbackRegistered { get; set; }
         public Terminal? Terminal { get; set; }

@@ -151,21 +151,21 @@
 
                     @if(User.IsInRole("Admin")) {
                         <li class="nav-item">
-                            <a class="nav-link collapsed" href="pages-error-404.html">
+                            <a class="nav-link collapsed" href="@Url.Action("Index","Reports")">
                                 <i class="bi bi-clipboard-data-fill"></i>
                                 <span>Reports</span>
                             </a>
                         </li><!-- End Reports Page Nav -->
                         <li class="nav-item">
-                            <a class="nav-link collapsed" href="@Url.Action("Index","Enchargements")">
+                            <a class="nav-link collapsed" href="@Url.Action("Index","Encashments")">
                                 <i class="bi bi-currency-dollar"></i>
-                                <span>Enchargements</span>
+                                <span>Encashments</span>
                             </a>
                         </li><!-- End Enrichments Page Nav -->
 
                         <!-- End Terminals Page Nav -->
                         <li class="nav-item">
-                            <a class="nav-link collapsed" href="/ApplicationUser">
+                            <a class="nav-link collapsed" href="@Url.Action("Index","ApplicationUser")">
                                 <i class="bi bi-people-fill"></i>
                                 <span>Users</span>
                             </a>
@@ -173,7 +173,7 @@
                     }
                     <!-- End Terminals Page Nav -->
                     <li class="nav-item">
-                        <a class="nav-link collapsed" href="/ApplicationUser">
+                        <a class="nav-link collapsed" href="/Identity/Account/Logout">
                             <i class="bi bi-box-arrow-right"></i>
                             <span>Sign Out</span>
                         </a>

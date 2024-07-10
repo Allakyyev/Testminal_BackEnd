@@ -1,0 +1,8 @@
+﻿@using DevExpress.XtraReports.UI
+
+@(Html.DevExpress().ReportDesigner("reportDesigner")
+    .Height("1000px")
+        .Bind(new XtraReport()))
+@section Scripts {
+    <script src="~/js/jquery/dist/jquery.min.js"></script>
+}

@@ -17,9 +17,17 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
         void DeleteTerminalById(long terminalId);
         (byte[], string) GetPasswordEncrypt(long terminalId);
     }
+
     public class TerminalService : ITerminalService {
         private readonly AppDbContext _dbContex;
         private readonly IMapper mapper;
+
+        static int GetRandomInt() {
+            byte[] randomNumber = new byte[4];
+            RandomNumberGenerator.Fill(randomNumber);
+            return BitConverter.ToInt32(randomNumber, 0) & int.MaxValue;
+        }
+
         public TerminalService(AppDbContext dbContext, IMapper mapper) {
             this._dbContex = dbContext;
             this.mapper = mapper;
@@ -32,6 +40,7 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
                 password = Convert.ToBase64String(aes.Key);
             }
             newTerminal.Password = AesEncryptionHelper.EncryptString(password);
+            newTerminal.EncashmenPassCode = GetRandomInt();
             newTerminal.CreatedDate = DateTime.Now;
             _dbContex.Terminals.Add(newTerminal);
             _dbContex.SaveChanges();
@@ -61,7 +70,7 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
             var terminal = _dbContex.Terminals.Include(p => p.ApplicationUser).FirstOrDefault(t => t.Id == terminalId);
             if(terminal != null) {
                 string password = terminal.Password;
-                string terminalSecrets = $"TerminalId: {terminal.TerminalId}\nTerminalKey: {password}";
+                string terminalSecrets = $"TerminalId: {terminal.TerminalId}\nTerminalKey: {password}\nEncashment Code: {terminal.EncashmenPassCode}";
                 return (Encoding.UTF8.GetBytes(terminalSecrets), $"{terminal.Name} {terminal.ApplicationUser?.FamilyName}.txt");
             }
             return (new byte[0], "NotAuthorized.txt");
@@ -70,7 +79,7 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
         public long GetTerminalCurrenTotal(long terminalId) {
             var result = _dbContex.Terminals.Where(t => t.Id == terminalId).Include(p => p.Transactions).ToList();
             if(result.Any()) {
-                long sum = result.First().Transactions?.Where(t => t.EncharchmentId == null || t.EncharchmentId <= 0).Sum(p => p.Amount) ?? 0;
+                long sum = result.First().Transactions?.Where(t => t.EncargementId == null || t.EncargementId <= 0).Sum(p => p.Amount) ?? 0;
                 return sum / 100;
             }
             return 0;

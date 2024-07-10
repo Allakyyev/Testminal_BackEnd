@@ -42,6 +42,22 @@
                         ajaxOptions.xhrFields = { withCredentials: true };
                     }
                 }),
+                onExporting: function (e) {
+                    var workbook = new ExcelJS.Workbook();
+                    var worksheet = workbook.addWorksheet('Main sheet');
+                    DevExpress.excelExporter.exportDataGrid({
+                        worksheet: worksheet,
+                        component: e.component,
+                        customizeCell: function (options) {
+                            options.excelCell.font = { name: 'Arial', size: 12 };
+                            options.excelCell.alignment = { horizontal: 'left' };
+                        }
+                    }).then(function () {
+                        workbook.xlsx.writeBuffer().then(function (buffer) {
+                            saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'DataGrid.xlsx');
+                        });
+                    });
+                },
                 onInitNewRow: function (e) {
                     var url = `@Url.Action("Create", "Terminal")`;
                     window.location = url;

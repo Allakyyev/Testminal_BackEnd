@@ -81,7 +81,7 @@ namespace Terminal_BackEnd.Web.Services {
                     appDbContext.Encashments.Add(enchargement);
                     appDbContext.SaveChanges();
                     foreach(var item in transactions) {
-                        item.EncharchmentId = enchargement.Id;
+                        item.EncargementId = enchargement.Id;
                         appDbContext.Transactions.Update(item);
                     }
                     appDbContext.SaveChanges();
@@ -173,21 +173,21 @@ namespace Terminal_BackEnd.Web.Services {
         }
 
         public List<Transaction> GetAllTransactions() {
-            return appDbContext.Transactions.Include(p => p.TransactionStatuses)
+            return appDbContext.Transactions
                 .Include(t => t.Terminal).ThenInclude(terminal => terminal.ApplicationUser)
                 .Where(t => t.Terminal != null && t.Terminal.ApplicationUser != null)
                 .ToList();
         }
 
         public List<Transaction> GetAllTransactions(string userId) {
-            return appDbContext.Transactions.Include(p => p.TransactionStatuses)
+            return appDbContext.Transactions
                 .Include(t => t.Terminal).ThenInclude(terminal => terminal.ApplicationUser)
                 .Where(t => t.Terminal != null && t.Terminal.ApplicationUser != null && t.Terminal.UserId == userId)
                 .ToList();
         }
 
         public List<Transaction> GetAllTransactionsById(long terminalId) {
-            return appDbContext.Transactions.Include(p => p.TransactionStatuses)
+            return appDbContext.Transactions
                 .Include(t => t.Terminal).ThenInclude(terminal => terminal.ApplicationUser)
                 .Where(t => t.Terminal != null && t.Terminal.ApplicationUser != null && t.Terminal.Id == terminalId)
                 .ToList();
@@ -204,7 +204,7 @@ namespace Terminal_BackEnd.Web.Services {
         }
 
         public TransactionViewModel GetTransactionViewModel(long transactionId) {
-            var transactions = appDbContext.Transactions.Where(t => t.Id == transactionId).Include(p => p.TransactionStatuses)
+            var transactions = appDbContext.Transactions.Where(t => t.Id == transactionId)
                 .Include(t => t.Terminal).ThenInclude(terminal => terminal.ApplicationUser)
                 .Where(t => t.Terminal != null && t.Terminal.ApplicationUser != null);
             if(transactions.Any()) {
@@ -225,7 +225,7 @@ namespace Terminal_BackEnd.Web.Services {
                 Status = transaction.Status,
                 Reason = transaction.Reason,
                 TerminalId = transaction.TerminalId,
-                EncharchmentId = transaction.EncharchmentId,
+                EncargementId = transaction.EncargementId,
                 TransactionDate = transaction.TransactionDate,
                 TermianlName = transaction.Terminal?.Name ?? "",
                 OwnerName = GetOwnerName(transaction.Terminal?.ApplicationUser)
@@ -250,11 +250,19 @@ namespace Terminal_BackEnd.Web.Services {
         }
 
         public List<Encashment> GetAllEncashment() {
-            return appDbContext.Encashments.Include(e => e.Transactions).ToList();
+            return appDbContext.Encashments.Include(e => e.Terminal).ThenInclude(p => p.ApplicationUser).ToList();
         }
 
         public List<Encashment> GetEncashmentsByTerminal(long terminalId) {
             return appDbContext.Encashments.Where(e => e.TerminalId == terminalId).ToList();
+        }
+
+        public List<Transaction> GetEncashmentTransactions(long encashmentId) {
+            return appDbContext.Transactions.AsNoTracking().Where(e => e.EncargementId == encashmentId).ToList();
+        }
+
+        public Encashment GetEncashmentById(long encashmentId) {
+            return appDbContext.Encashments.Where(e => e.Id == encashmentId).Include(e => e.Terminal).ThenInclude(t => t.ApplicationUser).First();
         }
     }
 }

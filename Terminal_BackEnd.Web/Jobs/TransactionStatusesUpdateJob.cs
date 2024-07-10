@@ -21,22 +21,24 @@ namespace Terminal_BackEnd.Web.Jobs {
             using(var scope = _serviceProvider.CreateScope()) {
                 var _appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                 var _altynAsyrTerminalService = scope.ServiceProvider.GetRequiredService<IAltynAsyrTerminalService>();
-                var terminals = _appDbContext.Transactions.Include(t => t.TransactionStatuses).ToList();
+                var transactions = _appDbContext.Transactions.Include(t => t.TransactionStatuses).ToList();
                 List<TransactionStatus> listToCheck = new List<TransactionStatus>();
-                terminals.ForEach(t => {
-                    var tStatus = t.TransactionStatuses.OrderByDescending(p => p.UpdatedDate).First();
-                    if(tStatus.Status == StateConstants.TransactionState.NEW ||
-                        //NEW, PENDING, PROCESSING, WAITING, ERROR, REJECTING, UNKNOWN
-                        tStatus.Status == StateConstants.TransactionState.NEW ||
-                        tStatus.Status == StateConstants.TransactionState.PENDING ||
-                        tStatus.Status == StateConstants.TransactionState.PROCESSING ||
-                        tStatus.Status == StateConstants.TransactionState.GWPROCESSING ||
-                        tStatus.Status == StateConstants.TransactionState.WAITING ||
-                        tStatus.Status == StateConstants.TransactionState.ERROR ||
-                        tStatus.Status == StateConstants.TransactionState.REJECTING ||
-                        tStatus.Status == StateConstants.TransactionState.REJECTED ||
-                        tStatus.Status == StateConstants.TransactionState.UNKNOWN) {
-                        listToCheck.Add(tStatus);
+                transactions.ForEach(t => {
+                    if(t.TransactionStatuses != null && t.TransactionStatuses.Any()) {
+                        var tStatus = t.TransactionStatuses.OrderByDescending(p => p.UpdatedDate).First();
+                        if(tStatus.Status == StateConstants.TransactionState.NEW ||
+                            //NEW, PENDING, PROCESSING, WAITING, ERROR, REJECTING, UNKNOWN
+                            tStatus.Status == StateConstants.TransactionState.NEW ||
+                            tStatus.Status == StateConstants.TransactionState.PENDING ||
+                            tStatus.Status == StateConstants.TransactionState.PROCESSING ||
+                            tStatus.Status == StateConstants.TransactionState.GWPROCESSING ||
+                            tStatus.Status == StateConstants.TransactionState.WAITING ||
+                            tStatus.Status == StateConstants.TransactionState.ERROR ||
+                            tStatus.Status == StateConstants.TransactionState.REJECTING ||
+                            tStatus.Status == StateConstants.TransactionState.REJECTED ||
+                            tStatus.Status == StateConstants.TransactionState.UNKNOWN) {
+                            listToCheck.Add(tStatus);
+                        }
                     }
                 });
                 foreach(var t in listToCheck) { 

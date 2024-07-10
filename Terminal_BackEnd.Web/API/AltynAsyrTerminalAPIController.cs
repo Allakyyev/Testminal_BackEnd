@@ -57,6 +57,7 @@ namespace Terminal_BackEnd.Web.API {
             var failObj = new AddEnchargementAPIResponse() { Success = false };
             if(encashementRequest == null) return failObj;
             if(this.securityService.TryValidateTerminalId(encashementRequest?.TerminalIdEncrypted ?? "", out Terminal terminal)) {
+                if(encashementRequest.EncashmentPasscode != terminal.EncashmenPassCode) return failObj;
                 if(this.securityService.ValidateCheckSum(encashementRequest.CheckSum, encashementRequest.CheckSumEncrypted, terminal.Password)) {
                     var result = await this.transactionController.CreateEncashment(terminal.Id);
                     return new AddEnchargementAPIResponse { Success = result.Success };
