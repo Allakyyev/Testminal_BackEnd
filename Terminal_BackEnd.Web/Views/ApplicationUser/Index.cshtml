@@ -80,13 +80,11 @@
                 allowColumnResizing: true,
                 onRowUpdating: function (e) {
                     e.newData = Object.assign(e.oldData, e.newData)
-                },
-                scrolling: {
-                    mode: "virtual",
-                    rowRenderingMode: "virtual"
-                },
-                paging: {
-                    pageSize: 100
+                },               
+                pager: {
+                    showPageSizeSelector: true,
+                    allowedPageSizes: [10, 20, 50],
+                    showNavigationButtons: true
                 },
                 editing: {
                     useIcons: true,

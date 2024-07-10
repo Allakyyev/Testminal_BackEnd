@@ -88,13 +88,11 @@
                     visible: false
                 },
                 filterRow: { visible: false },
-                remoteOperations: true,
-                scrolling: {
-                    mode: "virtual",
-                    rowRenderingMode: "virtual"
-                },
-                paging: {
-                    pageSize: 100
+                remoteOperations: true,                
+                pager: {
+                    showPageSizeSelector: true,
+                    allowedPageSizes: [10, 20, 50],
+                    showNavigationButtons: true
                 },
                 editing: {
                     useIcons: true,
@@ -238,12 +236,10 @@
                 },
                 filterRow: { visible: false },
                 remoteOperations: true,
-                scrolling: {
-                    mode: "virtual",
-                    rowRenderingMode: "virtual"
-                },
-                paging: {
-                    pageSize: 100
+                pager: {
+                    showPageSizeSelector: true,
+                    allowedPageSizes: [10, 20, 50],
+                    showNavigationButtons: true
                 },
                 editing: {
                     useIcons: true,
