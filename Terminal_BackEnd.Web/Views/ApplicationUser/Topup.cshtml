@@ -1,0 +1,143 @@
+﻿@model Terminal_BackEnd.Infrastructure.Entities.Topup
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+@{
+    ViewData["Title"] = SharedLocalizer["Topup"];
+}
+
+<div class="container-fluid">
+    <div class="col-lg-12">
+        <div class="row">
+            <h1 class="page-header">
+                @SharedLocalizer["Topup user balance"]
+            </h1>
+        </div>
+    </div>
+    <div>
+        <form asp-action="AddTopup" id="form" enctype="multipart/form-data">
+            <input type="hidden" asp-for="UserId" value="@Model.UserId" />
+            <div class="col-md-12">
+                <div class="form-row">
+                    <div class="col-md-8">
+                        <h1 class="page-header">
+                            @SharedLocalizer["Topup"] @ViewBag.UserName
+                        </h1>
+                        <div class="form-group">
+                            <label>@SharedLocalizer["Topup Amound"] *</label>
+                            <input type="number" class="form-control" asp-for="TopupSum" value="@Model.TopupSum" required />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="dx-fieldset">
+                <br />
+                <div id="summary"></div>
+                <br />
+                <div id="button"></div>
+            </div>
+        </form>
+    </div>
+    <div id="gridContainer"></div>
+</div>
+
+@section Scripts
+{
+    <script>
+        $(function () {           
+            $("#button").dxButton({
+                text: '@SharedLocalizer["Add"]',
+                type: "success",
+                useSubmitBehavior: true,
+            });
+            $("#summary").dxValidationSummary({});
+
+        });
+        $(function () {
+            let url = window.location.origin + '/' + 'api/ApplicationUserAPI/Topups/' + encodeURIComponent('@(Model.UserId)');
+            var returnUrl = '@Context.Request.Path@Context.Request.QueryString';
+            $("#gridContainer").dxDataGrid({
+                dataSource: DevExpress.data.AspNet.createStore({
+                    key: "id",
+                    loadUrl: url,
+                    insertUrl: url,
+                    updateUrl: url,
+                    deleteUrl: url,
+                    onBeforeSend: function (method, ajaxOptions) {
+                        ajaxOptions.xhrFields = { withCredentials: true };
+                    }
+                }),
+                onExporting: function (e) {
+                    var workbook = new ExcelJS.Workbook();
+                    var worksheet = workbook.addWorksheet('Main sheet');
+                    DevExpress.excelExporter.exportDataGrid({
+                        worksheet: worksheet,
+                        component: e.component,
+                        customizeCell: function (options) {
+                            options.excelCell.font = { name: 'Arial', size: 12 };
+                            options.excelCell.alignment = { horizontal: 'left' };
+                        }
+                    }).then(function () {
+                        workbook.xlsx.writeBuffer().then(function (buffer) {
+                            saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'DataGrid.xlsx');
+                        });
+                    });
+                },                
+                selection: {
+                    mode: "multiple"
+                },
+                "export": {
+                    enabled: true,
+                    fileName: "Documents",
+                    allowExportSelectedData: true
+                },
+                filterPanel: {
+                    visible: false
+                },
+                filterRow: { visible: false },
+                remoteOperations: true,
+                allowColumnResizing: true,
+                onRowUpdating: function (e) {
+                    e.newData = Object.assign(e.oldData, e.newData)
+                },
+                pager: {
+                    showPageSizeSelector: true,
+                    allowedPageSizes: [10, 20, 50],
+                    showNavigationButtons: true
+                },
+                editing: {
+                    useIcons: true,
+                    allowUpdating: false,
+                    allowDeleting: false,
+                    allowAdding: false
+                },
+                headerFilter: {
+                    visible: true
+                },
+                wordWrapEnabled: true,
+                showColumnLines: true,
+                showRowLines: true,
+                rowAlternationEnabled: true,
+                showBorders: true,
+                searchPanel: {
+                    visible: true
+                },
+                columns: [
+                    {
+                        caption: '@SharedLocalizer["TopUp Date"]',
+                        dataField: "topupDate",
+                        dataType: "datetime",
+                        allowHeaderFiltering: false
+                    },
+                    {
+                        caption: '@SharedLocalizer["TopUp Amound"]',
+                        dataField: "topupSum",
+                        allowHeaderFiltering: true
+                    }                
+                ]
+            });
+
+        });
+    </script>
+}

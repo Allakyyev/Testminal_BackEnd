@@ -109,7 +109,10 @@
                         }
                         </select>
                         </div> *@
-
+                        <div class="form-group">
+                            <label>@SharedLocalizer["Role"]</label>
+                            <div id="roleSelection"></div>
+                        </div>
                         <div class="form-group">
                             <label>@SharedLocalizer["Password"] *</label>
                             <input type="password" class="form-control" id="password" asp-for="Password" required min="7" />
@@ -176,6 +179,22 @@
                 {
                     type: "email",
                     message: '@SharedLocalizer["Email is invalid"]'
+                }
+                ]
+            });
+            var roles = [{ displayText: "Standard" }, { displayText: "Cashier" }]
+
+            $("#roleSelection").dxSelectBox({
+                dataSource: roles,
+                isRequired: true,
+                placeholder: 'Select status...',
+                displayExpr: "displayText",
+                valueExpr: "displayText",
+                name: 'Role'
+            }).dxValidator({
+                validationRules: [{
+                    type: "required",
+                    message: '@SharedLocalizer["Email is empty"]'
                 }
                 ]
             });

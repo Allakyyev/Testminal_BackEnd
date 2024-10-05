@@ -23,7 +23,7 @@ namespace Terminal_BackEnd.Web.API {
 
         [HttpPost("check-destination")]
         public async Task<CheckDestinationAPIResponse> CheckDestination(CheckDestinationRequest checkDestinationRequest) {
-            var failResponse = new CheckDestinationAPIResponse() { Success = true };
+            var failResponse = new CheckDestinationAPIResponse() { Success = false };
             if(checkDestinationRequest == null) return failResponse;
             if(this.securityService.TryValidateTerminalId(checkDestinationRequest?.TerminalIdEncrypted ?? "", out Terminal terminal)) {
                 if(this.securityService.TryValidateMsisdn(checkDestinationRequest?.MsisdnEncrypted ?? "", terminal.Password, out string msisdn)) {

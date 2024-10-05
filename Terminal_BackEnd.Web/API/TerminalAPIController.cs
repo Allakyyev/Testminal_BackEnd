@@ -1,6 +1,7 @@
 ﻿using DevExtreme.AspNet.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Terminal_BackEnd.Infrastructure.Constants;
 using Terminal_BackEnd.Infrastructure.Entities;
 using Terminal_BackEnd.Infrastructure.Services.TerminalService;
 using Terminal_BackEnd.Infrastructure.Services.TerminalService.Models;
@@ -17,9 +18,9 @@ namespace Terminal_BackEnd.Web.API {
         [HttpGet]
         public async Task<object?> Get(DataSourceLoadOptions loadOptions) {
             if(User.Identity != null && User.Identity.IsAuthenticated) {
-                if(User.IsInRole("Admin")) {
+                if(User.IsInRole(ConstantsCommon.Role.Admin)) {
                     return DataSourceLoader.Load<TerminalViewModel>(MapToViewModel(terminalService.GetAllTerminals()), loadOptions);
-                } else if(User.IsInRole("Standart")) {
+                } else if(User.IsInRole(ConstantsCommon.Role.Standard)) {
                     return DataSourceLoader.Load<TerminalViewModel>(MapToViewModel(terminalService.GetAllTerminalsByUser(User.Identity.Name)), loadOptions);
                 }
             }

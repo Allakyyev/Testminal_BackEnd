@@ -63,7 +63,7 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
         }
 
         public List<Terminal> GetAllTerminalsByUser(string userName) {
-            throw new NotImplementedException();
+            return _dbContex.Terminals.Include(i => i.ApplicationUser).Where(t => t.ApplicationUser != null && t.ApplicationUser.UserName == userName).ToList();
         }
 
         public (byte[], string) GetPasswordEncrypt(long terminalId) {

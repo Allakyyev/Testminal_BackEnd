@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Terminal_BackEnd.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using Terminal_BackEnd.Infrastructure.Data;
 namespace Terminal_BackEnd.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241005143644_Topups_Json_Recursive_Error")]
+    partial class Topups_Json_Recursive_Error
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -311,9 +314,6 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime>("TopupDate")
                         .HasColumnType("datetime2");
 
@@ -321,11 +321,12 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Topups");
                 });
@@ -480,9 +481,13 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
 
             modelBuilder.Entity("Terminal_BackEnd.Infrastructure.Entities.Topup", b =>
                 {
-                    b.HasOne("Terminal_BackEnd.Infrastructure.Entities.ApplicationUser", null)
+                    b.HasOne("Terminal_BackEnd.Infrastructure.Entities.ApplicationUser", "ApplicationUser")
                         .WithMany("Topups")
-                        .HasForeignKey("ApplicationUserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("Terminal_BackEnd.Infrastructure.Entities.Transaction", b =>

@@ -18,6 +18,9 @@ namespace Terminal_BackEnd.Infrastructure.Services.UserService.Models {
         [Required]
         public required string FamilyName { get; set; }
 
+        [Required]
+        public required string Role { get; set; }
+
         [Compare("Password", ErrorMessage = "Confirm password doesn't match, Type again !")]
         public required string ConfirmPassword { get; set; }
 

@@ -105,22 +105,31 @@ namespace Terminal_BackEnd.Web {
                 var context = services.GetRequiredService<RoleManager<IdentityRole>>();
                 if(!context.Roles.Any()) {
                     await context.CreateAsync(new IdentityRole {
-                        Name = "Admin"
+                        Name = ConstantsCommon.Role.Admin
                     });
                     await context.CreateAsync(new IdentityRole {
-                        Name = "Standart"
+                        Name = ConstantsCommon.Role.Standard
+                    });
+                    await context.CreateAsync(new IdentityRole {
+                        Name = ConstantsCommon.Role.Cashier
                     });
                 } else {
                     var adminRole = context.Roles.FirstOrDefault(r => !String.IsNullOrEmpty(r.Name) && (r.Name.Contains(ConstantsCommon.Role.Admin)));
                     if(adminRole == null) {
                         await context.CreateAsync(new IdentityRole {
-                            Name = "Admin"
+                            Name = ConstantsCommon.Role.Admin
                         });
                     }
-                    var standartRole = context.Roles.FirstOrDefault(r => !String.IsNullOrEmpty(r.Name) && (r.Name.Contains(ConstantsCommon.Role.Standart)));
+                    var standartRole = context.Roles.FirstOrDefault(r => !String.IsNullOrEmpty(r.Name) && (r.Name.Contains(ConstantsCommon.Role.Standard)));
                     if(standartRole == null) {
                         await context.CreateAsync(new IdentityRole {
-                            Name = "Standart"
+                            Name = ConstantsCommon.Role.Standard
+                        });
+                    }
+                    var cashierRole = context.Roles.FirstOrDefault(r => !String.IsNullOrEmpty(r.Name) && (r.Name.Contains(ConstantsCommon.Role.Cashier)));
+                    if(cashierRole == null) {
+                        await context.CreateAsync(new IdentityRole {
+                            Name = ConstantsCommon.Role.Cashier
                         });
                     }
                 }
@@ -138,7 +147,6 @@ namespace Terminal_BackEnd.Web {
                 var user = await userContext.CreateAsync(adminUser, "Password!1");
                 await userContext.AddToRoleAsync(adminUser, "Admin");
                 dbContext.SaveChanges();
-
             }
             // Configure the HTTP request pipeline.
             if(!app.Environment.IsDevelopment()) {

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Terminal_BackEnd.Infrastructure.Constants;
 using Terminal_BackEnd.Infrastructure.Data;
 using Terminal_BackEnd.Infrastructure.Entities;
+using Terminal_BackEnd.Infrastructure.Services.UserService;
 using Terminal_BackEnd.Infrastructure.Services.UserService.Models;
 
 namespace Terminal_BackEnd.Web.Controllers {
@@ -13,14 +14,15 @@ namespace Terminal_BackEnd.Web.Controllers {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly AppDbContext _dbContex;
         private readonly RoleManager<IdentityRole> _roleManager;
-        //private readonly IApplicationUserService _applicationUserService;        
+        private readonly IApplicationUserService _applicationUserService;        
         //private readonly IStringLocalizer<SharedResource> _localizer;
 
         public ApplicationUserController(RoleManager<IdentityRole> roleManager,
-            UserManager<ApplicationUser> userManager, AppDbContext dbContext) {
+            UserManager<ApplicationUser> userManager, AppDbContext dbContext, IApplicationUserService applicationUserService) {
             _roleManager = roleManager;
             _userManager = userManager;
             _dbContex = dbContext;
+            _applicationUserService = applicationUserService;
         }
         // GET: Admin/ApplicationUser
         public IActionResult Index() {
@@ -76,7 +78,12 @@ namespace Terminal_BackEnd.Web.Controllers {
                 var result = await _userManager.CreateAsync(user, model.Password);
 
                 if(result.Succeeded) {
-                    await _userManager.AddToRoleAsync(user, ConstantsCommon.Role.Standart);
+                    var roleInRoles = model.Role == ConstantsCommon.Role.Standard ||
+                                      model.Role == ConstantsCommon.Role.Cashier;
+                    if(roleInRoles)
+                        await _userManager.AddToRoleAsync(user, model.Role);
+                    else
+                        await _userManager.AddToRoleAsync(user, ConstantsCommon.Role.Standard);
                     return RedirectToAction("Index");
                 }
             }
@@ -153,20 +160,43 @@ namespace Terminal_BackEnd.Web.Controllers {
         }
 
         [HttpGet]
-        public async Task<IActionResult> Create() {
+        public IActionResult Create() {
             return View(new CreateUserModel() {
                 Email = String.Empty,
                 UserName = String.Empty,
                 Password = String.Empty,
                 ConfirmPassword = String.Empty,
                 FirstName = String.Empty,
-                FamilyName = String.Empty
-
+                FamilyName = String.Empty,
+                Role = ConstantsCommon.Role.Standard
             });
         }
 
         // GET: Admin/ApplicationUser/Delete/5
         public IActionResult Delete(string id) {
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Topup(string id) {
+            var user = await _userManager.FindByIdAsync(id);
+            if(user != null) {
+                ViewBag.UserName = user.UserName + " - " + user.FirstName;
+                return View(new Topup() { UserId = id, TopupDate = DateTime.Now, TopupSum = 0 });
+            }
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddTopup(Topup model) {
+            if(ModelState.IsValid) {
+                var result = await _applicationUserService.Topup(model.UserId, model.TopupSum);
+                return View("Topup", new { id = model.UserId });
+            }                            
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet] IActionResult SuccessTopup() {
             return View();
         }
     }

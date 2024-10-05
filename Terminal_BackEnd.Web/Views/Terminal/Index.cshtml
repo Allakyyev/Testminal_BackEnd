@@ -6,7 +6,7 @@
     ViewData["Title"] = SharedLocalizer["Terminals"];
     if(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin")) {
                                 <script>
-                                    const isAdmin = true;
+                                  windows["isAdmin"] = true;
                                 </script>
     }
 }
@@ -91,7 +91,7 @@
                     useIcons: true,
                     allowUpdating: true,
                     allowDeleting: true,
-                    allowAdding: true
+                    allowAdding: @(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin") ? "true" : "false")
                 },
                 headerFilter: {
                     visible: true

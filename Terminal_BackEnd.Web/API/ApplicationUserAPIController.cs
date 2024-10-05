@@ -6,6 +6,7 @@ using Terminal_BackEnd.Infrastructure.Constants;
 using Terminal_BackEnd.Infrastructure.Data;
 using Terminal_BackEnd.Infrastructure.Entities;
 using Terminal_BackEnd.Infrastructure.Services.UserService;
+using Terminal_BackEnd.Infrastructure.ViewModels;
 
 
 namespace Terminal_BackEnd.Web.API {
@@ -26,8 +27,14 @@ namespace Terminal_BackEnd.Web.API {
         // GET: api/ApplicationUserAPI
         [HttpGet]
         public async Task<object?> Get(DataSourceLoadOptions loadOptions) {            
-            return DataSourceLoader.Load<ApplicationUser>(_userService.GetAllUsers().AsQueryable(), loadOptions);            
+            return DataSourceLoader.Load<ApplicationUserViewModel>((await _userService.GetAllUsers()), loadOptions);            
         }
+
+        [HttpGet("Topups/{id}")]
+        public async Task<object?> Topups(string id, DataSourceLoadOptions loadOptions) {
+            return DataSourceLoader.Load<Topup>((await _userService.TopupsByUser(id)), loadOptions);
+        }
+
         // DELETE: api/CallBacksAPI/5
         [HttpDelete("{id}")]
         public async Task Delete(string id) {

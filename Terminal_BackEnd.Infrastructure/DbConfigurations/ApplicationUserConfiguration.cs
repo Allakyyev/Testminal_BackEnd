@@ -10,7 +10,7 @@ namespace Terminal_BackEnd.Infrastructure.DbConfigurations {
             builder.Property(p => p.CompanyName).IsRequired(false);
             builder.Property(p => p.CompanyAddress).IsRequired(false);
             builder.Property(p => p.Address).IsRequired(false);
-            builder.HasMany(p => p.Terminals).WithOne(p => p.ApplicationUser).HasForeignKey(p => p.TerminalId);
+            builder.HasMany(p => p.Terminals).WithOne(p => p.ApplicationUser).HasForeignKey(p => p.TerminalId);            
         }
     }
 }

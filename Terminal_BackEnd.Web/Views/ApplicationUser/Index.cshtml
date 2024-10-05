@@ -22,9 +22,9 @@
     </div>
 </div>
 
-@section Scripts{
+@section Scripts {
     <script>
-         var UserType = [
+        var UserType = [
             { Id: 0, name: '@SharedLocalizer["Employee"]' },
             { Id: 1, name: '@SharedLocalizer["Entrepreneur"]' },
             { Id: 2, name: '@SharedLocalizer["Organization"]' }
@@ -60,7 +60,7 @@
                         });
                     });
                 },
-                onInitNewRow: function(e) {
+                onInitNewRow: function (e) {
                     var url = `@Url.Action("Create", "ApplicationUser", new { Area = "Admin" })`;
                     window.location = url;
                 },
@@ -80,7 +80,7 @@
                 allowColumnResizing: true,
                 onRowUpdating: function (e) {
                     e.newData = Object.assign(e.oldData, e.newData)
-                },               
+                },
                 pager: {
                     showPageSizeSelector: true,
                     allowedPageSizes: [10, 20, 50],
@@ -116,23 +116,28 @@
                         dataField: "userName",
                         allowHeaderFiltering: false
                     },
-
-                      {
+                    {
+                        caption: '@SharedLocalizer["Role"]',
+                        dataField: "role",
+                        allowHeaderFiltering: true
+                    },
+                    {
                         caption: '@SharedLocalizer["Name"]',
                         dataField: "firstName",
-                          allowHeaderFiltering: false,
-                          cellTemplate: function (container, options) {                              
-                              $("<div>")
-                                  .text(options.data.firstName )
-                                  .appendTo(container);
-                          }
-                      },
+                        allowHeaderFiltering: false,
+                        cellTemplate: function (container, options) {
+                            $("<div>")
+                                .text(options.data.firstName)
+                                .appendTo(container);
+                        }
+                    },
 
                     {
                         caption: '@SharedLocalizer["Email"]',
                         dataField: "email",
                         allowHeaderFiltering: true
                     },
+
                     {
                         caption: '@SharedLocalizer["Address"]',
                         dataField: "address",
@@ -167,6 +172,15 @@
                                 onClick: function (e) {
                                     var idString = e.row.data.id;
                                     var url = `@Url.Action("ChangePassword", "ApplicationUser")`;
+                                    window.location = url + '?id=' + idString;
+                                }
+                            },
+                            {
+                                hint: '@SharedLocalizer["Topup balance"]',
+                                icon: "money",
+                                onClick: function (e) {
+                                    var idString = e.row.data.id;
+                                    var url = `@Url.Action("Topup", "ApplicationUser")`;
                                     window.location = url + '?id=' + idString;
                                 }
                             },

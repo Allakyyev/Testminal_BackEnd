@@ -8,5 +8,6 @@ namespace Terminal_BackEnd.Infrastructure.Entities {
         public string?  CompanyAddress{ get; set; }
         public string? Address { get; set; }
         public List<Terminal> Terminals { get; set; } = [];
+        public List<Topup> Topups { get; set; } = [];
     }
 }

@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Terminal_BackEnd.Web.Services;
 using Terminal_BackEnd.Web.Services.Model;
 
 namespace Terminal_BackEnd.Web.Controllers {
+    [Authorize]
     public class EncashmentsController : Controller {
         readonly ITransactionControllerService _transactionControllerService;
         public EncashmentsController(ITransactionControllerService transactionControllerService)

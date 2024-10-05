@@ -20,7 +20,7 @@ namespace Terminal_BackEnd.Web.API {
             if(User.Identity != null && User.Identity.IsAuthenticated) {
                 if(User.IsInRole("Admin")) {
                     return DataSourceLoader.Load<TransactionViewModel>(MapToViewModel(_transactionControllerService.GetAllTransactions()), loadOptions);
-                } else if(User.IsInRole("Standart")) {
+                } else if(User.IsInRole("Standard")) {
                     var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if(userId != null)
                         return DataSourceLoader.Load<TransactionViewModel>(MapToViewModel(_transactionControllerService.GetAllTransactions(userId)), loadOptions);
