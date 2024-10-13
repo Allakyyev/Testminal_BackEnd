@@ -10,4 +10,7 @@ namespace Terminal_BackEnd.Infrastructure.Services.DataContracts {
 
     [DataContract]
     public class AddEnchargementAPIResponse : APIResponseBase { }
+
+    [DataContract]
+    public class RegisterTerminalResponse : APIResponseBase { }
 }

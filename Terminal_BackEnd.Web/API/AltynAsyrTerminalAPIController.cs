@@ -2,6 +2,7 @@
 using Terminal_BackEnd.Infrastructure.Entities;
 using Terminal_BackEnd.Infrastructure.Services.APIDataContracts;
 using Terminal_BackEnd.Infrastructure.Services.DataContracts;
+using Terminal_BackEnd.Infrastructure.Services.TerminalService;
 using Terminal_BackEnd.Infrastructure.Services.UserService;
 using Terminal_BackEnd.Web.Services;
 
@@ -12,10 +13,12 @@ namespace Terminal_BackEnd.Web.API {
         readonly ITransactionControllerService transactionController;
         readonly ISecurityService securityService;
         readonly IApplicationUserService applicationUserService;
-        public AltynAsyrTerminalAPIController(ITransactionControllerService transactionController, ISecurityService securityService, IApplicationUserService applicationUserService) {
+        readonly ITerminalService terminalService;
+        public AltynAsyrTerminalAPIController(ITransactionControllerService transactionController, ISecurityService securityService, IApplicationUserService applicationUserService, ITerminalService terminalService) {
             this.transactionController = transactionController;
             this.securityService = securityService;
             this.applicationUserService = applicationUserService;
+            this.terminalService = terminalService;
         }
 
         [HttpGet("get-services")]
@@ -72,6 +75,14 @@ namespace Terminal_BackEnd.Web.API {
                 }
             }
             return failObj;
+        }
+
+        [HttpPost("register-terminal")]
+        public RegisterTerminalResponse RegisterTerminal(RegisterTerminalRequest registerTerminalRequest) {
+            var result = this.terminalService.RegisterTerminal(registerTerminalRequest.TerminalId, registerTerminalRequest.MotherboardId, registerTerminalRequest.CpuId);
+            return new RegisterTerminalResponse() {
+                Success = result
+            };
         }
     }
 }

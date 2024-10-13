@@ -43,7 +43,9 @@ namespace Terminal_BackEnd.Web.API {
                     TerminalId = terminal.TerminalId,
                     Status = terminal.Status == TerminalStatus.Active ? "Active" : "Inactive",
                     Owner = $"{terminal.ApplicationUser?.CompanyName}  {terminal.ApplicationUser?.FamilyName} {terminal.ApplicationUser?.FirstName}",
-                    CurrentTotal = terminalService.GetTerminalCurrenTotal(terminal.Id)
+                    CurrentTotal = terminalService.GetTerminalCurrenTotal(terminal.Id),
+                    DeviceCPUId = terminal.DeviceCPUId,
+                    DeviceMotherBoardId = terminal.DeviceMotherBoardId
                 };
                 terminalsViewModel.Add(terminalViewModel);
             }

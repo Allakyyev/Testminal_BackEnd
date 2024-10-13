@@ -14,5 +14,7 @@
         public ApplicationUser? ApplicationUser { get; set; }
         public TerminalStatus Status { get; set; }
         public DateTime CreatedDate { get; set; }
+        public string? DeviceMotherBoardId { get; set; }
+        public string? DeviceCPUId { get; set; }
     }
 }

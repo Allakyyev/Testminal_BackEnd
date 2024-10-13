@@ -16,6 +16,7 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
         void CreateTerminal(CreateTerminalModel terminalModel);
         void DeleteTerminalById(long terminalId);
         (byte[], string) GetPasswordEncrypt(long terminalId);
+        bool RegisterTerminal(string terminalId, string motherboardId, string cpuId);
     }
 
     public class TerminalService : ITerminalService {
@@ -32,6 +33,24 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
             this._dbContex = dbContext;
             this.mapper = mapper;
         }
+
+        public bool RegisterTerminal(string terminalId, string motherboardId, string cpuId) {
+            try {
+                var terminal = _dbContex.Terminals.FirstOrDefault(t => t.TerminalId == terminalId);
+                if(terminal == null) return false;
+                if(!string.IsNullOrEmpty(terminal.DeviceCPUId) && terminal.DeviceCPUId != cpuId) return false;
+                if(!string.IsNullOrEmpty(terminal.DeviceMotherBoardId) && terminal.DeviceMotherBoardId != motherboardId) return false;
+
+                terminal.DeviceCPUId = cpuId;
+                terminal.DeviceMotherBoardId = motherboardId;
+                _dbContex.Update(terminal);
+                _dbContex.SaveChanges();
+                return true;
+            } catch(Exception ex) {
+                return false;
+            }
+        }
+
         public void CreateTerminal(CreateTerminalModel terminalModel) {
             Terminal newTerminal = mapper.Map<Terminal>(terminalModel);
             string password = String.Empty;

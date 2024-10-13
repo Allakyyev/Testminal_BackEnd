@@ -7,6 +7,8 @@ namespace Terminal_BackEnd.Infrastructure.DbConfigurations {
         public void Configure(EntityTypeBuilder<Terminal> builder) {
             builder.HasKey(p => p.Id);
             builder.Property(p => p.UserId).IsRequired(false);
+            builder.Property(p => p.DeviceMotherBoardId).IsRequired(false);
+            builder.Property(p => p.DeviceCPUId).IsRequired(false);
             builder.Property(p => p.TerminalId).IsRequired(true);
             builder.Property(p => p.Name).IsRequired(true);
             builder.Property(p => p.Password).IsRequired(true);
