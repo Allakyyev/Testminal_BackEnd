@@ -130,7 +130,7 @@
                 <ul class="sidebar-nav" id="sidebar-nav">
                     @if(User.IsInRole("Admin")) {
                         <li class="nav-item">
-                            <a class="nav-link " href="@Url.Action("Index","Home")">
+                            <a class="nav-link" href="@Url.Action("Index","Home")">
                                 <i class="bi bi-grid"></i>
                                 <span>Dashboard</span>
                             </a>
@@ -140,7 +140,7 @@
                     }
                     @if(User.IsInRole("Standard") || User.IsInRole("Admin")) {
                         <li class="nav-item">
-                            <a class="nav-link collapsed" href="@Url.Action("Index","Transaction")">
+                            <a class="nav-link collapsed" id="Transaction" href="@Url.Action("Index","Transaction")">
                                 <i class="bi bi-card-list"></i>
                                 <span>Transactions</span>
                             </a>
@@ -148,7 +148,7 @@
 
                         <!-- End Transactions Page Nav -->
                         <li class="nav-item">
-                            <a class="nav-link collapsed" href="@Url.Action("Index","Terminal")">
+                            <a class="nav-link collapsed" id="Terminal" href="@Url.Action("Index","Terminal")">
                                 <i class="bi bi-file-post"></i>
                                 <span>Terminals</span>
                             </a>
@@ -157,31 +157,23 @@
                         <!-- End Terminals Page Nav -->
                     }
                     <li class="nav-item">
-                        <a class="nav-link collapsed" href="@Url.Action("Index","Encashments")">
+                        <a class="nav-link collapsed" id="Encashments" href="@Url.Action("Index","Encashments")">
                             <i class="bi bi-currency-dollar"></i>
                             <span>Encashments</span>
                         </a>
                     </li><!-- End Enrichments Page Nav -->
                     @if(User.IsInRole("Admin")) {
                         <li class="nav-item">
-                            <a class="nav-link collapsed" href="@Url.Action("Index","Reports")">
+                            <a class="nav-link collapsed" id="Reports" href="@Url.Action("Index","Reports")">
                                 <i class="bi bi-clipboard-data-fill"></i>
                                 <span>Reports</span>
-                            </a>
-                        </li>
-
-                        <!-- End Reports Page Nav -->
-                        <li class="nav-item">
-                            <a class="nav-link collapsed" href="@Url.Action("Index","Encashments")">
-                                <i class="bi bi-currency-dollar"></i>
-                                <span>Encashments</span>
                             </a>
                         </li>
 
                         <!-- End Enrichments Page Nav -->
                         <!-- End Terminals Page Nav -->
                         <li class="nav-item">
-                            <a class="nav-link collapsed" href="@Url.Action("Index","ApplicationUser")">
+                            <a class="nav-link collapsed" id="ApplicationUser" href="@Url.Action("Index","ApplicationUser")">
                                 <i class="bi bi-people-fill"></i>
                                 <span>Users</span>
                             </a>
@@ -189,9 +181,20 @@
 
                         <!-- End Users Page Nav -->
                     }
+                    @if(User.IsInRole("Standard")) {
+                        <!-- End Balance Page Nav -->
+                        <li class="nav-item">
+                            <a class="nav-link collapsed" id="Balance" href="@Url.Action("Index", "Balance")">
+                                <i class="bi bi-cash-coin"></i>
+                                <span>Balance</span>
+                            </a>
+                        </li>
+
+                        <!-- End Balance Page Nav -->
+                    }
                     <!-- End Terminals Page Nav -->
                     <li class="nav-item">
-                        <a class="nav-link collapsed" href="/Identity/Account/Logout">
+                        <a class="nav-link collapsed" id="Logout" href="/Identity/Account/Logout">
                             <i class="bi bi-box-arrow-right"></i>
                             <span>Sign Out</span>
                         </a>
@@ -223,6 +226,16 @@
     <!-- Vendor JS Files -->
     <!-- Template Main JS File -->
     <script src="~/assets/js/main.js"></script>
+    <script>
+        function performActionAndRedirect(id) {
+            var elements = document.querySelectorAll('.nav-item .nav-link');
+            elements.forEach((element) => element.classList.add("collapsed"));
+            var element = document.getElementById(id);
+            if (element !== undefined)
+                element.classList.remove("collapsed");
+
+        }
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

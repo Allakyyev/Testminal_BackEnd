@@ -2,7 +2,9 @@
 using DevExtreme.AspNet.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Terminal_BackEnd.Infrastructure.Constants;
 using Terminal_BackEnd.Infrastructure.Entities;
+using Terminal_BackEnd.Infrastructure.Services.UserService.Models;
 using Terminal_BackEnd.Web.Services;
 using Terminal_BackEnd.Web.Services.Model;
 
@@ -51,11 +53,16 @@ namespace Terminal_BackEnd.Web.API {
             return Unauthorized();
         }
 
+        [HttpPost("CloseEncashment")]
+        public void CloseEncashment(CloseEncashmentModel model) {
+            _transactionControllerService.CloseEncashment(model.Id);
+        }
+
         [HttpGet("Enchargement")]
         public async Task<object?> Enchargement(DataSourceLoadOptions loadOptions) {
             if(User.Identity != null && User.Identity.IsAuthenticated) {
                 var enchargement = _transactionControllerService.GetAllEncashment();
-                if(User.IsInRole("Admin")) {
+                if(User.IsInRole(ConstantsCommon.Role.Admin) || User.IsInRole(ConstantsCommon.Role.Cashier)) {
                     return DataSourceLoader.Load<EncashmentViewModel>(MapToEncachmentViewModel(enchargement), loadOptions);
                 } else if(enchargement.Any()) {
                     var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -141,7 +148,10 @@ namespace Terminal_BackEnd.Web.API {
                     EncashmentSum = item.EncashmentSum,
                     TerminalId = item.TerminalId,
                     TerminalName = terminal?.Name ?? String.Empty,
-                    TerminalOwner = $"{terminal.ApplicationUser?.FamilyName ?? String.Empty} {terminal.ApplicationUser?.CompanyName ?? String.Empty}"
+                    TerminalOwner = $"{terminal.ApplicationUser?.FamilyName ?? String.Empty} {terminal.ApplicationUser?.CompanyName ?? String.Empty}",
+                    EncashmentSumFromTerminal = item.EncashmentSumFromTerminal,
+                    BalanceDifference = item.EncashmentSum - item.EncashmentSumFromTerminal,
+                    Status = item.Status,
                 };
                 result.Add(enchargementViewModel);
             }

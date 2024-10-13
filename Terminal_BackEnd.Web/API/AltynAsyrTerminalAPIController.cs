@@ -2,6 +2,7 @@
 using Terminal_BackEnd.Infrastructure.Entities;
 using Terminal_BackEnd.Infrastructure.Services.APIDataContracts;
 using Terminal_BackEnd.Infrastructure.Services.DataContracts;
+using Terminal_BackEnd.Infrastructure.Services.UserService;
 using Terminal_BackEnd.Web.Services;
 
 namespace Terminal_BackEnd.Web.API {
@@ -10,9 +11,11 @@ namespace Terminal_BackEnd.Web.API {
     public class AltynAsyrTerminalAPIController : ControllerBase {
         readonly ITransactionControllerService transactionController;
         readonly ISecurityService securityService;
-        public AltynAsyrTerminalAPIController(ITransactionControllerService transactionController, ISecurityService securityService) {
+        readonly IApplicationUserService applicationUserService;
+        public AltynAsyrTerminalAPIController(ITransactionControllerService transactionController, ISecurityService securityService, IApplicationUserService applicationUserService) {
             this.transactionController = transactionController;
             this.securityService = securityService;
+            this.applicationUserService = applicationUserService;
         }
 
         [HttpGet("get-services")]
@@ -40,13 +43,18 @@ namespace Terminal_BackEnd.Web.API {
             var failResponse = new ForceAddAPIResponse() { Success = false };
             if(forceAddRequest == null)
                 return failResponse;
-            if(this.securityService.TryValidateTerminalId(forceAddRequest?.TerminalIdEncrypted ?? "", out Terminal terminal)) {
-                if(this.securityService.TryValidateMsisdn(forceAddRequest?.MsisdnEncrypted ?? "", terminal.Password, out string msisdn)) {
+            if(this.securityService.TryValidateTerminalId(forceAddRequest.TerminalIdEncrypted ?? "", out Terminal terminal)) {
+                if(this.securityService.TryValidateMsisdn(forceAddRequest.MsisdnEncrypted ?? "", terminal.Password, out string msisdn)) {
                     forceAddRequest.Msisdn = msisdn.Replace("993", "");
                     forceAddRequest.TerminalId = terminal.Id;
-
-                    var result = await this.transactionController.ForceAddTransactionAsync(forceAddRequest);
-                    return new ForceAddAPIResponse { Success = result.Success };
+                    long currentUserTotal = await applicationUserService.GetCurrentTotal(terminal.UserId);
+                    if(currentUserTotal > 0 && (currentUserTotal - forceAddRequest.Amount) >= 0) {
+                        var result = await this.transactionController.ForceAddTransactionAsync(forceAddRequest);
+                        if(result.Success) {
+                            await applicationUserService.UpdateCurrentTotal(terminal.UserId, forceAddRequest.Amount);
+                        }
+                        return new ForceAddAPIResponse { Success = result.Success };
+                    }
                 }
             }
             return failResponse;
@@ -59,7 +67,7 @@ namespace Terminal_BackEnd.Web.API {
             if(this.securityService.TryValidateTerminalId(encashementRequest?.TerminalIdEncrypted ?? "", out Terminal terminal)) {
                 if(encashementRequest.EncashmentPasscode != terminal.EncashmenPassCode) return failObj;
                 if(this.securityService.ValidateCheckSum(encashementRequest.CheckSum, encashementRequest.CheckSumEncrypted, terminal.Password)) {
-                    var result = await this.transactionController.CreateEncashment(terminal.Id);
+                    var result = await this.transactionController.CreateEncashment(terminal.Id, encashementRequest.Sum);
                     return new AddEnchargementAPIResponse { Success = result.Success };
                 }
             }

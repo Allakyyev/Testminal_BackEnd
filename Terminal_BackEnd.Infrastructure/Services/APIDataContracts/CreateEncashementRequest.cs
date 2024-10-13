@@ -9,5 +9,7 @@ namespace Terminal_BackEnd.Infrastructure.Services.APIDataContracts {
         public required string CheckSumEncrypted { get; set; }
         [DataMember(Name = "encashmentPasscode")]
         public int EncashmentPasscode { get; set; }
+        [DataMember(Name = "sum")]
+        public int Sum { get; set; }
     }
 }

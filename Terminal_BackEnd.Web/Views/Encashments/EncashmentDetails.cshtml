@@ -10,7 +10,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">@SharedLocalizer["Encashment Details"]: <strong>ID @Model.Id</strong></h5>
+                    <h5 class="card-title">@SharedLocalizer["Encashment Details"]: <strong>ID @Model.Id</strong> @(Model.Status == Terminal_BackEnd.Infrastructure.Entities.EncashmentStatus.Open ? "Open" :"Closed")</strong></h5>
                    <form class="row g-3">
                         <div class="col-md-4">
                             <label for="validationDefault01" class="form-label">@SharedLocalizer["Encashment Date"]</label>
@@ -27,7 +27,12 @@
                         <div class="col-md-4">
                             <label for="validationDefault02" class="form-label">@SharedLocalizer["Terminal Owner"]</label>
                             <input type="text" class="form-control" value="@(Model.TerminalOwner)" required disabled>
-                        </div>                                                
+                        </div>
+                        @if((User.IsInRole("Cashier") || User.IsInRole("Admin")) && Model.Status == Terminal_BackEnd.Infrastructure.Entities.EncashmentStatus.Open) {
+                        <div class="col-md-4">
+                            <div id="closeButton"></div>
+                        </div>
+                        }
                     </form>
                 </div>
             </div>
@@ -47,6 +52,7 @@
 </section>
 @section Scripts {
     <script>
+        performActionAndRedirect("Encashments");
         $(function () {
             let url = window.location.origin + '/' + 'api/TransactionsAPI/EncashmentTransactions/' + @(Model.Id);
             var returnUrl = '@Context.Request.Path@Context.Request.QueryString';
@@ -121,7 +127,7 @@
                 stateStoring: {
                     enabled: true,
                     type: "localStorage",
-                    storageKey: "userAdmin"
+                    storageKey: "EncashmentTransactions"
                 },
 
                 columns: [
@@ -190,6 +196,8 @@
             });
 
             let enchUrl = window.location.origin + '/' + 'api/TransactionsAPI/TerminalEnchargements/' + @(Model.Id);
+            let closeUrl = window.location.origin + '/' + 'api/TransactionsAPI/CloseEncashment';
+            
             $("#gridEnchargements").dxDataGrid({
                 dataSource: DevExpress.data.AspNet.createStore({
                     key: "id",
@@ -258,7 +266,7 @@
                 stateStoring: {
                     enabled: true,
                     type: "localStorage",
-                    storageKey: "userAdmin"
+                    storageKey: "TerminalEnchargements"
                 },
 
                 columns: [
@@ -279,6 +287,28 @@
                         allowHeaderFiltering: true,
                     }                   
                 ]
+            });
+            $("#closeButton").dxButton({
+                text: '@SharedLocalizer["Close Encashment"]',
+                type: "success",
+                useSubmitBehavior: false,
+                onClick: function() {
+                $.ajax({
+                    url: closeUrl,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: @Model.Id                        
+                    }),
+                    success: function(response) {
+                        alert("Encashment closed successfully!");
+                        window.location.href = window.location.pathname + '?id=' + '@(Model.Id)';
+                    },
+                    error: function(error) {
+                        alert("Something went wrong. Please try again!");
+                    }
+                });
+            }
             });
         });
     </script>

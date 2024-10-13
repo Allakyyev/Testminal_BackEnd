@@ -6,6 +6,7 @@ using Terminal_BackEnd.Infrastructure.Data;
 using Terminal_BackEnd.Infrastructure.Entities;
 using Terminal_BackEnd.Infrastructure.Services.UserService;
 using Terminal_BackEnd.Infrastructure.Services.UserService.Models;
+using Terminal_BackEnd.Infrastructure.ViewModel;
 
 namespace Terminal_BackEnd.Web.Controllers {
     //[Area("Admin")]
@@ -182,16 +183,16 @@ namespace Terminal_BackEnd.Web.Controllers {
             var user = await _userManager.FindByIdAsync(id);
             if(user != null) {
                 ViewBag.UserName = user.UserName + " - " + user.FirstName;
-                return View(new Topup() { UserId = id, TopupDate = DateTime.Now, TopupSum = 0 });
+                return View(new TopUpViewModel() { UserId = id, TopupDate = DateTime.Now, TopupSum = 0, CurrentTotal = user.CurrentTotal });
             }
             return RedirectToAction("Index");
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddTopup(Topup model) {
+        public async Task<IActionResult> AddTopup(TopUpViewModel model) {
             if(ModelState.IsValid) {
                 var result = await _applicationUserService.Topup(model.UserId, model.TopupSum);
-                return View("Topup", new { id = model.UserId });
+                return RedirectToAction("Topup", new { id = model.UserId });
             }                            
             return RedirectToAction("Index");
         }

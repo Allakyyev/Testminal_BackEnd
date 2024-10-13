@@ -29,7 +29,7 @@ namespace Terminal_BackEnd.Web.Services {
     public interface ITransactionControllerService {
         public Task<AddTransactionResponseClient> ForceAddTransactionAsync(ForceAddRequest forceAddRequest);
         public Task<CheckDestinationResponseClient> CheckDestinationAsync(CheckDestinationRequest checkDestinationRequest, int retryCount = 3);
-        public Task<EncashementResponse> CreateEncashment(long terminalId);
+        public Task<EncashementResponse> CreateEncashment(long terminalId, int sum);
         public Task<string[]> GetServicesAsync();
         public List<Transaction> GetAllTransactions();
         public List<Transaction> GetAllTransactions(string userId);
@@ -40,5 +40,6 @@ namespace Terminal_BackEnd.Web.Services {
         public List<Encashment> GetEncashmentsByTerminal(long terminalId);
         public List<Transaction> GetEncashmentTransactions(long encashmentId);
         public Encashment GetEncashmentById(long encashmentId);
+        public void CloseEncashment(long id);
     }
 }

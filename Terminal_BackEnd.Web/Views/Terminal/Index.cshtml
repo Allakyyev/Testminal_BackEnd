@@ -5,9 +5,9 @@
 @{
     ViewData["Title"] = SharedLocalizer["Terminals"];
     if(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin")) {
-                                <script>
-                                  windows["isAdmin"] = true;
-                                </script>
+        <script>
+            window["isAdmin"] = true;
+        </script>
     }
 }
 
@@ -27,7 +27,8 @@
 </div>
 
 @section Scripts {
-    <script>       
+    <script>
+        performActionAndRedirect("Terminal");
         $(function () {
             let url = 'api/TerminalAPI';
             var returnUrl = '@Context.Request.Path@Context.Request.QueryString';
@@ -80,7 +81,7 @@
                     visible: false
                 },
                 filterRow: { visible: false },
-                remoteOperations: true,                
+                remoteOperations: true,
                 allowColumnResizing: true,
                 pager: {
                     showPageSizeSelector: true,
@@ -92,7 +93,7 @@
                     allowUpdating: true,
                     allowDeleting: true,
                     allowAdding: @(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin") ? "true" : "false")
-                },
+                                },
                 headerFilter: {
                     visible: true
                 },
@@ -108,7 +109,7 @@
                 stateStoring: {
                     enabled: true,
                     type: "localStorage",
-                    storageKey: "userAdmin"
+                    storageKey: "TerminalIndex"
                 },
 
                 columns: [
@@ -131,7 +132,7 @@
                     {
                         caption: '@SharedLocalizer["Status"]',
                         dataField: "status",
-                        allowHeaderFiltering: true,                       
+                        allowHeaderFiltering: true,
                     },
                     {
                         caption: '@SharedLocalizer["Current Total"]',
@@ -146,29 +147,23 @@
                                 hint: '@SharedLocalizer["Edit"]',
                                 icon: "edit",
                                 onClick: function (e) {
-                                    if (isAdmin) {
-                                        var idString = e.row.data.id;
-                                        var url = `@Url.Action("Edit", "Terminal")`;
-                                        window.location = url + '?id=' + idString;
-                                    }else {
-                                        alert("Do not have permission!!");
-                                    }
-                                }
+                                    var idString = e.row.data.id;
+                                    var url = `@Url.Action("Edit", "Terminal")`;
+                                    window.location = url + '?id=' + idString;
+                                },
+                                visible: @(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin") ? "true" : "false")
                             },
                             {
                                 hint: '@SharedLocalizer["Get encrypted code"]',
                                 icon: "key",
                                 onClick: function (e) {
-                                    if (isAdmin) {
-                                        var idString = e.row.data.id;
-                                        var url = `@Url.Action("GetPasswordEncrypt", "Terminal")`;
-                                        window.location = url + '?id=' + idString;
-                                    } else {
-                                        alert("Do not have permission!!");
-                                    }
-                                }
+                                    var idString = e.row.data.id;
+                                    var url = `@Url.Action("GetPasswordEncrypt", "Terminal")`;
+                                    window.location = url + '?id=' + idString;
+                                },
+                                visible: @(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin") ? "true" : "false")
                             },
-                            "delete"
+                            "@(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin") ? "delete" : "")"
                         ]
                     }
                 ]

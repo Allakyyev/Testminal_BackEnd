@@ -11,7 +11,7 @@ using Terminal_BackEnd.Infrastructure.ViewModels;
 
 namespace Terminal_BackEnd.Web.API {
     [Route("api/[controller]")]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     [ApiController]
     public class ApplicationUserAPIController : ControllerBase {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -25,6 +25,7 @@ namespace Terminal_BackEnd.Web.API {
         }
 
         // GET: api/ApplicationUserAPI
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<object?> Get(DataSourceLoadOptions loadOptions) {            
             return DataSourceLoader.Load<ApplicationUserViewModel>((await _userService.GetAllUsers()), loadOptions);            
@@ -35,6 +36,7 @@ namespace Terminal_BackEnd.Web.API {
             return DataSourceLoader.Load<Topup>((await _userService.TopupsByUser(id)), loadOptions);
         }
 
+        [Authorize(Roles = "Admin")]
         // DELETE: api/CallBacksAPI/5
         [HttpDelete("{id}")]
         public async Task Delete(string id) {

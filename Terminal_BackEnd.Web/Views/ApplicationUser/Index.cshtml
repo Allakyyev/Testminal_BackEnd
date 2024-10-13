@@ -24,6 +24,7 @@
 
 @section Scripts {
     <script>
+        performActionAndRedirect("ApplicationUser");
         var UserType = [
             { Id: 0, name: '@SharedLocalizer["Employee"]' },
             { Id: 1, name: '@SharedLocalizer["Entrepreneur"]' },
@@ -107,7 +108,7 @@
                 stateStoring: {
                     enabled: true,
                     type: "localStorage",
-                    storageKey: "userAdmin"
+                    storageKey: "ApplicationUserIndex"
                 },
 
                 columns: [
@@ -151,6 +152,11 @@
                     {
                         caption: '@SharedLocalizer["Company Address"]',
                         dataField: "companyAddress",
+                        allowHeaderFiltering: true
+                    },
+                    {
+                        caption: '@SharedLocalizer["Current Balance"]',
+                        dataField: "currentTotal",
                         allowHeaderFiltering: true
                     },
                     {

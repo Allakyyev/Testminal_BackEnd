@@ -24,7 +24,10 @@ namespace Terminal_BackEnd.Web.Controllers {
                 EncashmentSum = encashment.EncashmentSum,
                 TerminalId = encashment.TerminalId,
                 TerminalName = terminal?.Name ?? String.Empty,
-                TerminalOwner = $"{terminal.ApplicationUser?.FamilyName ?? String.Empty} {terminal.ApplicationUser?.CompanyName ?? String.Empty}"
+                TerminalOwner = $"{terminal.ApplicationUser?.FamilyName ?? String.Empty} {terminal.ApplicationUser?.CompanyName ?? String.Empty}",
+                EncashmentSumFromTerminal = encashment.EncashmentSumFromTerminal,
+                BalanceDifference = encashment.EncashmentSum - encashment.EncashmentSumFromTerminal,
+                Status = encashment.Status
             };
             return View(enchargementViewModel);
         }

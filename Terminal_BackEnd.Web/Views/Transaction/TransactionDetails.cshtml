@@ -67,7 +67,7 @@
 </section>
 @section Scripts {
     <script>
-        console.log(window.location.origin);
+        performActionAndRedirect("Transaction");        
         $(function () {
             let url = window.location.origin + '/' + 'api/TransactionsAPI/Statuses/' + '@(Model.Id)';
             var returnUrl = '@Context.Request.Path@Context.Request.QueryString';
@@ -138,7 +138,7 @@
                 stateStoring: {
                     enabled: true,
                     type: "localStorage",
-                    storageKey: "userAdmin"
+                    storageKey: "TransactionDetails"
                 },
 
                 columns: [

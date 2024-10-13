@@ -27,6 +27,7 @@
 
 @section Scripts {
     <script>
+        performActionAndRedirect("Transaction");
         $(function () {
             let url = 'api/TransactionsAPI';
             var returnUrl = '@Context.Request.Path@Context.Request.QueryString';
@@ -102,7 +103,7 @@
                 stateStoring: {
                     enabled: true,
                     type: "localStorage",
-                    storageKey: "userAdmin"
+                    storageKey: "TransactionsIndex"
                 },
 
                 columns: [

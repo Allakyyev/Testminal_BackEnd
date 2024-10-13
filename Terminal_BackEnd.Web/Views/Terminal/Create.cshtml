@@ -61,7 +61,8 @@
 @section Scripts
 {
     <script src="~/js/CustomStore.js"></script>
-    <script>        
+    <script>
+        performActionAndRedirect("Terminal");
         $(function () {
             $("#userSelection").dxSelectBox({
                 dataSource: getUsers,

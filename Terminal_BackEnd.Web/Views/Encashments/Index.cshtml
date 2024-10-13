@@ -5,9 +5,9 @@
 @{
     ViewData["Title"] = SharedLocalizer["Encashments"];
     if(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin")) {
-        <script>
-            const isAdmin = true;
-        </script>
+            <script>
+                const isAdmin = true;
+            </script>
     }
 }
 <div class="container-fluid">
@@ -27,6 +27,7 @@
 
 @section Scripts {
     <script>
+        performActionAndRedirect("Encashments");
         $(function () {
             let url = 'api/TransactionsAPI/Enchargement';
             var returnUrl = '@Context.Request.Path@Context.Request.QueryString';
@@ -89,7 +90,7 @@
                 wordWrapEnabled: true,
                 showColumnLines: true,
                 showRowLines: true,
-                rowAlternationEnabled: true,
+                rowAlternationEnabled: false,
                 showBorders: true,
                 searchPanel: {
                     visible: true
@@ -98,9 +99,17 @@
                 stateStoring: {
                     enabled: true,
                     type: "localStorage",
-                    storageKey: "userAdmin"
+                    storageKey: "EnchashmentIndex"
                 },
-
+                onRowPrepared: function (e) {
+                    if (e.rowType === "data") {
+                        if (e.data.status === 1) {
+                            e.rowElement.css("background-color", "#9ecd9e");
+                        }else if (e.data.balanceDifference !== 0) {
+                            e.rowElement.css("background-color", "#e8aaaa");
+                        }
+                    }
+                },
                 columns: [
                     {
                         caption: '@SharedLocalizer["Encashment Id"]',
@@ -114,9 +123,27 @@
                         allowHeaderFiltering: true
                     },
                     {
-                        caption: '@SharedLocalizer["Encashment Sum(TMT)"]',
+                        caption: '@SharedLocalizer["Success Encashment Sum(TMT)"]',
                         dataField: "encashmentSum",
                         allowHeaderFiltering: true,
+                    },
+                    {
+                        caption: '@SharedLocalizer["Collected from Terminal Sum(TMT)"]',
+                        dataField: "encashmentSumFromTerminal",
+                        allowHeaderFiltering: true,
+                    },
+                    {
+                        caption: '@SharedLocalizer["Difference (TMT)"]',
+                        dataField: "balanceDifference",
+                        allowHeaderFiltering: true,
+                    },
+                    {
+                        caption: '@SharedLocalizer["Status"]',
+                        dataField: "statas",
+                        allowHeaderFiltering: true,
+                        calculateCellValue: function (data) {
+                            return data.status === 0 ? "Open" : "Close";
+                        }
                     },
                     {
                         caption: '@SharedLocalizer["Terminal Name"]',
@@ -127,7 +154,8 @@
                         caption: '@SharedLocalizer["Terminal Owner"]',
                         dataField: "terminalOwner",
                         allowHeaderFiltering: true,
-                    },                    
+                    },
+
                     {
                         type: "buttons",
                         width: 110,

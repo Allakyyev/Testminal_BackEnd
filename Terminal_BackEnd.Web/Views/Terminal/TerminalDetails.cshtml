@@ -41,6 +41,7 @@
 </section>
 @section Scripts {
     <script>
+        performActionAndRedirect("Terminal");
         $(function () {
             let url = window.location.origin + '/' + 'api/TransactionsAPI/Terminal/' + @(Model.Id);
             var returnUrl = '@Context.Request.Path@Context.Request.QueryString';
@@ -115,7 +116,7 @@
                 stateStoring: {
                     enabled: true,
                     type: "localStorage",
-                    storageKey: "userAdmin"
+                    storageKey: "TerminalDetails1"
                 },
 
                 columns: [
@@ -261,7 +262,7 @@
 
                 stateStoring: {
                     enabled: true,
-                    type: "localStorage",
+                    type: "TerminalDetails2",
                     storageKey: "userAdmin"
                 },
 

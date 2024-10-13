@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Terminal_BackEnd.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using Terminal_BackEnd.Infrastructure.Data;
 namespace Terminal_BackEnd.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241013104603_Enchashment from terminal")]
+    partial class Enchashmentfromterminal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -258,9 +261,6 @@ namespace Terminal_BackEnd.Infrastructure.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<int>("EncashmentSumFromTerminal")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<long>("TerminalId")
