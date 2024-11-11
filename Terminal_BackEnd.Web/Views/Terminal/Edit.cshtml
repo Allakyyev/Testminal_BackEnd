@@ -15,7 +15,7 @@
     <div class="col-lg-12">
         <div class="row">
             <h1 class="page-header">
-                @SharedLocalizer["Edit Terminal"]
+                @SharedLocalizer["Редактировать терминал"]
             </h1>
         </div>
     </div>
@@ -31,20 +31,20 @@
                         </h1>
 
                         <div class="form-group">
-                            <label>@SharedLocalizer["Terminal name"] *</label>
+                            <label>@SharedLocalizer["Имя терминала"] *</label>
                             <input type="text" class="form-control" asp-for="Name" value="@(string.IsNullOrEmpty(Model.Name)?"":Model.Name)" required />
                         </div>
 
                         <div class="form-group">
-                            <label>@SharedLocalizer["Terminal id"] *</label>
+                            <label>@SharedLocalizer["Id терминала"] *</label>
                             <input type="text" class="form-control" asp-for="TerminalId" value="@(string.IsNullOrEmpty(Model.TerminalId)?"":Model.TerminalId)" disabled />
                         </div>
                         <div class="form-group">
-                            <label>@SharedLocalizer["Terminal status"]</label>
+                            <label>@SharedLocalizer["Статус"]</label>
                             <div id="statusSelection"></div>
                         </div>
                         <div class="form-group">
-                            <label>@SharedLocalizer["Terminal owner"]</label>
+                            <label>@SharedLocalizer["Дилер"]</label>
                             <div id="userSelection"></div>
                         </div>
 
@@ -94,7 +94,7 @@
             });
 
             $("#button").dxButton({
-                text: '@SharedLocalizer["Save"]',
+                text: '@SharedLocalizer["Сохранить"]',
                 type: "success",
                 useSubmitBehavior: true,
             });

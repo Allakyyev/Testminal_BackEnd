@@ -5,7 +5,7 @@
 @inject IHtmlLocalizer<SharedResource> SharedLocalizer
 
 @{
-    ViewData["Title"] = SharedLocalizer["Create user account"];
+    ViewData["Title"] = SharedLocalizer["Создать дилера/пользователя"];
 }
 
 <div class="container-fluid">
@@ -13,7 +13,7 @@
     <div class="col-lg-12">
         <div class="row">
             <h1 class="page-header">
-                @SharedLocalizer["Create user account"]
+                @SharedLocalizer["Создать дилера/пользователя"]
             </h1>
         </div>
     </div>
@@ -35,28 +35,27 @@
                 <div class="form-row">
                     <div class="col-md-8">
                         <h1 class="page-header">
-                            @SharedLocalizer["Data"]
+                            @SharedLocalizer["Данные"]
                         </h1>
-
                         <div class="form-group">
-                            <label>@SharedLocalizer["First name"] *</label>
+                            <label>@SharedLocalizer["Имя"] *</label>
                             <input type="text" class="form-control" asp-for="FirstName" value="@(string.IsNullOrEmpty(Model.FirstName)?"":Model.FirstName )" required />
                         </div>
 
                         <div class="form-group">
-                            <label>@SharedLocalizer["Last name"] *</label>
+                            <label>@SharedLocalizer["Фамилия"] *</label>
                             <input type="text" class="form-control" asp-for="FamilyName" value="@(string.IsNullOrEmpty(Model.FamilyName)?"":Model.FamilyName )" required />
                         </div>
                         <div class="form-group">
-                            <label>@SharedLocalizer["Address"]</label>
+                            <label>@SharedLocalizer["Адрес"]</label>
                             <input type="text" class="form-control" asp-for="Address" value="@(string.IsNullOrEmpty(Model.Address)?"":Model.Address)" required />
                         </div>
                         <div class="form-group">
-                            <label>@SharedLocalizer["Company Name"]</label>
+                            <label>@SharedLocalizer["Имя компании"]</label>
                             <input type="text" class="form-control" asp-for="CompanyName" value="@(string.IsNullOrEmpty(Model.CompanyName)?"":Model.CompanyName)" required />
                         </div>
                         <div class="form-group">
-                            <label>@SharedLocalizer["Company Address"]</label>
+                            <label>@SharedLocalizer["Адрес компании"]</label>
                             <input type="text" class="form-control" asp-for="CompanyAddress" value="@(string.IsNullOrEmpty(Model.CompanyAddress)?"":Model.CompanyAddress)" required />
                         </div>
 
@@ -66,60 +65,20 @@
                         </div>
 
                         <div class="form-group">
-                            <label>@SharedLocalizer["Phone number"] *</label>
+                            <label>@SharedLocalizer["Телефон номер"] *</label>
                             <div id="phone"></div>
-                        </div>
-                        @*  <div class="form-group">
-                        <label>@SharedLocalizer["Gender"] *</label>
-                        <select asp-for="Gender" class="form-control" placeholder="@SharedLocalizer["Gender"]">
-                        @if ((int)Model.Gender == 0)
-                        {
-                        <option value="1" selected="selected">Male</option>
-                        <option value="2">Female</option>
-                        }
-                        else
-                        {
-                        @if ((int)Model.Gender == 1)
-                        {
-                        <option value="1" selected="selected">Male</option>
-                        <option value="2">Female</option>
-                        }
-                        else
-                        {
-                        <option value="1" >Male</option>
-                        <option value="2" selected="selected">Female</option>
-                        }
-                        }
-                        </select>
-                        </div>
+                        </div>                        
                         <div class="form-group">
-                        <label>@SharedLocalizer["Country"] *</label>
-                        <select asp-for="CountryId" class="form-control" placeholder="@SharedLocalizer["Gender"]">
-                        @foreach (var item in countries)
-                        {
-                        if (Model.CountryId == item.Id)
-                        {
-                        <option value="@item.Id" selected="selected">@item.Name</option>
-                        }
-                        else
-                        {
-                        <option value="@item.Id">@item.Name</option>
-                        }
-
-                        }
-                        </select>
-                        </div> *@
-                        <div class="form-group">
-                            <label>@SharedLocalizer["Role"]</label>
+                            <label>@SharedLocalizer["Роль"]</label>
                             <div id="roleSelection"></div>
                         </div>
                         <div class="form-group">
-                            <label>@SharedLocalizer["Password"] *</label>
+                            <label>@SharedLocalizer["Пароль"] *</label>
                             <input type="password" class="form-control" id="password" asp-for="Password" required min="7" />
                         </div>
 
                         <div class="form-group">
-                            <label>@SharedLocalizer["Confirm password"] *</label>
+                            <label>@SharedLocalizer["Подтвердить пароль"] *</label>
                             <input type="password" class="form-control" id="confirm_password" asp-for="ConfirmPassword" onfocusout="check()" required />
                             <span id='message'></span>
                         </div>
@@ -161,11 +120,11 @@
             $("#phone").dxTextBox({
                 name: "PhoneNumber",
                 mask: "(+000)-00-00-00-00",
-                maskInvalidMessage: '@SharedLocalizer["Please enter valid phone number"]'
+                maskInvalidMessage: '@SharedLocalizer["Не правильный номер телефона"]'
             }).dxValidator({
                 validationRules: [{
                     type: "required",
-                    message: '@SharedLocalizer["Please enter phone number"]'
+                    message: '@SharedLocalizer["Введите номер телефона"]'
                 }]
             });
 
@@ -175,11 +134,11 @@
             }).dxValidator({
                 validationRules: [{
                     type: "required",
-                    message: '@SharedLocalizer["Email is empty"]'
+                    message: '@SharedLocalizer["Введите почту"]'
                 },
                 {
                     type: "email",
-                    message: '@SharedLocalizer["Email is invalid"]'
+                    message: '@SharedLocalizer["Не правильный адрес почты"]'
                 }
                 ]
             });
@@ -195,12 +154,12 @@
             }).dxValidator({
                 validationRules: [{
                     type: "required",
-                    message: '@SharedLocalizer["Email is empty"]'
+                    message: '@SharedLocalizer["Выберите роль"]'
                 }
                 ]
             });
             $("#button").dxButton({
-                text: '@SharedLocalizer["Add"]',
+                text: '@SharedLocalizer["Сохранить"]',
                 type: "success",
                 useSubmitBehavior: true,
             });

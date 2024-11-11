@@ -3,7 +3,7 @@
 @inject IHtmlLocalizer<SharedResource> SharedLocalizer
 
 @{
-    ViewData["Title"] = SharedLocalizer["Encashments"];
+    ViewData["Title"] = SharedLocalizer["Инкассация"];
     if(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin")) {
             <script>
                 const isAdmin = true;
@@ -14,7 +14,7 @@
     <div class="row">
         <div class="col-lg-12">
             <h1 class="page-header">
-                @SharedLocalizer["Enchargement"]
+                @SharedLocalizer["Инкассация"]
             </h1>
         </div>
     </div>
@@ -112,46 +112,46 @@
                 },
                 columns: [
                     {
-                        caption: '@SharedLocalizer["Encashment Id"]',
+                        caption: '@SharedLocalizer["ID инкассации"]',
                         dataField: "id",
                         allowHeaderFiltering: true
                     },
                     {
-                        caption: '@SharedLocalizer["Encashment Date"]',
+                        caption: '@SharedLocalizer["Дата инкассации"]',
                         dataField: "encashmentDate",
                         dataType: 'date',
                         allowHeaderFiltering: true
                     },
                     {
-                        caption: '@SharedLocalizer["Success Encashment Sum(TMT)"]',
+                        caption: '@SharedLocalizer["Сумма успешных переводов(TMT)"]',
                         dataField: "encashmentSum",
                         allowHeaderFiltering: true,
                     },
                     {
-                        caption: '@SharedLocalizer["Collected from Terminal Sum(TMT)"]',
+                        caption: '@SharedLocalizer["Сумма в терминале(TMT)"]',
                         dataField: "encashmentSumFromTerminal",
                         allowHeaderFiltering: true,
                     },
                     {
-                        caption: '@SharedLocalizer["Difference (TMT)"]',
+                        caption: '@SharedLocalizer["Разница (TMT)"]',
                         dataField: "balanceDifference",
                         allowHeaderFiltering: true,
                     },
                     {
-                        caption: '@SharedLocalizer["Status"]',
+                        caption: '@SharedLocalizer["Статус"]',
                         dataField: "statas",
                         allowHeaderFiltering: true,
                         calculateCellValue: function (data) {
-                            return data.status === 0 ? "Open" : "Close";
+                            return data.status === 0 ? "Открыт" : "Закрыт";
                         }
                     },
                     {
-                        caption: '@SharedLocalizer["Terminal Name"]',
+                        caption: '@SharedLocalizer["Имя терминала"]',
                         dataField: "terminalName",
                         allowHeaderFiltering: true,
                     },
                     {
-                        caption: '@SharedLocalizer["Terminal Owner"]',
+                        caption: '@SharedLocalizer["Дилер"]',
                         dataField: "terminalOwner",
                         allowHeaderFiltering: true,
                     },
@@ -161,7 +161,7 @@
                         width: 110,
                         buttons: [
                             {
-                                hint: '@SharedLocalizer["Show details"]',
+                                hint: '@SharedLocalizer["Детальнее"]',
                                 icon: "info",
                                 onClick: function (e) {
                                     var idString = e.row.data.id;

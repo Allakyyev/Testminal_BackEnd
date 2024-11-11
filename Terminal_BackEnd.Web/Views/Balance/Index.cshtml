@@ -4,21 +4,21 @@
 @inject IHtmlLocalizer<SharedResource> SharedLocalizer
 
 @{
-    ViewData["Title"] = SharedLocalizer["Balance"];
+    ViewData["Title"] = SharedLocalizer["Информация о Балансе"];
 }
 
 <div class="container-fluid">
     <div class="col-lg-12">
         <div class="row">
             <h1 class="page-header">
-                @SharedLocalizer["Balance Information"]
+                @SharedLocalizer["Информация о Балансе"]
             </h1>
         </div>
     </div>
     <div>
-        <h3>@SharedLocalizer["Current Total"]: <strong style="color: blue">@Model.CurrentBalance</strong></h3>
+        <h3>@SharedLocalizer["Текущий Баланс"]: <strong style="color: blue">@Model.CurrentBalance</strong></h3>
     </div>
-    <h3>@SharedLocalizer["Topup History"]</h3>
+    <h3>@SharedLocalizer["История пополнения"]</h3>
     <div id="gridContainer"></div>
 </div>
 
@@ -28,7 +28,7 @@
         performActionAndRedirect("Balance");
         $(function () {           
             $("#button").dxButton({
-                text: '@SharedLocalizer["Add"]',
+                text: '@SharedLocalizer["Пополнить"]',
                 type: "success",
                 useSubmitBehavior: true,
             });
@@ -106,13 +106,13 @@
                 },
                 columns: [
                     {
-                        caption: '@SharedLocalizer["TopUp Date"]',
+                        caption: '@SharedLocalizer["Дата пополнения"]',
                         dataField: "topupDate",
                         dataType: "datetime",
                         allowHeaderFiltering: false
                     },
                     {
-                        caption: '@SharedLocalizer["TopUp Amound"]',
+                        caption: '@SharedLocalizer["Сумма пополнения"]',
                         dataField: "topupSum",
                         allowHeaderFiltering: true
                     }                

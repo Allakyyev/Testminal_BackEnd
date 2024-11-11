@@ -10,22 +10,22 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">@SharedLocalizer["Transaction Details"]: <strong>ID @Model.Id</strong></h5>
+                    <h5 class="card-title">@SharedLocalizer["Информация о транзакции"]: <strong>ID @Model.Id</strong></h5>
                     <form class="row g-3">
                         <div class="col-md-4">
-                            <label for="validationDefault01" class="form-label">@SharedLocalizer["Phone Number"]</label>
+                            <label for="validationDefault01" class="form-label">@SharedLocalizer["Номер телефона"]</label>
                             <input type="text" class="form-control" id="validationDefault01" value="+993@(Model.Msisdn)" required disabled>
                         </div>
                         <div class="col-md-4">
-                            <label for="validationDefault02" class="form-label">@SharedLocalizer["Amount"]</label>
+                            <label for="validationDefault02" class="form-label">@SharedLocalizer["Сумма"]</label>
                             <input type="text" class="form-control" id="validationDefault02" value="@(Model.Amount) TMT" required disabled>
                         </div>
                         <div class="col-md-4">
-                            <label for="validationDefault02" class="form-label">@SharedLocalizer["TransactionDate"]</label>
+                            <label for="validationDefault02" class="form-label">@SharedLocalizer["Дата транзакции"]</label>
                             <input type="text" class="form-control" id="validationDefault02" value="@(Model.TransactionDate)" required disabled>
                         </div>
                         <div class="col-md-4">
-                            <label for="validationDefault02" class="form-label">@SharedLocalizer["Status"]</label>
+                            <label for="validationDefault02" class="form-label">@SharedLocalizer["Статус"]</label>
                             @if(Model.Status == "SUCCESS") {
                                 <input type="text" style="background-color: green; color: white" class="form-control" id="validationDefault02" value="@(Model.Status)" required disabled>
                             } else {
@@ -33,7 +33,7 @@
                             }
                         </div>
                         <div class="col-md-4">
-                            <label for="validationDefault02" class="form-label">@SharedLocalizer["State"]</label>
+                            <label for="validationDefault02" class="form-label">@SharedLocalizer["Состояние"]</label>
                             @if(Model.State == "SUCCESS") {
                                 <input type="text" style="background-color: green; color: white" class="form-control" id="validationDefault02" value="@(Model.State)" required disabled>
                             } else {
@@ -41,11 +41,11 @@
                             }
                         </div>
                         <div class="col-md-4">
-                            <label for="validationDefault02" class="form-label">@SharedLocalizer["Terminal Name"]</label>
+                            <label for="validationDefault02" class="form-label">@SharedLocalizer["Имя терминала"]</label>
                             <input type="text" class="form-control" id="validationDefault02" value="@(Model.TermianlName)" required disabled>
                         </div>
                         <div class="col-md-4">
-                            <label for="validationDefault02" class="form-label">@SharedLocalizer["Owner Name"]</label>
+                            <label for="validationDefault02" class="form-label">@SharedLocalizer["Дилер"]</label>
                             <input type="text" class="form-control" id="validationDefault02" value="@(Model.OwnerName)" required disabled>
                         </div>
                     </form>
@@ -57,7 +57,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">@SharedLocalizer["Transaction State Updates"]</h5>
+                    <h5 class="card-title">@SharedLocalizer["История изменения статусов"]</h5>
                     <div id="gridContainer">
                     </div>
                 </div>
@@ -143,18 +143,18 @@
 
                 columns: [
                     {
-                        caption: '@SharedLocalizer["Transaction Status Id"]',
+                        caption: '@SharedLocalizer["Id статуса транзакции"]',
                         dataField: "id",
                         allowHeaderFiltering: true
                     },
                     {
-                        caption: '@SharedLocalizer["State Update Date"]',
+                        caption: '@SharedLocalizer["Дата обновления"]',
                         dataField: "updatedDate",
                         dataType: 'date',
                         allowHeaderFiltering: true,
                     },
                     {
-                        caption: '@SharedLocalizer["Status"]',
+                        caption: '@SharedLocalizer["Статус"]',
                         dataField: "status",
                         allowHeaderFiltering: true,
                     }

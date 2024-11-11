@@ -132,7 +132,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="@Url.Action("Index","Home")">
                                 <i class="bi bi-grid"></i>
-                                <span>Dashboard</span>
+                                <span>Дажбод</span>
                             </a>
                         </li>
 
@@ -142,7 +142,7 @@
                         <li class="nav-item">
                             <a class="nav-link collapsed" id="Transaction" href="@Url.Action("Index","Transaction")">
                                 <i class="bi bi-card-list"></i>
-                                <span>Transactions</span>
+                                <span>Транзакции</span>
                             </a>
                         </li>
 
@@ -150,7 +150,7 @@
                         <li class="nav-item">
                             <a class="nav-link collapsed" id="Terminal" href="@Url.Action("Index","Terminal")">
                                 <i class="bi bi-file-post"></i>
-                                <span>Terminals</span>
+                                <span>Терминалы</span>
                             </a>
                         </li>
 
@@ -159,14 +159,14 @@
                     <li class="nav-item">
                         <a class="nav-link collapsed" id="Encashments" href="@Url.Action("Index","Encashments")">
                             <i class="bi bi-currency-dollar"></i>
-                            <span>Encashments</span>
+                            <span>Инкассации</span>
                         </a>
                     </li><!-- End Enrichments Page Nav -->
                     @if(User.IsInRole("Admin")) {
                         <li class="nav-item">
                             <a class="nav-link collapsed" id="Reports" href="@Url.Action("Index","Reports")">
                                 <i class="bi bi-clipboard-data-fill"></i>
-                                <span>Reports</span>
+                                <span>Отчеты</span>
                             </a>
                         </li>
 
@@ -175,7 +175,7 @@
                         <li class="nav-item">
                             <a class="nav-link collapsed" id="ApplicationUser" href="@Url.Action("Index","ApplicationUser")">
                                 <i class="bi bi-people-fill"></i>
-                                <span>Users</span>
+                                <span>Дилеры</span>
                             </a>
                         </li>
 
@@ -186,13 +186,20 @@
                         <li class="nav-item">
                             <a class="nav-link collapsed" id="Balance" href="@Url.Action("Index", "Balance")">
                                 <i class="bi bi-cash-coin"></i>
-                                <span>Balance</span>
+                                <span>Балансы</span>
                             </a>
                         </li>
 
                         <!-- End Balance Page Nav -->
                     }
-                    <!-- End Terminals Page Nav -->
+                    @if(User.IsInRole("Admin")) {
+                        <li class="nav-item">
+                            <a class="nav-link collapsed" id="GlobalSettings" href="@Url.Action("Index", "GlobalSettings")">
+                                <i class="bi bi-cash-coin"></i>
+                                <span>Настройки</span>
+                            </a>
+                        </li>
+                    }
                     <li class="nav-item">
                         <a class="nav-link collapsed" id="Logout" href="/Identity/Account/Logout">
                             <i class="bi bi-box-arrow-right"></i>

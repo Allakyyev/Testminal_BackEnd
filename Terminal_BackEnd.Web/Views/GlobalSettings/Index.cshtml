@@ -1,0 +1,76 @@
+﻿@using Terminal_BackEnd.Infrastructure.Services.UserService.Models
+@using Terminal_BackEnd.Infrastructure.Entities
+@using Terminal_BackEnd.Infrastructure.Services;
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DevExtreme.AspNet.Data
+@using DevExtreme.AspNet.Mvc
+@model IEnumerable<GlobalSetting>
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+@{
+    ViewData["Title"] = SharedLocalizer["Настройки"];
+}
+<div class="container-fluid">
+
+    <div class="col-lg-12">
+        <div class="row">
+            <h1 class="page-header">
+                @SharedLocalizer["Настройки"]
+            </h1>
+        </div>
+    </div>
+    <div id="gridContainer">
+        <div class="col-md-12">
+            <div class="form-row">
+                <div class="col-md-8">
+                    <div class="form-group">
+                        @foreach(var setting in Model){
+                            <label>@SettingsService.GetLocalizationString(setting.Key)</label>
+                            <input type="text" class="form-control" id="@setting.Id" value="@setting.Value"/>
+                        }
+                    </div>                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="margin-top: 20px" id="save"></div>
+</div>
+
+@section Scripts
+{
+    <script src="~/js/CustomStore.js"></script>
+    <script>
+        performActionAndRedirect("GlobalSettings");
+        $(function () {
+            $("#save").dxButton({
+                text: '@SharedLocalizer["Сохранить"]',
+                type: "success",
+                onClick: function () {
+                    var settings = [];
+                    $('.form-group input').each(function () {
+                        var key = this.id;
+                        var value = this.value;
+
+                        settings.push({
+                            Id: key,
+                            Value: value
+                        });
+                    });
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/GlobalSettingsAPI/UpdateSettingsBatch",
+                        data: JSON.stringify(settings),
+                        contentType: "application/json; charset=utf-8",
+                        success: function (response) {
+                            DevExpress.ui.notify('@SharedLocalizer["Настройки успешно обновлены."]', 'success', 2000);
+                        },
+                        error: function (xhr, status, error) {
+                            DevExpress.ui.notify('@SharedLocalizer["Ошибка при обновлении настроек."]', 'error', 2000);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

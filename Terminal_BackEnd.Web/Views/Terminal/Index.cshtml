@@ -15,7 +15,7 @@
     <div class="row">
         <div class="col-lg-12">
             <h1 class="page-header">
-                @SharedLocalizer["Terminals"]
+                @SharedLocalizer["Терминалы"]
             </h1>
         </div>
     </div>
@@ -114,28 +114,28 @@
 
                 columns: [
                     {
-                        caption: '@SharedLocalizer["TerminalId"]',
+                        caption: '@SharedLocalizer["Id Терминала"]',
                         dataField: "terminalId",
                         dataType: 'string',
                         allowHeaderFiltering: true
                     },
                     {
-                        caption: '@SharedLocalizer["Name"]',
+                        caption: '@SharedLocalizer["Имя"]',
                         dataField: "name",
                         allowHeaderFiltering: true
                     },
                     {
-                        caption: '@SharedLocalizer["Owner"]',
+                        caption: '@SharedLocalizer["Дилер"]',
                         dataField: "owner",
                         allowHeaderFiltering: true,
                     },
                     {
-                        caption: '@SharedLocalizer["Status"]',
+                        caption: '@SharedLocalizer["Статус"]',
                         dataField: "status",
                         allowHeaderFiltering: true,
                     },
                     {
-                        caption: '@SharedLocalizer["Current Total"]',
+                        caption: '@SharedLocalizer["Текущяя сумма"]',
                         dataField: "currentTotal",
                         allowHeaderFiltering: true,
                     },
@@ -154,7 +154,7 @@
                         width: 110,
                         buttons: [
                             {
-                                hint: '@SharedLocalizer["Edit"]',
+                                hint: '@SharedLocalizer["Редактировать"]',
                                 icon: "edit",
                                 onClick: function (e) {
                                     var idString = e.row.data.id;

@@ -14,7 +14,7 @@
     <div class="row">
         <div class="col-lg-12">
             <h1 class="page-header">
-                @SharedLocalizer["Transactions"]
+                @SharedLocalizer["Транзакции"]
             </h1>
         </div>
     </div>
@@ -108,22 +108,22 @@
 
                 columns: [
                     {
-                        caption: '@SharedLocalizer["Transaction Id"]',
+                        caption: '@SharedLocalizer["ID Транзакции"]',
                         dataField: "id",
                         allowHeaderFiltering: true
                     },
                     {
-                        caption: '@SharedLocalizer["Phone number"]',
+                        caption: '@SharedLocalizer["Телефон"]',
                         dataField: "msisdn",
                         allowHeaderFiltering: true
                     },
                     {
-                        caption: '@SharedLocalizer["Amount(TMT)"]',
+                        caption: '@SharedLocalizer["Сумма(TMT)"]',
                         dataField: "amount",
                         allowHeaderFiltering: true,
                     },
                     {
-                        caption: '@SharedLocalizer["Transaction Date"]',
+                        caption: '@SharedLocalizer["Дата Транзакции"]',
                         dataField: "transactionDate",
                         dataType: 'datetime',
                         allowHeaderFiltering: true,
@@ -134,32 +134,32 @@
                         allowHeaderFiltering: true,
                     },
                     {
-                        caption: '@SharedLocalizer["Status"]',
+                        caption: '@SharedLocalizer["Статус"]',
                         dataField: "status",
                         allowHeaderFiltering: true,
                     },
                     {
-                        caption: '@SharedLocalizer["State"]',
+                        caption: '@SharedLocalizer["Состояние"]',
                         dataField: "state",
                         allowHeaderFiltering: true,
                     },
                     {
-                        caption: '@SharedLocalizer["Reason"]',
+                        caption: '@SharedLocalizer["Причина"]',
                         dataField: "reason",
                         allowHeaderFiltering: true,
                     },
                     {
-                        caption: '@SharedLocalizer["Terminal Id"]',
+                        caption: '@SharedLocalizer["Id Терминала"]',
                         dataField: "terminalId",
                         allowHeaderFiltering: true,
                     },
                     {
-                        caption: '@SharedLocalizer["Termianl Name"]',
+                        caption: '@SharedLocalizer["Имя Терминала"]',
                         dataField: "termianlName",
                         allowHeaderFiltering: true,
                     },
                     {
-                        caption: '@SharedLocalizer["Owner Name"]',
+                        caption: '@SharedLocalizer["Дилер"]',
                         dataField: "ownerName",
                         allowHeaderFiltering: true,
                     },
@@ -168,7 +168,7 @@
                         width: 110,
                         buttons: [
                             {
-                                hint: '@SharedLocalizer["Show details"]',
+                                hint: '@SharedLocalizer["Детали"]',
                                 icon: "info",
                                 onClick: function (e) {
                                     var idString = e.row.data.id;

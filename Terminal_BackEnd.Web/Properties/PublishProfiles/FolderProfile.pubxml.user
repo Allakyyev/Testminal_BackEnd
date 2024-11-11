@@ -4,8 +4,37 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
 -->
 <Project>
   <PropertyGroup>
-    <_PublishTargetUrl>C:\Work\Terminal_BackEnd\Terminal_BackEnd.Web\bin\Release\net8.0\publish\</_PublishTargetUrl>
-    <History>True|2024-07-09T05:59:16.0815831Z;True|2024-07-07T21:05:37.8859862+05:00;</History>
+    <_PublishTargetUrl>bin\Release\net8.0\publish\</_PublishTargetUrl>
+    <History>True|2024-10-14T12:02:28.2616027Z||;True|2024-07-09T10:59:16.0815831+05:00||;True|2024-07-07T21:05:37.8859862+05:00||;</History>
     <LastFailureDetails />
   </PropertyGroup>
+  <ItemGroup>
+    <File Include="Controllers/ApplicationUserController.cs">
+      <publishTime>10/13/2024 15:08:32</publishTime>
+    </File>
+    <File Include="Controllers/BalanceController.cs">
+      <publishTime>10/13/2024 14:49:59</publishTime>
+    </File>
+    <File Include="Controllers/DefaultDashboardController.cs">
+      <publishTime>06/30/2024 17:26:46</publishTime>
+    </File>
+    <File Include="Controllers/EncashmentsController.cs">
+      <publishTime>10/13/2024 16:20:52</publishTime>
+    </File>
+    <File Include="Controllers/HomeController.cs">
+      <publishTime>05/28/2024 17:52:50</publishTime>
+    </File>
+    <File Include="Controllers/ReportingControllers.cs">
+      <publishTime>07/07/2024 16:27:50</publishTime>
+    </File>
+    <File Include="Controllers/ReportsController.cs">
+      <publishTime>07/07/2024 16:30:58</publishTime>
+    </File>
+    <File Include="Controllers/TerminalController.cs">
+      <publishTime>07/07/2024 18:46:37</publishTime>
+    </File>
+    <File Include="Controllers/TransactionController.cs">
+      <publishTime>07/06/2024 15:03:27</publishTime>
+    </File>
+  </ItemGroup>
 </Project>

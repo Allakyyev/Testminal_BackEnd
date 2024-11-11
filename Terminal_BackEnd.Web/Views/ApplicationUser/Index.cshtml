@@ -11,7 +11,7 @@
     <div class="row">
         <div class="col-lg-12">
             <h1 class="page-header">
-                @SharedLocalizer["Users"]
+                @SharedLocalizer["Дилер"]
             </h1>
         </div>
     </div>
@@ -118,12 +118,12 @@
                         allowHeaderFiltering: false
                     },
                     {
-                        caption: '@SharedLocalizer["Role"]',
+                        caption: '@SharedLocalizer["Роль"]',
                         dataField: "role",
                         allowHeaderFiltering: true
                     },
                     {
-                        caption: '@SharedLocalizer["Name"]',
+                        caption: '@SharedLocalizer["Имя"]',
                         dataField: "firstName",
                         allowHeaderFiltering: false,
                         cellTemplate: function (container, options) {
@@ -134,28 +134,28 @@
                     },
 
                     {
-                        caption: '@SharedLocalizer["Email"]',
+                        caption: '@SharedLocalizer["Почта"]',
                         dataField: "email",
                         allowHeaderFiltering: true
                     },
 
                     {
-                        caption: '@SharedLocalizer["Address"]',
+                        caption: '@SharedLocalizer["Адрес"]',
                         dataField: "address",
                         allowHeaderFiltering: true
                     },
                     {
-                        caption: '@SharedLocalizer["Company Name"]',
+                        caption: '@SharedLocalizer["Имя компании"]',
                         dataField: "companyName",
                         allowHeaderFiltering: true
                     },
                     {
-                        caption: '@SharedLocalizer["Company Address"]',
+                        caption: '@SharedLocalizer["Адрес компании"]',
                         dataField: "companyAddress",
                         allowHeaderFiltering: true
                     },
                     {
-                        caption: '@SharedLocalizer["Current Balance"]',
+                        caption: '@SharedLocalizer["Текущий баланс"]',
                         dataField: "currentTotal",
                         allowHeaderFiltering: true
                     },
@@ -164,7 +164,7 @@
                         width: 110,
                         buttons: [
                             {
-                                hint: '@SharedLocalizer["Edit"]',
+                                hint: '@SharedLocalizer["Сохранить"]',
                                 icon: "edit",
                                 onClick: function (e) {
                                     var idString = e.row.data.id;
@@ -173,7 +173,7 @@
                                 }
                             },
                             {
-                                hint: '@SharedLocalizer["Change password"]',
+                                hint: '@SharedLocalizer["Изменить пароль"]',
                                 icon: "key",
                                 onClick: function (e) {
                                     var idString = e.row.data.id;
@@ -182,7 +182,7 @@
                                 }
                             },
                             {
-                                hint: '@SharedLocalizer["Topup balance"]',
+                                hint: '@SharedLocalizer["Добавить в баланс"]',
                                 icon: "money",
                                 onClick: function (e) {
                                     var idString = e.row.data.id;
