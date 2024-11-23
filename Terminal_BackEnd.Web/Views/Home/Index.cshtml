@@ -8,6 +8,24 @@
         .WorkingMode(WorkingMode.ViewerOnly)
         .Width("100%")
         .Height("100%")
+        .Extensions(extensions =>
+        {
+            extensions.UrlState(urlState =>
+            {
+                urlState.IncludeDashboardIdToUrl(true);
+                urlState.IncludeDashboardStateToUrl(true);
+            });
+            extensions.DataInspector(dataInspector =>
+            {
+                dataInspector.AllowInspectAggregatedData(true);
+                dataInspector.AllowInspectRawData(true);
+            });
+            extensions.DataSourceWizard(dataSourceWizard =>
+            {
+                dataSourceWizard.AllowCreateNewJsonConnection(true);
+            });
+        })
+        .OnBeforeRender("onBeforeRender")
         )
 </div>
 <script>

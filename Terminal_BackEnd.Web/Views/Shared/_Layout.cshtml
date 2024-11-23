@@ -46,6 +46,16 @@
     <link href="~/css/site.min.css" rel="stylesheet" />
     <link href="~/css/ace/ace.bundle.css" rel="stylesheet" />
     <script src="~/js/site.min.js"></script>
+    <script>
+        function performActionAndRedirect(id) {
+            var elements = document.querySelectorAll('.nav-item .nav-link');
+            elements.forEach((element) => element.classList.add("collapsed"));
+            var element = document.getElementById(id);
+            if (element !== undefined)
+                element.classList.remove("collapsed");
+
+        }
+    </script>
 </head>
 <body>
     <header id="header" class="header fixed-top d-flex align-items-center">
@@ -255,16 +265,7 @@
     <!-- Vendor JS Files -->
     <!-- Template Main JS File -->
     <script src="~/assets/js/main.js"></script>
-    <script>
-        function performActionAndRedirect(id) {
-            var elements = document.querySelectorAll('.nav-item .nav-link');
-            elements.forEach((element) => element.classList.add("collapsed"));
-            var element = document.getElementById(id);
-            if (element !== undefined)
-                element.classList.remove("collapsed");
-
-        }
-    </script>
+    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
