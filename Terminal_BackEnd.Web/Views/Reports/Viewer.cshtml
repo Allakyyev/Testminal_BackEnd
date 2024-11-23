@@ -1,0 +1,24 @@
+﻿@using DevExpress.XtraReports.UI
+@model Terminal_BackEnd.Web.Models.ReportViewerModel
+<form id="mainForm" method="post">
+    <select class="form-select" tabindex="-1" asp-for="ReportUrl" asp-items="ViewBag.ReportList" onchange="submitMyForm()"></select>
+</form>
+@(Html.DevExpress().WebDocumentViewer("DocumentViewer")
+    .Height("calc(100vh - 52px)")
+    .Bind(Model.ViewerModelToBind));
+@section Scripts {
+    <script>
+        function submitMyForm(s, e) {
+            const formData = new FormData(this.mainForm);
+            // Construct the query string
+            const params = new URLSearchParams(formData);
+            //params.append('extraParam', 'extraValue'); // Add custom query parameters
+            // Update the form's action URL with the query string
+           const newAction = this.origin + window.location.pathname + '?' + params.toString();
+           this.mainForm.action = newAction;
+           this.mainForm.submit();
+        }
+        performActionAndRedirect("ReportViewer");
+    </script>
+    <script src="~/js/jquery/dist/jquery.min.js"></script>
+}

@@ -5,11 +5,11 @@
 <div style="position: absolute; left:0;top:60px;right:0;bottom:0;">
     @(Html.DevExpress().Dashboard("clientDashboardControl1")
         .ControllerName("DefaultDashboard")
-        .WorkingMode(WorkingMode.ViewerOnly)
+        .WorkingMode(WorkingMode.Designer)
         .Width("100%")
         .Height("100%")
         )
 </div>
 <script>
-    performActionAndRedirect("DashboardViewer");
+    performActionAndRedirect("DashboardDesigner");
 </script>

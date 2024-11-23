@@ -66,14 +66,18 @@
                         <i class="bi bi-search"></i>
                     </a>
                 </li><!-- End Search Icon-->
-                @if(User.Identity != null && User.Identity.IsAuthenticated) {
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
                     <li class="nav-item dropdown pe-3">
                         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                             <li class="dropdown-header">
                                 <h6>@User.Identity.Name</h6>
-                                @if(User.IsInRole("Admin")) {
+                                @if (User.IsInRole("Admin"))
+                                {
                                     <span>Admin</span>
-                                } else {
+                                }
+                                else
+                                {
                                     <span>Standard User</span>
                                 }
                             </li>
@@ -125,20 +129,28 @@
 
     </header><!-- End Header -->
     @{
-        if(User.Identity != null && User.Identity.IsAuthenticated) {
+        if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
             <aside id="sidebar" class="sidebar">
                 <ul class="sidebar-nav" id="sidebar-nav">
-                    @if(User.IsInRole("Admin")) {
+                    @if (User.IsInRole("Admin"))
+                    {
                         <li class="nav-item">
-                            <a class="nav-link" href="@Url.Action("Index","Home")">
+                            <a class="nav-link" id="DashboardViewer" href="@Url.Action("Index","Home")">
                                 <i class="bi bi-grid"></i>
                                 <span>Дажбод</span>
                             </a>
                         </li>
-
+                        <li class="nav-item">
+                            <a class="nav-link collapsed" id="DashboardDesigner" href="@Url.Action("Designer","Home")">
+                                <i class="bi bi-grid"></i>
+                                <span>Дажбод Дизайнер</span>
+                            </a>
+                        </li>
                         <!-- End Dashboard Nav -->
                     }
-                    @if(User.IsInRole("Standard") || User.IsInRole("Admin")) {
+                    @if (User.IsInRole("Standard") || User.IsInRole("Admin"))
+                    {
                         <li class="nav-item">
                             <a class="nav-link collapsed" id="Transaction" href="@Url.Action("Index","Transaction")">
                                 <i class="bi bi-card-list"></i>
@@ -162,11 +174,19 @@
                             <span>Инкассации</span>
                         </a>
                     </li><!-- End Enrichments Page Nav -->
-                    @if(User.IsInRole("Admin")) {
+
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" id="ReportViewer" href="@Url.Action("Viewer","Reports")">
+                            <i class="bi bi-clipboard-data-fill"></i>
+                            <span>Отчеты</span>
+                        </a>
+                    </li>
+                    @if (User.IsInRole("Admin"))
+                    {
                         <li class="nav-item">
                             <a class="nav-link collapsed" id="Reports" href="@Url.Action("Index","Reports")">
                                 <i class="bi bi-clipboard-data-fill"></i>
-                                <span>Отчеты</span>
+                                <span>Дизайнер отчетов</span>
                             </a>
                         </li>
 
@@ -181,7 +201,8 @@
 
                         <!-- End Users Page Nav -->
                     }
-                    @if(User.IsInRole("Standard")) {
+                    @if (User.IsInRole("Standard"))
+                    {                        
                         <!-- End Balance Page Nav -->
                         <li class="nav-item">
                             <a class="nav-link collapsed" id="Balance" href="@Url.Action("Index", "Balance")">
@@ -192,7 +213,8 @@
 
                         <!-- End Balance Page Nav -->
                     }
-                    @if(User.IsInRole("Admin")) {
+                    @if (User.IsInRole("Admin"))
+                    {
                         <li class="nav-item">
                             <a class="nav-link collapsed" id="GlobalSettings" href="@Url.Action("Index", "GlobalSettings")">
                                 <i class="bi bi-cash-coin"></i>

@@ -16,6 +16,10 @@ namespace Terminal_BackEnd.Web.Controllers {
             return View();
         }
 
+        public IActionResult Designer() {
+            return View();
+        }
+
         public IActionResult Privacy() {
             return View();
         }

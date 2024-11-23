@@ -117,7 +117,7 @@ namespace Terminal_BackEnd.Web.Services {
                 CrossTransactionId = Guid.NewGuid().ToString("N"),
                 Status = StateConstants.TransactionState.NEW
             };
-            appDbContext.Transactions.Add(tnx);
+            appDbContext.Add<Transaction>(tnx);
             appDbContext.SaveChanges();
 
             TransactionStatus tnxStatus = new TransactionStatus() {
@@ -145,7 +145,7 @@ namespace Terminal_BackEnd.Web.Services {
 
             }
             tnx.TransactionDate = tnxDate;
-            appDbContext.Transactions.Update(tnx);
+            appDbContext.Update<Transaction>(tnx);
             appDbContext.SaveChanges();
             if(result.ConnectionError) {
                 int retryCount = 0;
@@ -160,7 +160,7 @@ namespace Terminal_BackEnd.Web.Services {
                         TransactionId = tnx.Id,
                         UpdatedDate = DateTime.UtcNow,
                     };
-                    appDbContext.TransactionStatuses.Add(statusChange);
+                    appDbContext.Add<TransactionStatus>(statusChange);
                     appDbContext.SaveChanges();
                 }
                 responseObj.Success = !continueRetry;
