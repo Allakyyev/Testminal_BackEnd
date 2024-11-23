@@ -12,6 +12,7 @@ namespace Terminal_BackEnd.Infrastructure.Data {
         public DbSet<Encashment> Encashments { get; set; }
         public DbSet<Topup> Topups { get; set; }
         public DbSet<GlobalSetting> GlobalSettings { get; set; }
+        public DbSet<TerminalLog> TerminalLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder) {
             builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);

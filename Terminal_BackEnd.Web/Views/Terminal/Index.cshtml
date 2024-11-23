@@ -88,6 +88,13 @@
                     allowedPageSizes: [10, 20, 50],
                     showNavigationButtons: true
                 },
+                onRowPrepared: function (e) {
+                    if (e.rowType === "data") {
+                        if (e.data.logType === 2) {
+                            e.rowElement.css("background-color", "#e8aaaa");
+                        }
+                    }
+                },
                 editing: {
                     useIcons: true,
                     allowUpdating: true,
@@ -99,8 +106,7 @@
                 },
                 wordWrapEnabled: true,
                 showColumnLines: true,
-                showRowLines: true,
-                rowAlternationEnabled: true,
+                showRowLines: true,                
                 showBorders: true,
                 searchPanel: {
                     visible: true
@@ -132,6 +138,11 @@
                     {
                         caption: '@SharedLocalizer["Статус"]',
                         dataField: "status",
+                        allowHeaderFiltering: true,
+                    },
+                    {
+                        caption: '@SharedLocalizer["Работоспособность"]',
+                        dataField: "healthy",
                         allowHeaderFiltering: true,
                     },
                     {

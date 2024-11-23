@@ -27,6 +27,14 @@ namespace Terminal_BackEnd.Web.API {
             return Unauthorized();
         }
 
+        [HttpGet("Logs/{terminalId}")]
+        public object Logs(DataSourceLoadOptions loadOptions, long terminalId) {
+            if(User.Identity != null && User.Identity.IsAuthenticated) {
+                return DataSourceLoader.Load<TerminalLogViewModel>(terminalService.TerminalLogs(terminalId), loadOptions);
+            }
+            return Unauthorized();
+        }
+
         [HttpDelete()]
         public IActionResult Delete([FromForm] long key) {
             if(!User.IsInRole("Admin")) return BadRequest();
@@ -37,6 +45,10 @@ namespace Terminal_BackEnd.Web.API {
         List<TerminalViewModel> MapToViewModel(List<Terminal> terminals) {
             var terminalsViewModel = new List<TerminalViewModel>();
             foreach(var terminal in terminals) {
+                var terminalLogs = terminal.TerminalLogs;
+                LogType logType = LogType.Repaired;
+                if(terminalLogs != null && terminalLogs.Count() > 0)
+                    logType = terminalLogs.OrderByDescending(t => t.LogDate).First().Type;
                 var terminalViewModel = new TerminalViewModel() {
                     Id = terminal.Id,
                     Name = terminal.Name,
@@ -45,7 +57,9 @@ namespace Terminal_BackEnd.Web.API {
                     Owner = $"{terminal.ApplicationUser?.CompanyName}  {terminal.ApplicationUser?.FamilyName} {terminal.ApplicationUser?.FirstName}",
                     CurrentTotal = terminalService.GetTerminalCurrenTotal(terminal.Id),
                     DeviceCPUId = terminal.DeviceCPUId,
-                    DeviceMotherBoardId = terminal.DeviceMotherBoardId
+                    DeviceMotherBoardId = terminal.DeviceMotherBoardId,
+                    Healthy = logType == LogType.Error ? "В ошибочном состоянии" : "В рабочем состоянии",
+                    LogType = logType
                 };
                 terminalsViewModel.Add(terminalViewModel);
             }

@@ -114,6 +114,7 @@ namespace Terminal_BackEnd.Web.Services {
                 Amount = forceAddRequest.Amount,
                 PollingCallbackRegistered = false,
                 Service = forceAddRequest.ServiceKey,
+                CrossTransactionId = Guid.NewGuid().ToString("N"),
                 Status = StateConstants.TransactionState.NEW
             };
             appDbContext.Transactions.Add(tnx);
@@ -132,7 +133,7 @@ namespace Terminal_BackEnd.Web.Services {
                 TransactionId = tnx.Id,
                 Success = true
             };
-            var result = await this.altynAsyrTerminalService.ForceAddTransactionAsync(forceAddRequest.ServiceKey, forceAddRequest.Amount, forceAddRequest.Msisdn, tnx.Id.ToString(), null);
+            var result = await this.altynAsyrTerminalService.ForceAddTransactionAsync(forceAddRequest.ServiceKey, forceAddRequest.Amount, forceAddRequest.Msisdn, tnx.CrossTransactionId, null);
             tnx.State = result.State;
             tnx.Status = result.Status;
             tnx.Reason = result.Reason;
@@ -151,8 +152,9 @@ namespace Terminal_BackEnd.Web.Services {
                 bool continueRetry = true;
                 while(retryCount < 5 && continueRetry) {
                     Thread.Sleep(1000);
-                    result = await this.altynAsyrTerminalService.ForceAddTransactionAsync(forceAddRequest.ServiceKey, forceAddRequest.Amount, forceAddRequest.Msisdn, tnx.Id.ToString(), result.FormData?.ToDictionary());
+                    result = await this.altynAsyrTerminalService.ForceAddTransactionAsync(forceAddRequest.ServiceKey, forceAddRequest.Amount, forceAddRequest.Msisdn, tnx.CrossTransactionId, result.FormData?.ToDictionary());
                     continueRetry = result.ConnectionError;
+                    retryCount++;
                     TransactionStatus statusChange = new TransactionStatus() {
                         Status = $"Retried. Status={result.Status} Message: {result.Message}",
                         TransactionId = tnx.Id,
@@ -242,6 +244,7 @@ namespace Terminal_BackEnd.Web.Services {
                 EncargementId = transaction.EncargementId,
                 TransactionDate = transaction.TransactionDate,
                 TermianlName = transaction.Terminal?.Name ?? "",
+                CrossTransactionId = transaction.CrossTransactionId,
                 OwnerName = GetOwnerName(transaction.Terminal?.ApplicationUser)
             };
         }

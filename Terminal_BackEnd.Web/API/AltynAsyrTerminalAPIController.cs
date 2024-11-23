@@ -5,6 +5,7 @@ using Terminal_BackEnd.Infrastructure.Services.DataContracts;
 using Terminal_BackEnd.Infrastructure.Services.TerminalService;
 using Terminal_BackEnd.Infrastructure.Services.UserService;
 using Terminal_BackEnd.Web.Services;
+using static DevExpress.Xpo.Helpers.AssociatedCollectionCriteriaHelper;
 
 namespace Terminal_BackEnd.Web.API {
     [Route("api/[controller]")]
@@ -32,10 +33,12 @@ namespace Terminal_BackEnd.Web.API {
             var failResponse = new CheckDestinationAPIResponse() { Success = false };
             if(checkDestinationRequest == null) return failResponse;
             if(this.securityService.TryValidateTerminalId(checkDestinationRequest?.TerminalIdEncrypted ?? "", out Terminal terminal)) {
+                if(terminal != null && terminal.Status == TerminalStatus.Inactive) return failResponse;
                 if(this.securityService.TryValidateMsisdn(checkDestinationRequest?.MsisdnEncrypted ?? "", terminal.Password, out string msisdn)) {
                     checkDestinationRequest.Msisdn = msisdn;
                     var result = await this.transactionController.CheckDestinationAsync(checkDestinationRequest);
-                    return new CheckDestinationAPIResponse() { Success = result.Success };
+                    long currentUserTotal = await applicationUserService.GetCurrentTotal(terminal.UserId);
+                    return new CheckDestinationAPIResponse() { Success = result.Success, DealerTotal = currentUserTotal };
                 }
             }
             return failResponse;
@@ -51,7 +54,7 @@ namespace Terminal_BackEnd.Web.API {
                     forceAddRequest.Msisdn = msisdn.Replace("993", "");
                     forceAddRequest.TerminalId = terminal.Id;
                     long currentUserTotal = await applicationUserService.GetCurrentTotal(terminal.UserId);
-                    if(currentUserTotal > 0 && (currentUserTotal - forceAddRequest.Amount) >= 0) {
+                    if(currentUserTotal > 0) {
                         var result = await this.transactionController.ForceAddTransactionAsync(forceAddRequest);
                         if(result.Success) {
                             await applicationUserService.UpdateCurrentTotal(terminal.UserId, forceAddRequest.Amount);
@@ -82,6 +85,17 @@ namespace Terminal_BackEnd.Web.API {
             var result = this.terminalService.RegisterTerminal(registerTerminalRequest.TerminalId, registerTerminalRequest.MotherboardId, registerTerminalRequest.CpuId);
             return new RegisterTerminalResponse() {
                 Success = result
+            };
+        }
+
+        [HttpPost("terminal-log")]
+        public LogTerminalResponse TerminalLog(TerminalLogRequest terminalLogRequest) {            
+            bool logSuccess = false;
+            if(!string.IsNullOrEmpty(terminalLogRequest?.LogInfo) && this.securityService.TryValidateTerminalId(terminalLogRequest?.TerminalIdEncrypted ?? "", out Terminal terminal)) {
+                logSuccess = this.terminalService.LogTerminal(terminal.Id, terminalLogRequest.LogInfo, terminalLogRequest.Type, DateTime.Now);                
+            }
+            return new LogTerminalResponse() {
+                Success = logSuccess
             };
         }
     }

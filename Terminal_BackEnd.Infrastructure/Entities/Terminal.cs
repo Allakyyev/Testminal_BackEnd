@@ -10,6 +10,7 @@
         public required string UserId { get; set; }
         public int EncashmenPassCode {  get; set; }
         public List<Transaction>? Transactions { get; set; }
+        public List<TerminalLog>? TerminalLogs { get; set; }
         public List<Encashment>? Encashments { get; set; }
         public ApplicationUser? ApplicationUser { get; set; }
         public TerminalStatus Status { get; set; }

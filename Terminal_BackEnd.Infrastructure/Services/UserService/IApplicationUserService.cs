@@ -46,11 +46,9 @@ namespace Terminal_BackEnd.Infrastructure.Services.UserService {
         public async Task UpdateCurrentTotal(string userId, int amount) {
             var user = await _userManager.FindByIdAsync(userId);
             if(user != null) {
-                if(user.CurrentTotal - amount >= 0) {
-                    user.CurrentTotal -= amount;
-                    _dbContex.Update(user);
-                    _dbContex.SaveChanges();
-                }
+                user.CurrentTotal -= (amount / 100);
+                _dbContex.Update(user);
+                _dbContex.SaveChanges();
             }
         }
         public async Task<long> GetCurrentTotal(string userId) {

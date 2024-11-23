@@ -130,6 +130,7 @@ namespace Terminal_BackEnd.Web.API {
                     TerminalId = transaction.TerminalId,
                     EncargementId = transaction.EncargementId,
                     TransactionDate = transaction.TransactionDate,
+                    CrossTransactionId = transaction.CrossTransactionId,
                     TermianlName = transaction.Terminal?.Name ?? "",
                     OwnerName = GetOwnerName(transaction.Terminal?.ApplicationUser)
                 };

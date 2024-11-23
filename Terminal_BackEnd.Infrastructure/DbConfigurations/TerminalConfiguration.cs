@@ -15,6 +15,7 @@ namespace Terminal_BackEnd.Infrastructure.DbConfigurations {
             builder.Property(p => p.EncashmenPassCode).IsRequired(true);
             builder.HasOne(p => p.ApplicationUser).WithMany(p => p.Terminals).HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.Restrict);
             builder.HasMany(p => p.Transactions).WithOne(p => p.Terminal).HasForeignKey(p => p.TerminalId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasMany(p => p.TerminalLogs).WithOne(p => p.Terminal).HasForeignKey(p => p.TerminalId).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

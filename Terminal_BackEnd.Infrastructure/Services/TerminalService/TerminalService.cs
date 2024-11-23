@@ -17,6 +17,8 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
         void DeleteTerminalById(long terminalId);
         (byte[], string) GetPasswordEncrypt(long terminalId);
         bool RegisterTerminal(string terminalId, string motherboardId, string cpuId);
+        bool LogTerminal(long terminalId, string info, LogType type, DateTime date);
+        List<TerminalLogViewModel> TerminalLogs(long terminalId);
     }
 
     public class TerminalService : ITerminalService {
@@ -78,7 +80,7 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
         }
 
         public List<Terminal> GetAllTerminals() {
-            return _dbContex.Terminals.Include(i => i.ApplicationUser).ToList();
+            return _dbContex.Terminals.Include(i => i.ApplicationUser).Include(t => t.TerminalLogs).ToList();
         }
 
         public List<Terminal> GetAllTerminalsByUser(string userName) {
@@ -115,5 +117,36 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
             }
         }
 
+        public bool LogTerminal(long terminalId, string info, LogType type, DateTime date) {
+            try {
+                var terminalLogs = TerminalLogs(terminalId);
+                if(terminalLogs.Count() == 0 || terminalLogs.OrderByDescending(t => t.LogDate).FirstOrDefault()?.Type != LogType.Error) return true;
+                TerminalLog newLog = new TerminalLog() { TerminalId = terminalId, LogInfo = info, Type = type, LogDate = date };
+                _dbContex.TerminalLogs.Add(newLog);
+                _dbContex.SaveChanges();
+                return true;
+            } catch(Exception ex) {
+                return false;
+            }
+        }
+
+        public List<TerminalLogViewModel> TerminalLogs(long terminalId) {
+            var terminalLogs = _dbContex.TerminalLogs.Where(t => t.TerminalId == terminalId).ToList();
+            List<TerminalLogViewModel> result = new List<TerminalLogViewModel>();
+            if(terminalLogs.Count() > 0) {
+                terminalLogs.ForEach(t => {
+                    result.Add(
+                        new TerminalLogViewModel() {
+                            TerminalId = terminalId,
+                            LogInfo = t.LogInfo,
+                            Type = t.Type,
+                            LogDate = t.LogDate,
+                            Id = t.Id,
+                            Status = t.Type == LogType.Error ? "Ошибка" : "Востановлено"
+                        });
+                });
+            }
+            return result;
+        }
     }
 }

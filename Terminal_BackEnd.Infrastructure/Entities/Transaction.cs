@@ -7,6 +7,11 @@
         public string? Service { get; set; }
         public string? State { get; set; }
         public string? Reason { get; set; }
+
+        /// <summary>
+        /// The CrossTransactionId is a local transaction id and is send to tmcell
+        /// </summary>
+        public required string CrossTransactionId { get; set; } = Guid.NewGuid().ToString("N");
         public required long TerminalId { get; set; }
         public long? EncargementId { get; set; }
         public DateTime TransactionDate { get; set; }
