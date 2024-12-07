@@ -1,0 +1,107 @@
+﻿@using Terminal_BackEnd.Infrastructure.Services.UserService.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DevExtreme.AspNet.Data
+@using DevExtreme.AspNet.Mvc
+@model Terminal_BackEnd.Infrastructure.Services.TerminalService.Models.CreateEncashmentModel
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+@{
+    ViewData["Title"] = SharedLocalizer["Create Enchashment"];
+}
+
+<div class="container-fluid">
+
+    <div class="col-lg-12">
+        <div class="row">
+            <h1 class="page-header">
+                @SharedLocalizer["Создать инкассацию"]
+            </h1>
+        </div>
+    </div>
+    <div id="gridContainer">
+        <form asp-action="Create" id="form" enctype="multipart/form-data">
+            <div class="col-md-12">
+                <div class="form-row">
+                    <div class="col-md-8">
+                        <h1 class="page-header">
+                            @SharedLocalizer["Данные"]
+                        </h1>
+                        <div class="form-group">
+                            <label>@SharedLocalizer["Терминал"]</label>
+                            <div id="terminalSelection"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>@SharedLocalizer["Сумма"] *</label>
+                            <input type="number" class="form-control" asp-for="TotalSum" value="@Model.TotalSum" required />
+                        </div>
+                        <div class="form-group">
+                            <label>@SharedLocalizer["Статус"]</label>
+                            <div id="statusSelection"></div>
+                        </div>
+                        <div class="dx-fieldset form-group">
+                            <div id="summary"></div>
+                            <div id="button"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/js/CustomStore.js"></script>
+    <script>
+        performActionAndRedirect("Terminal");
+        $(function () {
+            $("#terminalSelection").dxSelectBox({
+                dataSource: getTerminals,
+                isRequired: true,
+                placeholder: 'Выберите терминал',
+                displayExpr: "name",
+                valueExpr: "id",
+                name: 'TerminalId',
+                searchEnabled: true,
+                itemTemplate: function (itemData, itemIndex, itemElement) {
+                return $("<div />").append(
+                        $("<span />").text(itemData.name + " - " + itemData.owner)
+                    );
+                }
+            }).dxValidator({
+                validationRules: [{
+                    type: "required",
+                    message: '@SharedLocalizer["Выберите Терминал"]'
+                }
+                ]
+            });
+
+            var statuses = [{ status: 0, displayText: "Open" }, { status: 1, displayText: "Closed" }]
+
+            $("#statusSelection").dxSelectBox({
+                dataSource: statuses,
+                isRequired: true,
+                placeholder: 'Select status...',
+                displayExpr: "displayText",
+                valueExpr: "status",
+                name: 'Status'
+            }).dxValidator({
+                validationRules: [{
+                    type: "required",
+                    message: '@SharedLocalizer["Выберите статус"]'
+                }
+                ]
+            });
+
+
+            $("#button").dxButton({
+                text: '@SharedLocalizer["Сохранить"]',
+                type: "success",
+                useSubmitBehavior: true,
+            });
+            $("#summary").dxValidationSummary({});
+
+        });
+    </script>
+}

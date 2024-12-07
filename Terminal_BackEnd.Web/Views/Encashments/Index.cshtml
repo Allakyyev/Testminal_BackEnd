@@ -78,11 +78,15 @@
                     allowedPageSizes: [10, 20, 50],
                     showNavigationButtons: true
                 },
+                onInitNewRow: function (e) {
+                    var url = `@Url.Action("Create", "Encashments")`;
+                    window.location = url;
+                },
                 editing: {
                     useIcons: true,
                     allowUpdating: false,
                     allowDeleting: false,
-                    allowAdding: false
+                    allowAdding: @(User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Cashier")) ? "true" : "false")
                 },
                 headerFilter: {
                     visible: true
@@ -119,7 +123,8 @@
                     {
                         caption: '@SharedLocalizer["Дата инкассации"]',
                         dataField: "encashmentDate",
-                        dataType: 'date',
+                        dataType: 'datetime',
+                        format: "dd/mm/yyyy HH:mm", // Optional: Customize the format
                         allowHeaderFiltering: true
                     },
                     {
@@ -139,7 +144,7 @@
                     },
                     {
                         caption: '@SharedLocalizer["Статус"]',
-                        dataField: "statas",
+                        dataField: "status",
                         allowHeaderFiltering: true,
                         calculateCellValue: function (data) {
                             return data.status === 0 ? "Открыт" : "Закрыт";

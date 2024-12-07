@@ -61,16 +61,17 @@ namespace Terminal_BackEnd.Web.Services {
             return failResponseObj;
         }
 
-        public void CloseEncashment(long id) {
+        public void CloseEncashment(long id, int sum) {
             if(id == null) return;
             var encashment = appDbContext.Encashments.Find(id);
             if(encashment == null) return;
             encashment.Status = EncashmentStatus.Close;
+            encashment.EncashmentSumFromTerminal = (sum != 0 ? sum : encashment.EncashmentSumFromTerminal);
             appDbContext.Update(encashment);
             appDbContext.SaveChanges();
         }
 
-        public Task<EncashementResponse> CreateEncashment(long terminalId, int sumFromTerminal) {
+        public Task<EncashementResponse> CreateEncashment(long terminalId, int sumFromTerminal, EncashmentStatus status = EncashmentStatus.Open) {
             using(var transaction = appDbContext.Database.BeginTransaction()) {
                 try {
                     var terminal = appDbContext.Terminals.Include(p => p.Encashments).FirstOrDefault(x => x.Id == terminalId);
@@ -88,15 +89,16 @@ namespace Terminal_BackEnd.Web.Services {
                             TerminalId = terminalId,
                             EncashmentSum = sum > 0 ? sum / 100 : sum,
                             EncashmentSumFromTerminal = sumFromTerminal,
-                            Status = EncashmentStatus.Open
+                            Status = status
                         };
-                        appDbContext.Encashments.Add(enchargement);
+                        appDbContext.Add(enchargement);
                         appDbContext.SaveChanges();
                         foreach(var item in transactions) {
                             item.EncargementId = enchargement.Id;
                             appDbContext.Transactions.Update(item);
                         }
                         appDbContext.SaveChanges();
+                        transaction.Commit();
                         return Task.FromResult(new EncashementResponse() { Success = true, TerminalId = terminal.TerminalId });
                     }
                 } catch {
@@ -267,7 +269,7 @@ namespace Terminal_BackEnd.Web.Services {
         }
 
         public List<Encashment> GetAllEncashment() {
-            return appDbContext.Encashments.Include(e => e.Terminal).ThenInclude(p => p.ApplicationUser).ToList();
+            return appDbContext.Encashments.Include(e => e.Terminal).ThenInclude(p => p.ApplicationUser).OrderByDescending(e => e.EncashmentDate).ToList();
         }
 
         public List<Encashment> GetEncashmentsByTerminal(long terminalId) {

@@ -19,6 +19,40 @@
       </Query>
       <ConnectionOptions CloseConnection="true" />
     </SqlDataSource>
+    <SqlDataSource Name="Transactions" ComponentName="sqlDataSource2">
+      <Connection Name="DashboardConnection" FromAppConfig="true" />
+      <Query Type="SelectQuery" Name="Transactions">
+        <Tables>
+          <Table Name="Transactions" />
+          <Table Name="Encashments" />
+          <Relation Type="Inner" Parent="Transactions" Nested="Encashments">
+            <KeyColumn Parent="EncargementId" Nested="Id" />
+          </Relation>
+        </Tables>
+        <Columns>
+          <Column Table="Transactions" Name="Id" />
+          <Column Table="Transactions" Name="Msisdn" />
+          <Column Table="Transactions" Name="Amount" />
+          <Column Table="Transactions" Name="Status" />
+          <Column Table="Transactions" Name="RefNum" />
+          <Column Table="Transactions" Name="Service" />
+          <Column Table="Transactions" Name="State" />
+          <Column Table="Transactions" Name="Reason" />
+          <Column Table="Transactions" Name="TerminalId" />
+          <Column Table="Transactions" Name="PollingCallbackRegistered" />
+          <Column Table="Transactions" Name="TransactionDate" />
+          <Column Table="Transactions" Name="EncargementId" />
+          <Column Table="Transactions" Name="CrossTransactionId" />
+          <Column Table="Encashments" Name="Id" Alias="Encashments_Id" />
+          <Column Table="Encashments" Name="EncashmentDate" />
+          <Column Table="Encashments" Name="TerminalId" Alias="Encashments_TerminalId" />
+          <Column Table="Encashments" Name="EncashmentSum" />
+          <Column Table="Encashments" Name="EncashmentSumFromTerminal" />
+          <Column Table="Encashments" Name="Status" Alias="Encashments_Status" />
+        </Columns>
+      </Query>
+      <ConnectionOptions CloseConnection="true" />
+    </SqlDataSource>
   </DataSources>
   <Items>
     <Grid ComponentName="gridDashboardItem1" Name="Grid 1" DataSource="sqlDataSource1" DataMember="Terminals">
@@ -41,10 +75,25 @@
       <GridOptions />
       <ColumnFilterOptions />
     </Grid>
+    <Pie ComponentName="pieDashboardItem1" Name="Pies 1" DataSource="sqlDataSource1" DataMember="Terminals" />
+    <Pie ComponentName="pieDashboardItem2" Name="Pies 2" DataSource="sqlDataSource2" DataMember="Transactions">
+      <DataItems>
+        <Measure DataMember="Id" DefaultId="DataItem0" />
+        <Measure DataMember="Amount" DefaultId="DataItem1" />
+      </DataItems>
+      <Values>
+        <Value DefaultId="DataItem0" />
+        <Value DefaultId="DataItem1" />
+      </Values>
+    </Pie>
   </Items>
   <LayoutTree>
     <LayoutGroup>
-      <LayoutItem DashboardItem="gridDashboardItem1" />
+      <LayoutGroup Orientation="Vertical">
+        <LayoutItem DashboardItem="pieDashboardItem2" />
+        <LayoutItem DashboardItem="pieDashboardItem1" />
+        <LayoutItem DashboardItem="gridDashboardItem1" />
+      </LayoutGroup>
     </LayoutGroup>
   </LayoutTree>
 </Dashboard>

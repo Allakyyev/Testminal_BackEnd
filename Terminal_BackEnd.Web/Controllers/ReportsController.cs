@@ -1,5 +1,4 @@
 ﻿using DevExpress.AspNetCore.Reporting.WebDocumentViewer;
-using DevExpress.Pdf.Native.BouncyCastle.Utilities;
 using DevExpress.XtraReports.Web.Extensions;
 using DevExpress.XtraReports.Web.WebDocumentViewer;
 using Microsoft.AspNetCore.Mvc;
@@ -16,11 +15,14 @@ namespace Terminal_BackEnd.Web.Controllers {
             [FromServices] IWebDocumentViewerClientSideModelGenerator clientSideModelGenerator,
             [FromServices] ReportStorageWebExtension reportStorageWebExtension) {
             ViewBag.ReportList = reportStorageWebExtension.GetUrls().Select(x => new SelectListItem(x.Key, x.Value));
+            ViewBag.ReportSourceList = new List<SelectListItem>() {
+                new SelectListItem("TerminalTransactionsReport", "Отчет по продажам и инкассации")
+            };
             var reportNameToOpen = ReportUrl ?? "Report.repx";
             WebDocumentViewerModel viewerModel;
             viewerModel = clientSideModelGenerator.GetModel(reportNameToOpen, WebDocumentViewerController.DefaultUri);
             var model = new ReportViewerModel {
-                ReportUrl = reportNameToOpen,                                                                                          
+                ReportUrl = reportNameToOpen,
                 ViewerModelToBind = viewerModel
             };
             return View(model);

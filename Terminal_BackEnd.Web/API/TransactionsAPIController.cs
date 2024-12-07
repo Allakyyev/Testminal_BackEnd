@@ -55,7 +55,7 @@ namespace Terminal_BackEnd.Web.API {
 
         [HttpPost("CloseEncashment")]
         public void CloseEncashment(CloseEncashmentModel model) {
-            _transactionControllerService.CloseEncashment(model.Id);
+            _transactionControllerService.CloseEncashment(model.Id, model.SumFromTerm);
         }
 
         [HttpGet("Enchargement")]

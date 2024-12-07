@@ -12,25 +12,37 @@
                 <div class="card-body">
                     <h5 class="card-title">@SharedLocalizer["Информация о инкассации"]: <strong>ID @Model.Id</strong> @(Model.Status == Terminal_BackEnd.Infrastructure.Entities.EncashmentStatus.Open ? "Open" :"Closed")</strong></h5>
                    <form class="row g-3">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="validationDefault01" class="form-label">@SharedLocalizer["Дата инкассации"]</label>
                             <input type="text" class="form-control" value="@Model.EncashmentDate" required disabled>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="validationDefault02" class="form-label">@SharedLocalizer["Сумма"]</label>
                             <input type="text" class="form-control" id="validationDefault02" value="@(Model.EncashmentSum) TMT" required disabled>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="validationDefault02" class="form-label">@SharedLocalizer["Имя терминала"]</label>
                             <input type="text" class="form-control" value="@(Model.TerminalName)" required disabled>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="validationDefault02" class="form-label">@SharedLocalizer["Дилер"]</label>
                             <input type="text" class="form-control" value="@(Model.TerminalOwner)" required disabled>
                         </div>
+                        @if(Model.Status == Terminal_BackEnd.Infrastructure.Entities.EncashmentStatus.Close) {
+                            <div class="col-md-3">
+                                <label for="validationDefault02" class="form-label">@SharedLocalizer["Физическая Сумма"]</label>
+                                <input type="text" class="form-control" value="@(Model.EncashmentSumFromTerminal)" required disabled>
+                            </div>
+                        }
                         @if((User.IsInRole("Cashier") || User.IsInRole("Admin")) && Model.Status == Terminal_BackEnd.Infrastructure.Entities.EncashmentStatus.Open) {
-                        <div class="col-md-4">
-                            <div id="closeButton"></div>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="validationDefault02" class="form-label">@SharedLocalizer["Физическая Сумма"]</label>
+                                <input type="number" min="1" id="sumFromTerm" class="form-control" value="@(Model.EncashmentSumFromTerminal)" required>
+                            </div>
+                            <div class="col-md-4" style="align-content: flex-end">
+                                <div id="closeButton"></div>
+                            </div>
                         </div>
                         }
                     </form>
@@ -293,12 +305,14 @@
                 type: "success",
                 useSubmitBehavior: false,
                 onClick: function() {
+                    let sum = $("#sumFromTerm").val();
                 $.ajax({
                     url: closeUrl,
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify({
-                        id: @Model.Id                        
+                        id: @Model.Id,
+                        sumFromTerm: sum
                     }),
                     success: function(response) {
                         alert("Инкассации закрыта успешно!");

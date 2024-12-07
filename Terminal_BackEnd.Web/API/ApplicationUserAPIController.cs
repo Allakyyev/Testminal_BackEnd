@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Terminal_BackEnd.Infrastructure.Constants;
 using Terminal_BackEnd.Infrastructure.Data;
 using Terminal_BackEnd.Infrastructure.Entities;
 using Terminal_BackEnd.Infrastructure.Services.UserService;
@@ -27,8 +26,8 @@ namespace Terminal_BackEnd.Web.API {
         // GET: api/ApplicationUserAPI
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        public async Task<object?> Get(DataSourceLoadOptions loadOptions) {            
-            return DataSourceLoader.Load<ApplicationUserViewModel>((await _userService.GetAllUsers()), loadOptions);            
+        public async Task<object?> Get(DataSourceLoadOptions loadOptions) {
+            return DataSourceLoader.Load<ApplicationUserViewModel>((await _userService.GetAllUsers()), loadOptions);
         }
 
         [HttpGet("Topups/{id}")]

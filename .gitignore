@@ -6,3 +6,5 @@ Terminal_BackEnd.Core/bin
 Terminal_BackEnd.Infrastructure/bin
 Terminal_BackEnd.Web/bin
 Terminal_BackEnd.Web/obj
+Terminal_BackEnd.Web/ReportDocuments
+Terminal_BackEnd.Web/PreviewedReports
