@@ -71,7 +71,7 @@ namespace Terminal_BackEnd.Web.Services {
             appDbContext.SaveChanges();
         }
 
-        public Task<EncashementResponse> CreateEncashment(long terminalId, int sumFromTerminal, EncashmentStatus status = EncashmentStatus.Open) {
+        public Task<EncashementResponse> CreateEncashment(long terminalId, int sumFromTerminal, DateTime? date, EncashmentStatus status = EncashmentStatus.Open) {
             using(var transaction = appDbContext.Database.BeginTransaction()) {
                 try {
                     var terminal = appDbContext.Terminals.Include(p => p.Encashments).FirstOrDefault(x => x.Id == terminalId);
@@ -85,7 +85,7 @@ namespace Terminal_BackEnd.Web.Services {
                         }
                         long sum = transactions.Sum(t => t.Amount);
                         var enchargement = new Encashment() {
-                            EncashmentDate = DateTime.Now,
+                            EncashmentDate = date ?? DateTime.Now,
                             TerminalId = terminalId,
                             EncashmentSum = sum > 0 ? sum / 100 : sum,
                             EncashmentSumFromTerminal = sumFromTerminal,

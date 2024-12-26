@@ -1,10 +1,13 @@
-﻿using DevExtreme.AspNet.Data;
+﻿using System.Security.Claims;
+using DevExtreme.AspNet.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Terminal_BackEnd.Infrastructure.Constants;
 using Terminal_BackEnd.Infrastructure.Entities;
 using Terminal_BackEnd.Infrastructure.Services.TerminalService;
 using Terminal_BackEnd.Infrastructure.Services.TerminalService.Models;
+using Terminal_BackEnd.Web.SignalR;
 
 namespace Terminal_BackEnd.Web.API {
     [Route("api/[controller]")]
@@ -12,8 +15,10 @@ namespace Terminal_BackEnd.Web.API {
     [Authorize]
     public class TerminalAPIController : ControllerBase {
         private readonly ITerminalService terminalService;
-        public TerminalAPIController(ITerminalService terminalService) {
+        private readonly IHubContext<CommandHub> hubContext;
+        public TerminalAPIController(ITerminalService terminalService, IHubContext<CommandHub> hubContext) {
             this.terminalService = terminalService;
+            this.hubContext = hubContext;
         }
         [HttpGet]
         public async Task<object?> Get(DataSourceLoadOptions loadOptions) {
@@ -47,10 +52,22 @@ namespace Terminal_BackEnd.Web.API {
             foreach(var terminal in terminals) {
                 var terminalLogs = terminal.TerminalLogs;
                 LogType logType = LogType.Repaired;
-                if(terminalLogs != null && terminalLogs.Count() > 0)
-                    logType = terminalLogs.OrderByDescending(t => t.LogDate).First().Type;
+                if(terminalLogs != null && terminalLogs.Count() > 0) {
+                    var lastLog = terminalLogs.OrderByDescending(t => t.LogDate).First();
+                    logType = lastLog.Type;
+                    if(terminal.Transactions?.Count() > 0) {
+                        var lastTransaction = terminal.Transactions.OrderByDescending(t => t.TransactionDate).First();
+                        if(lastTransaction.TransactionDate > lastLog.LogDate)
+                            logType = LogType.Repaired;
+                    }
+                }
+                string healthMessage = logType == LogType.Error ? "В ошибочном состоянии. " : "В рабочем состоянии. ";
+                if(terminal.LastPing.AddMinutes(30) < DateTime.Now) {
+                    healthMessage += "Нет сигнала от Терминала";
+                }
                 var terminalViewModel = new TerminalViewModel() {
                     Id = terminal.Id,
+                    TerminalNumber = terminal.Id.ToString("D4"),
                     Name = terminal.Name,
                     TerminalId = terminal.TerminalId,
                     Status = terminal.Status == TerminalStatus.Active ? "Active" : "Inactive",
@@ -58,7 +75,7 @@ namespace Terminal_BackEnd.Web.API {
                     CurrentTotal = terminalService.GetTerminalCurrenTotal(terminal.Id),
                     DeviceCPUId = terminal.DeviceCPUId,
                     DeviceMotherBoardId = terminal.DeviceMotherBoardId,
-                    Healthy = logType == LogType.Error ? "В ошибочном состоянии" : "В рабочем состоянии",
+                    Healthy = healthMessage,
                     LogType = logType
                 };
                 terminalsViewModel.Add(terminalViewModel);
@@ -66,5 +83,34 @@ namespace Terminal_BackEnd.Web.API {
             return terminalsViewModel;
         }
 
+        [HttpGet("restart/{terminalId}")]
+        public IActionResult RestartTerminal(long terminalId) {
+            if(User.Identity != null && User.Identity.IsAuthenticated) {
+                var terminal = terminalService.GetTerminalById(terminalId);
+                if(terminal != null && terminal.UserId == User.FindFirst(ClaimTypes.NameIdentifier)?.Value || User.IsInRole(ConstantsCommon.Role.Admin)) {
+                    this.hubContext.Clients.All.SendAsync("Restart", terminal?.TerminalId);
+                    return Ok();
+                } else {
+                    return Forbid();
+                }
+            } else {
+                return Unauthorized();
+            }
+        }
+
+        [HttpGet("restartOS/{terminalId}")]
+        public IActionResult RestartOS(long terminalId) {
+            if(User.Identity != null && User.Identity.IsAuthenticated) {
+                var terminal = terminalService.GetTerminalById(terminalId);
+                if(terminal != null && terminal.UserId == User.FindFirst(ClaimTypes.NameIdentifier)?.Value || User.IsInRole(ConstantsCommon.Role.Admin)) {
+                    this.hubContext.Clients.All.SendAsync("RestartOS", terminal?.TerminalId);
+                    return Ok();
+                } else {
+                    return Forbid();
+                }
+            } else {
+                return Unauthorized();
+            }
+        }
     }
 }

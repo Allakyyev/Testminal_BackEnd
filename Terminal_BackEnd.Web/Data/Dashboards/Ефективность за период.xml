@@ -1,0 +1,137 @@
+<Dashboard>
+  <Title Text="Активность терминалов" />
+  <DataSources>
+    <SqlDataSource Name="Terminals" ComponentName="sqlDataSource1">
+      <Connection Name="DashboardConnection" FromAppConfig="true" />
+      <Query Type="SelectQuery" Name="Terminals">
+        <Tables>
+          <Table Name="Terminals" />
+        </Tables>
+        <Columns>
+          <Column Table="Terminals" Name="Id" />
+          <Column Table="Terminals" Name="Password" />
+          <Column Table="Terminals" Name="TerminalId" />
+          <Column Table="Terminals" Name="Name" />
+          <Column Table="Terminals" Name="UserId" />
+          <Column Table="Terminals" Name="CreatedDate" />
+          <Column Table="Terminals" Name="Status" />
+        </Columns>
+      </Query>
+      <ConnectionOptions CloseConnection="true" />
+    </SqlDataSource>
+    <SqlDataSource Name="Transactions" ComponentName="sqlDataSource2">
+      <Connection Name="DashboardConnection" FromAppConfig="true" />
+      <Query Type="SelectQuery" Name="Transactions">
+        <Tables>
+          <Table Name="Transactions" />
+          <Table Name="Encashments" />
+          <Relation Type="Inner" Parent="Transactions" Nested="Encashments">
+            <KeyColumn Parent="EncargementId" Nested="Id" />
+          </Relation>
+        </Tables>
+        <Columns>
+          <Column Table="Transactions" Name="Id" />
+          <Column Table="Transactions" Name="Msisdn" />
+          <Column Table="Transactions" Name="Amount" />
+          <Column Table="Transactions" Name="Status" />
+          <Column Table="Transactions" Name="RefNum" />
+          <Column Table="Transactions" Name="Service" />
+          <Column Table="Transactions" Name="State" />
+          <Column Table="Transactions" Name="Reason" />
+          <Column Table="Transactions" Name="TerminalId" />
+          <Column Table="Transactions" Name="PollingCallbackRegistered" />
+          <Column Table="Transactions" Name="TransactionDate" />
+          <Column Table="Transactions" Name="EncargementId" />
+          <Column Table="Transactions" Name="CrossTransactionId" />
+          <Column Table="Encashments" Name="Id" Alias="Encashments_Id" />
+          <Column Table="Encashments" Name="EncashmentDate" />
+          <Column Table="Encashments" Name="TerminalId" Alias="Encashments_TerminalId" />
+          <Column Table="Encashments" Name="EncashmentSum" />
+          <Column Table="Encashments" Name="EncashmentSumFromTerminal" />
+          <Column Table="Encashments" Name="Status" Alias="Encashments_Status" />
+        </Columns>
+      </Query>
+      <ConnectionOptions CloseConnection="true" />
+    </SqlDataSource>
+    <ObjectDataSource Name="Object Data Source" ComponentName="objectDataSource1" DataId="TraminalActivityByPeriod" />
+    <ObjectDataSource Name="Object Data Source 1" ComponentName="objectDataSource2" DataId="TerminalActivityByPeriod" />
+  </DataSources>
+  <Parameters>
+    <Parameter Name="Start" Type="System.DateTime" Description="Дата начало" />
+    <Parameter Name="End" Type="System.DateTime" Description="Последня дата периода" />
+    <Parameter Name="minValue" Type="System.Int32" Value="100" Description="Красный если меньше" />
+    <Parameter Name="maxValue" Type="System.Int32" Value="200" Description="Синий если больше" />
+  </Parameters>
+  <Items>
+    <Grid ComponentName="gridDashboardItem1" Name="Таблица активности Терминалов" DataSource="objectDataSource2">
+      <DataItems>
+        <Dimension DataMember="Name" DefaultId="DataItem0" />
+        <Dimension DataMember="Dealer" DefaultId="DataItem1" />
+        <Dimension DataMember="FirstTransactionDate" DateTimeGroupInterval="DayMonthYear" DefaultId="DataItem2" />
+        <Dimension DataMember="LastTransactionDate" DateTimeGroupInterval="DayMonthYear" DefaultId="DataItem3" />
+        <Measure DataMember="TransactionCount" DefaultId="DataItem4" />
+        <Measure DataMember="TotalTransactionAmount" DefaultId="DataItem5" />
+        <Measure DataMember="TotalDaysInPeriod" DefaultId="DataItem6" />
+        <Measure DataMember="AverageTransactionAmountPerDay" DefaultId="DataItem7" />
+        <Measure DataMember="TotalDaysWithTransaction" DefaultId="DataItem8" />
+        <Measure DataMember="MaxTransactionAmountPerDay" DefaultId="DataItem9" />
+      </DataItems>
+      <FormatRules>
+        <GridItemFormatRule Name="Format Rule 1">
+          <FormatConditionExpression>
+            <AppearanceSettings AppearanceType="PaleGreen" />
+          </FormatConditionExpression>
+        </GridItemFormatRule>
+        <GridItemFormatRule Name="Format Rule 2" DataItem="DataItem7" DataItemApplyTo="DataItem7">
+          <FormatConditionExpression Expression="[DataItem7] &gt;= ?maxValue">
+            <AppearanceSettings AppearanceType="PaleGreen" />
+          </FormatConditionExpression>
+        </GridItemFormatRule>
+        <GridItemFormatRule Name="Format Rule 3" DataItem="DataItem7" DataItemApplyTo="DataItem7">
+          <FormatConditionExpression Expression="[DataItem7] &lt;= ?minValue">
+            <AppearanceSettings AppearanceType="PaleRed" />
+          </FormatConditionExpression>
+        </GridItemFormatRule>
+      </FormatRules>
+      <GridColumns>
+        <GridDimensionColumn Name="Теринал">
+          <Dimension DefaultId="DataItem0" />
+        </GridDimensionColumn>
+        <GridDimensionColumn Name="Дистрибьютор">
+          <Dimension DefaultId="DataItem1" />
+        </GridDimensionColumn>
+        <GridDimensionColumn Name="Первая продажа">
+          <Dimension DefaultId="DataItem2" />
+        </GridDimensionColumn>
+        <GridDimensionColumn Name="Последняя продажа">
+          <Dimension DefaultId="DataItem3" />
+        </GridDimensionColumn>
+        <GridMeasureColumn Name="Количество продаж">
+          <Measure DefaultId="DataItem4" />
+        </GridMeasureColumn>
+        <GridMeasureColumn Name="Сумма продаж">
+          <Measure DefaultId="DataItem5" />
+        </GridMeasureColumn>
+        <GridMeasureColumn Name="Дней в периоде">
+          <Measure DefaultId="DataItem6" />
+        </GridMeasureColumn>
+        <GridMeasureColumn Name="Ефективность за период">
+          <Measure DefaultId="DataItem7" />
+        </GridMeasureColumn>
+        <GridMeasureColumn Name="Работал дней">
+          <Measure DefaultId="DataItem8" />
+        </GridMeasureColumn>
+        <GridMeasureColumn Name="Ефективность за 1 день продаж">
+          <Measure DefaultId="DataItem9" />
+        </GridMeasureColumn>
+      </GridColumns>
+      <GridOptions ColumnWidthMode="Manual" />
+      <ColumnFilterOptions />
+    </Grid>
+  </Items>
+  <LayoutTree>
+    <LayoutGroup>
+      <LayoutItem DashboardItem="gridDashboardItem1" />
+    </LayoutGroup>
+  </LayoutTree>
+</Dashboard>

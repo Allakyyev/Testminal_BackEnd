@@ -2,7 +2,9 @@ using System.Globalization;
 using DevExpress.AspNetCore;
 using DevExpress.AspNetCore.Reporting;
 using DevExpress.DashboardAspNetCore;
+using DevExpress.DashboardCommon;
 using DevExpress.DashboardWeb;
+using DevExpress.XtraCharts;
 using DevExpress.XtraReports.Web.Extensions;
 using DevExpress.XtraReports.Web.WebDocumentViewer;
 using Microsoft.AspNetCore.Identity;
@@ -17,8 +19,11 @@ using Terminal_BackEnd.Infrastructure.Entities;
 using Terminal_BackEnd.Infrastructure.Services;
 using Terminal_BackEnd.Infrastructure.Services.TerminalService;
 using Terminal_BackEnd.Infrastructure.Services.UserService;
+using Terminal_BackEnd.Web.DataSources.Dashboards;
+using Terminal_BackEnd.Web.DataSources.Reports;
 using Terminal_BackEnd.Web.Jobs;
 using Terminal_BackEnd.Web.Services;
+using Terminal_BackEnd.Web.SignalR;
 
 namespace Terminal_BackEnd.Web {
     public class Program {
@@ -60,6 +65,40 @@ namespace Terminal_BackEnd.Web {
                 DashboardConfigurator configurator = new DashboardConfigurator();
                 configurator.SetDashboardStorage(new DashboardFileRepository(fileProvider.GetFileInfo("Data/Dashboards").PhysicalPath));
                 configurator.SetConnectionStringsProvider(new DashboardConnectionStringsProvider(configuration));
+
+                DashboardObjectDataSource objDataSource = new DashboardObjectDataSource("Object Data Source");
+                objDataSource.DataId = "TerminalActivityByPeriod";
+                configurator.DataLoading += DataLoading;
+
+                DashboardObjectDataSource activityByDay = new DashboardObjectDataSource("Terminal Activity By day");
+                activityByDay.DataId = "TerminalActivityByDay";
+                configurator.DataLoading += DataLoading;
+
+                static void DataLoading(object sender, DataLoadingWebEventArgs e) {
+                    if(e.DataId == "TerminalActivityByPeriod") {
+                        var startParameter = e.Parameters.Where(p => p.Name == "Start");
+                        var endParameter = e.Parameters.Where(p => p.Name == "End");
+                        if(startParameter.Any() && endParameter.Any()) {
+                            DateTime start = (DateTime)startParameter.First().Value;
+                            DateTime end = (DateTime)endParameter.First().Value;
+                            e.Data = TerminalActivitiesDataSource.GetData(start, end);
+                        }
+                    } else if(e.DataId == "TerminalActivityByDay") {
+                        var days = e.Parameters.Where(p => p.Name == "Days");
+
+                        if(days.Any()) {
+                            int _days = (int)days.First().Value;
+                            e.Data = TerminalActivitiesByDayDataSource.GetData(_days);
+                        }
+                    }
+                }
+                DataSourceInMemoryStorage dataSourceStorage = new DataSourceInMemoryStorage();
+
+                // Register the Object data source.
+                dataSourceStorage.RegisterDataSource("objDataSource", objDataSource.SaveToXml());
+                dataSourceStorage.RegisterDataSource("TerminalActivityByDay", activityByDay.SaveToXml());
+                // Register the storage for the Web Dashboard.
+                configurator.SetDataSourceStorage(dataSourceStorage);
                 return configurator;
             });
             builder.Services.AddMvc();
@@ -67,12 +106,15 @@ namespace Terminal_BackEnd.Web {
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization();
 
+            RegisterTrustedTypes.Register();
+            ServiceProvider.collection = builder.Services;
             builder.Services.ConfigureReportingServices(configurator => {
                 if(builder.Environment.IsDevelopment()) {
                     configurator.UseDevelopmentMode();
                 }
                 configurator.ConfigureReportDesigner(designerConfigurator => {
                     designerConfigurator.RegisterDataSourceWizardConfigFileConnectionStringsProvider();
+                    designerConfigurator.RegisterObjectDataSourceWizardTypeProvider<CustomObjectDataSource>();
                 });
                 configurator.ConfigureWebDocumentViewer(viewerConfigurator => {
                     viewerConfigurator.UseFileDocumentStorage(Path.Combine(builder.Environment.ContentRootPath, "ReportDocuments"), StorageSynchronizationMode.InterProcess);
@@ -95,6 +137,8 @@ namespace Terminal_BackEnd.Web {
                 options.SupportedCultures = supportedCultures;
                 options.SupportedUICultures = supportedCultures;
             });
+            builder.Services.AddSignalR();
+           
             var app = builder.Build();
             using(var scope = app.Services.CreateScope()) {
                 var services = scope.ServiceProvider;
@@ -157,6 +201,8 @@ namespace Terminal_BackEnd.Web {
             app.UseStaticFiles();
             app.UseDevExpressControls();
             app.UseRouting();
+            app.UseCors("AllowAnyOrigin");
+            app.MapHub<CommandHub>("/CommandHub/signalr");
             app.UseAuthentication();  // Ensure that authentication is added
             app.UseAuthorization();
             app.MapDashboardRoute("api/dashboard", "DefaultDashboard");

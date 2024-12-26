@@ -1,13 +1,15 @@
-﻿using DevExpress.XtraReports.Native;
+﻿using System.Reflection;
+using DevExpress.XtraReports.Native;
 using DevExpress.XtraReports.Services;
-using System.Reflection;
 using DevExpress.XtraReports.UI;
 using DevExpress.XtraReports.Web.Extensions;
+using XtraReportsDemosTerminal_BackEnd.Web.ReportSources;
 
 namespace Terminal_BackEnd.Web.Services {
     public static class ReportsFactory {
         public static Dictionary<string, Func<XtraReport>> Reports = new Dictionary<string, Func<XtraReport>>() {
-            ["NewReport"] = () => new XtraReport()            
+            ["NewReport"] = () => new XtraReport(),
+            ["TerminalTransactionsReport"] = () => new TerminalTransactionsReport()
         };
     }
 

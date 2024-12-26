@@ -11,5 +11,9 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService.Models {
         public required string UserId { get; set; }
         [Required]
         public TerminalStatus Status { get; set; }
+        [Required]
+        public string Address { get; set; }
+        [Required]
+        public string ContactPhoneNumber { get; set; }
     }
 }

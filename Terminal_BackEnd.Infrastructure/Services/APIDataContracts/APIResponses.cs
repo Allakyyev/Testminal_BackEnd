@@ -19,4 +19,7 @@ namespace Terminal_BackEnd.Infrastructure.Services.DataContracts {
 
     [DataContract]
     public class LogTerminalResponse : APIResponseBase { }
+
+    [DataContract]
+    public class PingTerminalResponse : APIResponseBase { }
 }

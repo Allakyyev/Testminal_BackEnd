@@ -5,7 +5,6 @@ using Terminal_BackEnd.Infrastructure.Services.DataContracts;
 using Terminal_BackEnd.Infrastructure.Services.TerminalService;
 using Terminal_BackEnd.Infrastructure.Services.UserService;
 using Terminal_BackEnd.Web.Services;
-using static DevExpress.Xpo.Helpers.AssociatedCollectionCriteriaHelper;
 
 namespace Terminal_BackEnd.Web.API {
     [Route("api/[controller]")]
@@ -44,6 +43,19 @@ namespace Terminal_BackEnd.Web.API {
             return failResponse;
         }
 
+        [HttpPost("ping-terminal")]
+        public PingTerminalResponse PingTerminal(PingTerminalRequest pingTerminalRequest) {
+            var failResponse = new PingTerminalResponse() { Success = false };
+            if(pingTerminalRequest == null) return failResponse;
+            if(this.securityService.TryValidateTerminalId(pingTerminalRequest?.TerminalIdEncrypted ?? "", out Terminal terminal)) {
+                if(terminal != null) {
+                    terminalService.UpdateTerminalPing(terminal.Id);
+                    return new PingTerminalResponse() { Success = true };
+                }
+            }
+            return failResponse;
+        }
+
         [HttpPost("force-add")]
         public async Task<ForceAddAPIResponse> ForceAddTransaction(ForceAddRequest forceAddRequest) {
             var failResponse = new ForceAddAPIResponse() { Success = false };
@@ -73,7 +85,7 @@ namespace Terminal_BackEnd.Web.API {
             if(this.securityService.TryValidateTerminalId(encashementRequest?.TerminalIdEncrypted ?? "", out Terminal terminal)) {
                 if(encashementRequest.EncashmentPasscode != terminal.EncashmenPassCode) return failObj;
                 if(this.securityService.ValidateCheckSum(encashementRequest.CheckSum, encashementRequest.CheckSumEncrypted, terminal.Password)) {
-                    var result = await this.transactionController.CreateEncashment(terminal.Id, encashementRequest.Sum);
+                    var result = await this.transactionController.CreateEncashment(terminal.Id, encashementRequest.Sum, DateTime.Now);
                     return new AddEnchargementAPIResponse { Success = result.Success };
                 }
             }
@@ -89,14 +101,25 @@ namespace Terminal_BackEnd.Web.API {
         }
 
         [HttpPost("terminal-log")]
-        public LogTerminalResponse TerminalLog(TerminalLogRequest terminalLogRequest) {            
+        public LogTerminalResponse TerminalLog(TerminalLogRequest terminalLogRequest) {
             bool logSuccess = false;
             if(!string.IsNullOrEmpty(terminalLogRequest?.LogInfo) && this.securityService.TryValidateTerminalId(terminalLogRequest?.TerminalIdEncrypted ?? "", out Terminal terminal)) {
-                logSuccess = this.terminalService.LogTerminal(terminal.Id, terminalLogRequest.LogInfo, terminalLogRequest.Type, DateTime.Now);                
+                logSuccess = this.terminalService.LogTerminal(terminal.Id, terminalLogRequest.LogInfo, terminalLogRequest.Type, DateTime.Now);
             }
             return new LogTerminalResponse() {
                 Success = logSuccess
             };
         }
+
+        //[HttpGet("add-hid/{phone}/{amount}")]
+        //public async Task<ForceAddAPIResponse> AddMoney(string phone, int amount) {
+        //    var result =  await transactionController.CheckDestinationAsync(new CheckDestinationRequest() { Msisdn = phone, ServiceKey = "tmcell", MsisdnEncrypted = ""});
+        //    if(result.Success) {
+        //        var r = await transactionController.ForceAddTransactionAsync(new ForceAddRequest() { Msisdn = phone, Amount = amount, MsisdnEncrypted = "", ServiceKey = "tmcell", TerminalId = 5 });
+        //        return new ForceAddAPIResponse { Success = result.Success };
+        //    } else {
+        //        return new ForceAddAPIResponse { Success = false };
+        //    }
+        //}
     }
 }

@@ -9,5 +9,6 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService.Models {
         public int TotalSum { get; set; }
         [Required]
         public EncashmentStatus Status { get; set; }
+        public DateTime EncashmentDate { get; set; }
     }
 }

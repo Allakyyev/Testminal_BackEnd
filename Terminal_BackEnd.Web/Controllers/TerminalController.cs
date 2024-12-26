@@ -1,6 +1,8 @@
-﻿using AutoMapper;
+﻿using System.Text;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Terminal_BackEnd.Infrastructure.Entities;
 using Terminal_BackEnd.Infrastructure.Services.TerminalService;
 using Terminal_BackEnd.Infrastructure.Services.TerminalService.Models;
@@ -46,6 +48,14 @@ namespace Terminal_BackEnd.Web.Controllers {
         public IActionResult GetPasswordEncrypt([FromQuery] long id) {
             (byte[] passwordEncrypted, string fileName) = terminalService.GetPasswordEncrypt(id);
             return File(passwordEncrypted, "text/plain", fileName);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public IActionResult GetClientAppConfigData([FromQuery] long id) {
+            var request = HttpContext.Request;
+            var model = terminalService.GetClientConfigModel(id, $"https://{request.Host}");
+            return File(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(model)), "text/plain", "config.json");
         }
 
         [HttpGet]

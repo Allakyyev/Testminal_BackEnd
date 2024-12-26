@@ -1,0 +1,53 @@
+<Dashboard>
+  <Title Text="Продажи по дням" />
+  <DataSources>
+    <ObjectDataSource Name="Terminal Activity By day" ComponentName="objectDataSource1" DataId="TerminalActivityByDay" />
+  </DataSources>
+  <Parameters>
+    <Parameter Name="Days" Type="System.Int32" Value="30" Description="Количество дней" />
+    <Parameter Name="minValue" Type="System.Int32" Value="100" Description="Крачный если меньше" />
+    <Parameter Name="maxValue" Type="System.Int32" Value="200" Description="Синий если больше" />
+  </Parameters>
+  <Items>
+    <Pivot ComponentName="pivotDashboardItem1" Name="Активность по дням" DataSource="objectDataSource1">
+      <DataItems>
+        <Measure DataMember="TotalTransactionAmount" Name="Сумма продаж" DefaultId="DataItem0" />
+        <Measure DataMember="TransactionCount" Name="Количество продаж" DefaultId="DataItem1" />
+        <Dimension DataMember="Date" DateTimeGroupInterval="DayMonthYear" DefaultId="DataItem2" />
+        <Dimension DataMember="Name" DefaultId="DataItem3" />
+      </DataItems>
+      <FormatRules>
+        <PivotItemFormatRule Name="Format Rule 1" DataItem="DataItem0">
+          <FormatConditionExpression Expression="[DataItem0] &lt;= ?minValue">
+            <AppearanceSettings AppearanceType="PaleRed" />
+          </FormatConditionExpression>
+          <PivotItemFormatRuleLevel />
+        </PivotItemFormatRule>
+        <PivotItemFormatRule Name="Format Rule 2" DataItem="DataItem0">
+          <FormatConditionExpression Expression="[DataItem0] &gt;= ?maxValue">
+            <AppearanceSettings AppearanceType="PaleGreen" />
+          </FormatConditionExpression>
+          <PivotItemFormatRuleLevel />
+        </PivotItemFormatRule>
+      </FormatRules>
+      <Columns>
+        <Column DefaultId="DataItem2" />
+      </Columns>
+      <Rows>
+        <Row DefaultId="DataItem3" />
+      </Rows>
+      <Values>
+        <Value DefaultId="DataItem0" />
+        <Value DefaultId="DataItem1" />
+      </Values>
+      <AutoExpandColumnGroups>true</AutoExpandColumnGroups>
+      <AutoExpandRowGroups>true</AutoExpandRowGroups>
+      <ShowRowGrandTotals>false</ShowRowGrandTotals>
+    </Pivot>
+  </Items>
+  <LayoutTree>
+    <LayoutGroup>
+      <LayoutItem DashboardItem="pivotDashboardItem1" />
+    </LayoutGroup>
+  </LayoutTree>
+</Dashboard>

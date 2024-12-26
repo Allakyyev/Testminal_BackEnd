@@ -12,10 +12,13 @@
         public List<Transaction>? Transactions { get; set; }
         public List<TerminalLog>? TerminalLogs { get; set; }
         public List<Encashment>? Encashments { get; set; }
-        public ApplicationUser? ApplicationUser { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
         public TerminalStatus Status { get; set; }
         public DateTime CreatedDate { get; set; }
         public string? DeviceMotherBoardId { get; set; }
         public string? DeviceCPUId { get; set; }
+        public string Address { get; set; }
+        public string ContactPhoneNumber { get; set; }
+        public DateTime LastPing { get; set; }
     }
 }

@@ -19,6 +19,8 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
         bool RegisterTerminal(string terminalId, string motherboardId, string cpuId);
         bool LogTerminal(long terminalId, string info, LogType type, DateTime date);
         List<TerminalLogViewModel> TerminalLogs(long terminalId);
+        ClientConfigModel? GetClientConfigModel(long terminalId, string baseUri);
+        void UpdateTerminalPing(long terminalId);
     }
 
     public class TerminalService : ITerminalService {
@@ -80,11 +82,11 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
         }
 
         public List<Terminal> GetAllTerminals() {
-            return _dbContex.Terminals.Include(i => i.ApplicationUser).Include(t => t.TerminalLogs).ToList();
+            return _dbContex.Terminals.Include(i => i.ApplicationUser).Include(t => t.TerminalLogs).Include(t => t.Transactions).ToList();
         }
 
         public List<Terminal> GetAllTerminalsByUser(string userName) {
-            return _dbContex.Terminals.Include(i => i.ApplicationUser).Where(t => t.ApplicationUser != null && t.ApplicationUser.UserName == userName).ToList();
+            return _dbContex.Terminals.Include(i => i.ApplicationUser).Include(t => t.Transactions).Where(t => t.ApplicationUser != null && t.ApplicationUser.UserName == userName).ToList();
         }
 
         public (byte[], string) GetPasswordEncrypt(long terminalId) {
@@ -95,6 +97,22 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
                 return (Encoding.UTF8.GetBytes(terminalSecrets), $"{terminal.Name} {terminal.ApplicationUser?.FamilyName}.txt");
             }
             return (new byte[0], "NotAuthorized.txt");
+        }
+
+        public ClientConfigModel? GetClientConfigModel(long terminalId, string baseUri) {
+            var terminal = _dbContex.Terminals.Include(p => p.ApplicationUser).FirstOrDefault(t => t.Id == terminalId);
+            ClientConfigModel? model = null;
+            if(terminal != null) {
+                model = new ClientConfigModel() {
+                    BackendBaseUri = $"{baseUri}/api/AltynAsyrTerminalAPI",
+                    ComPort = "COM1",
+                    TerminalId = terminal.TerminalId,
+                    TerminalKey = terminal.Password,
+                    PhoneNumber = terminal.ContactPhoneNumber,
+                    TerminalNumber = terminal.Id.ToString("D4")
+                };                
+            }
+            return model;
         }
 
         public long GetTerminalCurrenTotal(long terminalId) {
@@ -119,8 +137,6 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
 
         public bool LogTerminal(long terminalId, string info, LogType type, DateTime date) {
             try {
-                var terminalLogs = TerminalLogs(terminalId);
-                if(terminalLogs.Count() == 0 || terminalLogs.OrderByDescending(t => t.LogDate).FirstOrDefault()?.Type != LogType.Error) return true;
                 TerminalLog newLog = new TerminalLog() { TerminalId = terminalId, LogInfo = info, Type = type, LogDate = date };
                 _dbContex.TerminalLogs.Add(newLog);
                 _dbContex.SaveChanges();
@@ -147,6 +163,15 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
                 });
             }
             return result;
+        }
+
+        public void UpdateTerminalPing(long terminalId) {
+            var terminal = _dbContex.Terminals.Find(terminalId);
+            if(terminal != null) {
+                terminal.LastPing = DateTime.Now;
+                _dbContex.Update(terminal);
+                _dbContex.SaveChanges();
+            }
         }
     }
 }

@@ -47,7 +47,14 @@
                             <label>@SharedLocalizer["Дилер"]</label>
                             <div id="userSelection"></div>
                         </div>
-
+                        <div class="form-group">
+                            <label>@SharedLocalizer["Адрес"] *</label>
+                            <input type="text" class="form-control" asp-for="Address" value="@(string.IsNullOrEmpty(Model.Address)?"":Model.Address)" required />
+                        </div>
+                        <div class="form-group">
+                            <label>@SharedLocalizer["Контактный номер (для обратнов связи от клиентов)"] *</label>
+                            <input type="text" class="form-control" asp-for="ContactPhoneNumber" value="@(string.IsNullOrEmpty(Model.ContactPhoneNumber)?"":Model.ContactPhoneNumber)" required />
+                        </div>
                         <div class="dx-fieldset form-group">
                             <div id="summary"></div>
                             <div id="button"></div>

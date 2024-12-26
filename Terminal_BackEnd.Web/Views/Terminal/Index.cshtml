@@ -4,7 +4,8 @@
 
 @{
     ViewData["Title"] = SharedLocalizer["Terminals"];
-    if(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin")) {
+    if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+    {
         <script>
             window["isAdmin"] = true;
         </script>
@@ -25,9 +26,11 @@
         </div>
     </div>
 </div>
+<div id="toast"></div>
 
 @section Scripts {
     <script>
+        const toast = $('#toast').dxToast({ displayTime: 3000 }).dxToast('instance');
         performActionAndRedirect("Terminal");
         $(function () {
             let url = 'api/TerminalAPI';
@@ -90,7 +93,9 @@
                 },
                 onRowPrepared: function (e) {
                     if (e.rowType === "data") {
-                        if (e.data.logType === 2) {
+                        if(e.data.healthy && e.data.healthy.includes("Нет сигнала от Терминала")) {
+                            e.rowElement.css("background-color", "#e8aaaa");
+                        } else if (e.data.logType === 2 ) {
                             e.rowElement.css("background-color", "#e8aaaa");
                         }
                     }
@@ -106,7 +111,7 @@
                 },
                 wordWrapEnabled: true,
                 showColumnLines: true,
-                showRowLines: true,                
+                showRowLines: true,
                 showBorders: true,
                 searchPanel: {
                     visible: true
@@ -119,6 +124,12 @@
                 },
 
                 columns: [
+                    {
+                        caption: '@SharedLocalizer["Номер Терминала"]',
+                        dataField: "terminalNumber",
+                        dataType: 'string',
+                        allowHeaderFiltering: true
+                    },
                     {
                         caption: '@SharedLocalizer["Id Терминала"]',
                         dataField: "terminalId",
@@ -162,7 +173,7 @@
                     },
                     {
                         type: "buttons",
-                        width: 110,
+                        width: 180,
                         buttons: [
                             {
                                 hint: '@SharedLocalizer["Редактировать"]',
@@ -182,6 +193,42 @@
                                     var url = `@Url.Action("GetPasswordEncrypt", "Terminal")`;
                                     window.location = url + '?id=' + idString;
                                 },
+                                visible: @(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin") ? "true" : "false")
+                            },
+                            {
+                                hint: '@SharedLocalizer["Get client config json"]',
+                                icon: "file",
+                                onClick: function (e) {
+                                    var idString = e.row.data.id;
+                                    var url = `@Url.Action("GetClientAppConfigData", "Terminal")`;
+                                    window.location = url + '?id=' + idString;
+                                },
+                                visible: @(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin") ? "true" : "false")
+                            },
+                            {
+                                hint: '@SharedLocalizer["Restart Application"]',
+                                icon: "refresh",
+                                onClick: async function (e) {
+                                    const baseUrl = `${window.location.protocol}//${window.location.host}/api/TerminalAPI/restart/` + e.row.data.id;
+                                          await fetch(baseUrl).then(response => {
+                                              successType = 'success';
+                                              errorType = 'error';
+                                              successMessage = 'Запрос на перезагрузку приложения отправлено'
+                                              errorMessage = 'Запрос на перезагрузку приложения не отправлено!!'
+                                              if (!response.ok) {
+                                                  toast.option('message', errorMessage);
+                                                  toast.option('type', errorType);
+                                              } else {
+                                                  toast.option('message', successMessage);
+                                                  toast.option('type', successType);
+                                              }
+                                              toast.show();
+                                          }).catch(error => {
+                                              toast.option('message', errorMessage);
+                                              toast.option('type', errorType);
+                                              toast.show();
+                                          });
+                                 },
                                 visible: @(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin") ? "true" : "false")
                             },
                             "@(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin") ? "delete" : "")"

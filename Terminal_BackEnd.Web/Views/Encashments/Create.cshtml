@@ -32,6 +32,10 @@
                             <div id="terminalSelection"></div>
                         </div>
                         <div class="form-group">
+                            <label>@SharedLocalizer["Дата инкассации"]</label>
+                            <div id="incashmentDate"></div>
+                        </div>
+                        <div class="form-group">
                             <label>@SharedLocalizer["Сумма"] *</label>
                             <input type="number" class="form-control" asp-for="TotalSum" value="@Model.TotalSum" required />
                         </div>
@@ -78,7 +82,7 @@
             });
 
             var statuses = [{ status: 0, displayText: "Open" }, { status: 1, displayText: "Closed" }]
-
+            const now = new Date();
             $("#statusSelection").dxSelectBox({
                 dataSource: statuses,
                 isRequired: true,
@@ -93,7 +97,12 @@
                 }
                 ]
             });
-
+           $('#incashmentDate').dxDateBox({
+                type: 'datetime',
+                value: now,
+                inputAttr: { 'aria-label': 'Date Time' },
+                name: 'EncashmentDate'
+            });            
 
             $("#button").dxButton({
                 text: '@SharedLocalizer["Сохранить"]',

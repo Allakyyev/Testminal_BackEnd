@@ -42,7 +42,7 @@ namespace Terminal_BackEnd.Web.Controllers {
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(CreateEncashmentModel model) {
             if(ModelState.IsValid) {
-                var result = await _transactionControllerService.CreateEncashment(model.TerminalId, model.TotalSum, model.Status);
+                var result = await _transactionControllerService.CreateEncashment(model.TerminalId, model.TotalSum, model.EncashmentDate, model.Status);
             }
             return RedirectToAction("Index");
         }
