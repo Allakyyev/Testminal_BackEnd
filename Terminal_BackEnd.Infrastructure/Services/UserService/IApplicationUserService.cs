@@ -94,8 +94,7 @@ namespace Terminal_BackEnd.Infrastructure.Services.UserService {
         }
 
         public async Task<bool> Topup(string userId, long totalSum) {
-            try {
-                if(!(totalSum > 0)) return false;
+            try {                
                 var user = await _userManager.FindByIdAsync(userId);
                 if(user != null) {
                     user.CurrentTotal += totalSum;

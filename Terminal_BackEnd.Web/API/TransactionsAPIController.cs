@@ -20,9 +20,9 @@ namespace Terminal_BackEnd.Web.API {
         [HttpGet]
         public async Task<object?> Get(DataSourceLoadOptions loadOptions) {
             if(User.Identity != null && User.Identity.IsAuthenticated) {
-                if(User.IsInRole("Admin")) {
+                if(User.IsInRole(ConstantsCommon.Role.Admin) || User.IsInRole(ConstantsCommon.Role.Cashier)) {
                     return DataSourceLoader.Load<TransactionViewModel>(MapToViewModel(_transactionControllerService.GetAllTransactions()), loadOptions);
-                } else if(User.IsInRole("Standard")) {
+                } else if(User.IsInRole(ConstantsCommon.Role.Standard)) {
                     var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if(userId != null)
                         return DataSourceLoader.Load<TransactionViewModel>(MapToViewModel(_transactionControllerService.GetAllTransactions(userId)), loadOptions);
@@ -35,7 +35,7 @@ namespace Terminal_BackEnd.Web.API {
         public async Task<object?> Terminal(long id, DataSourceLoadOptions loadOptions) {
             if(User.Identity != null && User.Identity.IsAuthenticated) {
                 var transactions = _transactionControllerService.GetAllTransactionsById(id);
-                if(User.IsInRole("Admin")) {
+                if(User.IsInRole(ConstantsCommon.Role.Admin) || User.IsInRole(ConstantsCommon.Role.Cashier)) {
                     return DataSourceLoader.Load<TransactionViewModel>(MapToViewModel(transactions), loadOptions);
                 } else {
                     var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -55,7 +55,7 @@ namespace Terminal_BackEnd.Web.API {
 
         [HttpPost("CloseEncashment")]
         public void CloseEncashment(CloseEncashmentModel model) {
-            _transactionControllerService.CloseEncashment(model.Id, model.SumFromTerm);
+            _transactionControllerService.CloseEncashment(model.Id, model.SumFromTerm, model.Remark);
         }
 
         [HttpGet("Enchargement")]
@@ -79,14 +79,14 @@ namespace Terminal_BackEnd.Web.API {
         public async Task<object?> TerminalEnchargements(long id, DataSourceLoadOptions loadOptions) {
             if(User.Identity != null && User.Identity.IsAuthenticated) {
                 var enchargement = _transactionControllerService.GetEncashmentsByTerminal(id);
-                if(User.IsInRole("Admin")) {
-                    return DataSourceLoader.Load<Encashment>(enchargement, loadOptions);
+                if(User.IsInRole(ConstantsCommon.Role.Admin) || User.IsInRole(ConstantsCommon.Role.Cashier)) {
+                    return DataSourceLoader.Load<EncashmentViewModel>(MapToEncachmentViewModel(enchargement.ToList()), loadOptions);
                 } else if(enchargement.Any()) {
                     var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     var filteredEnchargement = enchargement.Where(e => e.Terminal != null && e.Terminal.UserId == userId);
-                    return DataSourceLoader.Load<Encashment>(filteredEnchargement, loadOptions);
+                    return DataSourceLoader.Load<EncashmentViewModel>(MapToEncachmentViewModel(filteredEnchargement.ToList()), loadOptions);
                 } else {
-                    return DataSourceLoader.Load<Encashment>(enchargement, loadOptions);
+                    return DataSourceLoader.Load<EncashmentViewModel>(MapToEncachmentViewModel(enchargement.ToList()), loadOptions);
                 }
             }
             return Unauthorized();
@@ -100,12 +100,12 @@ namespace Terminal_BackEnd.Web.API {
                 {
                     item.Amount = item.Amount > 0 ? item.Amount / 100 : item.Amount;
                 }
-                if (User.IsInRole("Admin")) {
+                if (User.IsInRole(ConstantsCommon.Role.Admin) || User.IsInRole(ConstantsCommon.Role.Cashier)) {
                     return DataSourceLoader.Load<Transaction>(transactions, loadOptions);
                 } else if(transactions.Any()) {
                     var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     var encashment = _transactionControllerService.GetEncashmentById(id);
-                    if(encashment != null && encashment.Terminal != null && encashment.Terminal.UserId == userId) {                                                
+                    if(encashment != null && encashment.Terminal != null && encashment.Terminal.UserId == userId) {
                         return DataSourceLoader.Load<Transaction>(transactions, loadOptions);
 
                     }
@@ -151,8 +151,9 @@ namespace Terminal_BackEnd.Web.API {
                     TerminalName = terminal?.Name ?? String.Empty,
                     TerminalOwner = $"{terminal.ApplicationUser?.FamilyName ?? String.Empty} {terminal.ApplicationUser?.CompanyName ?? String.Empty}",
                     EncashmentSumFromTerminal = item.EncashmentSumFromTerminal,
-                    BalanceDifference = item.EncashmentSum - item.EncashmentSumFromTerminal,
+                    BalanceDifference = item.EncashmentSumFromTerminal - item.EncashmentSum,
                     Status = item.Status,
+                    Remarks = item.Remarks,
                 };
                 result.Add(enchargementViewModel);
             }

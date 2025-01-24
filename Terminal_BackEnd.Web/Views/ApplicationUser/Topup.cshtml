@@ -132,6 +132,7 @@
                         caption: '@SharedLocalizer["Дата пополнения"]',
                         dataField: "topupDate",
                         dataType: "datetime",
+                        format: "dd/MM/yyyy HH:mm",
                         allowHeaderFiltering: false
                     },
                     {
@@ -139,7 +140,18 @@
                         dataField: "topupSum",
                         allowHeaderFiltering: true
                     }                
-                ]
+                ],
+                summary: {
+                      totalItems: [
+                        {
+                            column: 'topupSum',
+                            summaryType: 'sum',
+                            customizeText(itemInfo) {
+                                return `Всего: ${itemInfo.value} man.`;
+                            }
+                        }
+                      ]
+                }
             });
 
         });

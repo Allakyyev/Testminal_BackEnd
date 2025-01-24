@@ -12,9 +12,9 @@ namespace Terminal_BackEnd.Web.DataSources.Dashboards {
     }
 
     public static class TerminalActivitiesByDayDataSource {
-        static List<TerminalActivitiesByDay> GetTransactionStatistics(List<Transaction> transactions, int days) {
+        static List<TerminalActivitiesByDay> GetTransactionStatistics(List<Transaction> transactions, int days, List<string> terminalNames) {
             var lastDays = DateTime.Today.AddDays(-1 * days);
-            var allDates = Enumerable.Range(0, 31).Select(offset => lastDays.AddDays(offset)).ToList();
+            var allDates = Enumerable.Range(0, days).Select(offset => lastDays.AddDays(offset)).ToList();
 
             var groupedTransactions = transactions
             .Where(t => t.TransactionDate >= lastDays)
@@ -27,7 +27,19 @@ namespace Terminal_BackEnd.Web.DataSources.Dashboards {
             });
 
             var allNames = transactions.Select(t => t.Terminal.Name).Distinct();
-            var allCombinations = from name in allNames
+            List<string> temp = new List<string>();
+            List<string> allTerminalNames = new List<string>();
+
+            if(allNames != null) {
+                temp.AddRange(allNames.ToList());
+            }
+
+            if(terminalNames != null) {
+                temp.AddRange(terminalNames.ToList());
+            }
+            allTerminalNames = temp.Distinct().ToList();
+
+            var allCombinations = from name in allTerminalNames
                                   from date in allDates
                                   select new { Name = name, Date = date };
 
@@ -48,8 +60,9 @@ namespace Terminal_BackEnd.Web.DataSources.Dashboards {
             var _dbContext = ServiceProvider.GetService<AppDbContext>();
             if(_dbContext == null) return new List<object>();
             DataTable table = new DataTable();
+            var allTerminals = _dbContext.Terminals.Select(t => t.Name).ToList();
             var transactions = _dbContext.Transactions.Include(t => t.Terminal).ThenInclude(a => a.ApplicationUser);
-            return GetTransactionStatistics(transactions.ToList(), days);
+            return GetTransactionStatistics(transactions.ToList(), days, allTerminals);
         }
     }
 }

@@ -59,7 +59,7 @@ namespace Terminal_BackEnd.Web.API {
         [HttpPost("force-add")]
         public async Task<ForceAddAPIResponse> ForceAddTransaction(ForceAddRequest forceAddRequest) {
             var failResponse = new ForceAddAPIResponse() { Success = false };
-            if(forceAddRequest == null)
+            if(forceAddRequest == null || forceAddRequest.Amount < 100)
                 return failResponse;
             if(this.securityService.TryValidateTerminalId(forceAddRequest.TerminalIdEncrypted ?? "", out Terminal terminal)) {
                 if(this.securityService.TryValidateMsisdn(forceAddRequest.MsisdnEncrypted ?? "", terminal.Password, out string msisdn)) {
@@ -105,6 +105,7 @@ namespace Terminal_BackEnd.Web.API {
             bool logSuccess = false;
             if(!string.IsNullOrEmpty(terminalLogRequest?.LogInfo) && this.securityService.TryValidateTerminalId(terminalLogRequest?.TerminalIdEncrypted ?? "", out Terminal terminal)) {
                 logSuccess = this.terminalService.LogTerminal(terminal.Id, terminalLogRequest.LogInfo, terminalLogRequest.Type, DateTime.Now);
+                terminalService.UpdateTerminalPing(terminal.Id);
             }
             return new LogTerminalResponse() {
                 Success = logSuccess

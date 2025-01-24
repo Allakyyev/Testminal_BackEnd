@@ -22,6 +22,7 @@ namespace Terminal_BackEnd.Web.Controllers {
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create() {
             return View(new CreateTerminalModel() {
                 Name = String.Empty,
@@ -88,6 +89,7 @@ namespace Terminal_BackEnd.Web.Controllers {
 
 
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(string id) {
             return View();
         }

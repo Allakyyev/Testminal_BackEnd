@@ -234,7 +234,18 @@
                             "@(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin") ? "delete" : "")"
                         ]
                     }
-                ]
+                ],
+                summary: {
+                      totalItems: [
+                        {
+                            column: 'currentTotal',
+                            summaryType: 'sum',
+                            customizeText(itemInfo) {
+                                return `Сумма ост.: ${itemInfo.value} man.`;
+                            }
+                        }
+                      ]
+                }
             });
 
         });

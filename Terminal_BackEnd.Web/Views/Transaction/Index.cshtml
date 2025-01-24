@@ -4,7 +4,8 @@
 
 @{
     ViewData["Title"] = SharedLocalizer["Transactinos"];
-    if(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin")) {
+    if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+    {
         <script>
             const isAdmin = true;
         </script>
@@ -109,7 +110,7 @@
                 columns: [
                     {
                         caption: '@SharedLocalizer["ID Транзакции"]',
-                        dataField: "id",
+                        dataField: "crossTransactionId",
                         allowHeaderFiltering: true
                     },
                     {
@@ -121,12 +122,15 @@
                         caption: '@SharedLocalizer["Сумма(TMT)"]',
                         dataField: "amount",
                         allowHeaderFiltering: true,
+                        width: 100
                     },
                     {
                         caption: '@SharedLocalizer["Дата Транзакции"]',
                         dataField: "transactionDate",
                         dataType: 'datetime',
+                        format: "dd/MM/yyyy HH:mm",
                         allowHeaderFiltering: true,
+                        width: 80
                     },
                     {
                         caption: '@SharedLocalizer["RefNum"]',
@@ -178,7 +182,18 @@
                             }
                         ]
                     }
-                ]
+                ],
+                summary: {
+                      totalItems: [
+                        {
+                            column: 'amount',
+                            summaryType: 'sum',
+                            customizeText(itemInfo) {
+                                return `Сумма: ${itemInfo.value} man.`;
+                            }
+                        }
+                      ]
+                }
             });
 
         });

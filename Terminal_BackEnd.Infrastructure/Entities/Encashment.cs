@@ -11,5 +11,6 @@
         public Terminal? Terminal { get; set; }
         public EncashmentStatus Status { get; set; }
         public List<Transaction>? Transactions { get; set; }
+        public string Remarks { get; set; }
     }
 }

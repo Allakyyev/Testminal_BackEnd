@@ -1,10 +1,10 @@
 using System.Globalization;
+using System.Text.Json.Serialization;
 using DevExpress.AspNetCore;
 using DevExpress.AspNetCore.Reporting;
 using DevExpress.DashboardAspNetCore;
 using DevExpress.DashboardCommon;
 using DevExpress.DashboardWeb;
-using DevExpress.XtraCharts;
 using DevExpress.XtraReports.Web.Extensions;
 using DevExpress.XtraReports.Web.WebDocumentViewer;
 using Microsoft.AspNetCore.Identity;
@@ -17,6 +17,7 @@ using Terminal_BackEnd.Infrastructure.Constants;
 using Terminal_BackEnd.Infrastructure.Data;
 using Terminal_BackEnd.Infrastructure.Entities;
 using Terminal_BackEnd.Infrastructure.Services;
+using Terminal_BackEnd.Infrastructure.Services.ReportService;
 using Terminal_BackEnd.Infrastructure.Services.TerminalService;
 using Terminal_BackEnd.Infrastructure.Services.UserService;
 using Terminal_BackEnd.Web.DataSources.Dashboards;
@@ -45,8 +46,9 @@ namespace Terminal_BackEnd.Web {
                .AddRoles<IdentityRole>()
                .AddEntityFrameworkStores<AppDbContext>()
                .AddDefaultTokenProviders();
-            builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation().AddJsonOptions(options => {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            }); ;
             builder.Services.AddRazorPages();
             builder.Services.Configure<TerminalSettings>(builder.Configuration.GetSection("TerminalSettings"));
             builder.Services.AddScoped<Endpoints>();
@@ -58,6 +60,7 @@ namespace Terminal_BackEnd.Web {
             builder.Services.AddScoped<ITerminalService, TerminalService>();
             builder.Services.AddScoped<ISecurityService, SecurityService>();
             builder.Services.AddScoped<ISettingsService, SettingsService>();
+            builder.Services.AddScoped<IReportService, ReportService>();
             builder.Services.AddHostedService<TransactionStatusesUpdateJob>();
             builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
             builder.Services.AddDevExpressControls();
@@ -138,7 +141,7 @@ namespace Terminal_BackEnd.Web {
                 options.SupportedUICultures = supportedCultures;
             });
             builder.Services.AddSignalR();
-           
+
             var app = builder.Build();
             using(var scope = app.Services.CreateScope()) {
                 var services = scope.ServiceProvider;

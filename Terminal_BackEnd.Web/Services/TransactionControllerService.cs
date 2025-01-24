@@ -14,10 +14,12 @@ namespace Terminal_BackEnd.Web.Services {
     }
     public class TransactionControllerService : ITransactionControllerService {
         readonly IAltynAsyrTerminalService altynAsyrTerminalService;
+        readonly ISettingsService settingsService;
         readonly AppDbContext appDbContext;
-        public TransactionControllerService(IAltynAsyrTerminalService altynAsyrTerminal, AppDbContext appDbContext) {
+        public TransactionControllerService(IAltynAsyrTerminalService altynAsyrTerminal, AppDbContext appDbContext, ISettingsService settingsService) {
             this.altynAsyrTerminalService = altynAsyrTerminal;
             this.appDbContext = appDbContext;
+            this.settingsService = settingsService;
         }
         public async Task<CheckDestinationResponseClient> CheckDestinationAsync(CheckDestinationRequest checkDestinationRequest, int retryCount = 0) {
             var failResponseObj = new CheckDestinationResponseClient() {
@@ -61,31 +63,32 @@ namespace Terminal_BackEnd.Web.Services {
             return failResponseObj;
         }
 
-        public void CloseEncashment(long id, int sum) {
+        public void CloseEncashment(long id, int sum, string remark) {
             if(id == null) return;
             var encashment = appDbContext.Encashments.Find(id);
             if(encashment == null) return;
             encashment.Status = EncashmentStatus.Close;
             encashment.EncashmentSumFromTerminal = (sum != 0 ? sum : encashment.EncashmentSumFromTerminal);
+            encashment.Remarks = remark;
             appDbContext.Update(encashment);
             appDbContext.SaveChanges();
         }
 
-        public Task<EncashementResponse> CreateEncashment(long terminalId, int sumFromTerminal, DateTime? date, EncashmentStatus status = EncashmentStatus.Open) {
+        public Task<EncashementResponse> CreateEncashment(long terminalId, int sumFromTerminal, DateTime date, EncashmentStatus status = EncashmentStatus.Open) {
             using(var transaction = appDbContext.Database.BeginTransaction()) {
                 try {
                     var terminal = appDbContext.Terminals.Include(p => p.Encashments).FirstOrDefault(x => x.Id == terminalId);
                     List<Transaction> transactions = new List<Transaction>();
                     if(terminal != null) {
                         if(terminal.Encashments != null && terminal.Encashments.Any()) {
-                            var lastEnchargementDate = terminal.Encashments.OrderByDescending(p => p.EncashmentDate).First().EncashmentDate;
-                            transactions = appDbContext.Transactions.Include(t => t.Encashment).Where(p => p.TransactionDate > lastEnchargementDate && p.TerminalId == terminalId && p.Encashment == null).ToList();
+                            //var lastEnchargementDate = terminal.Encashments.OrderByDescending(p => p.EncashmentDate).First().EncashmentDate;
+                            transactions = appDbContext.Transactions.Where(t => t.Status == "SUCCESS").Include(t => t.Encashment).Where(p => p.TerminalId == terminalId && p.Encashment == null && p.TransactionDate <= date).ToList();
                         } else {
-                            transactions = appDbContext.Transactions.Where(p => p.TerminalId == terminalId).ToList();
+                            transactions = appDbContext.Transactions.Where(p => p.TerminalId == terminalId && p.Status == "SUCCESS").ToList();
                         }
                         long sum = transactions.Sum(t => t.Amount);
                         var enchargement = new Encashment() {
-                            EncashmentDate = date ?? DateTime.Now,
+                            EncashmentDate = date,
                             TerminalId = terminalId,
                             EncashmentSum = sum > 0 ? sum / 100 : sum,
                             EncashmentSumFromTerminal = sumFromTerminal,
@@ -110,6 +113,17 @@ namespace Terminal_BackEnd.Web.Services {
         }
 
         public async Task<AddTransactionResponseClient> ForceAddTransactionAsync(ForceAddRequest forceAddRequest) {
+            var settings = settingsService.GetGlobalSettings();
+            bool exciding = forceAddRequest.Amount / 100 > 500;
+            if(settings != null && settings.Any()) {
+                var sum = settings.FirstOrDefault(s => s.Key == GlobalSettingKey.LimitAmountOfOneTransaction);
+                if(sum != null) {
+                    if(int.TryParse(sum.Value ?? "", out int limit)) {
+                        exciding = forceAddRequest.Amount / 100 > limit;
+                    }
+                }
+            }
+
             Transaction tnx = new Transaction() {
                 Msisdn = forceAddRequest.Msisdn,
                 TerminalId = forceAddRequest.TerminalId,
@@ -117,7 +131,7 @@ namespace Terminal_BackEnd.Web.Services {
                 PollingCallbackRegistered = false,
                 Service = forceAddRequest.ServiceKey,
                 CrossTransactionId = Guid.NewGuid().ToString("N"),
-                Status = StateConstants.TransactionState.NEW
+                Status = exciding ? StateConstants.TransactionState.ERROR : StateConstants.TransactionState.NEW
             };
             appDbContext.Add<Transaction>(tnx);
             appDbContext.SaveChanges();
@@ -135,16 +149,20 @@ namespace Terminal_BackEnd.Web.Services {
                 TransactionId = tnx.Id,
                 Success = true
             };
+            if(exciding)
+                return responseObj;
+
             var result = await this.altynAsyrTerminalService.ForceAddTransactionAsync(forceAddRequest.ServiceKey, forceAddRequest.Amount, forceAddRequest.Msisdn, tnx.CrossTransactionId, null);
             tnx.State = result.State;
             tnx.Status = result.Status;
             tnx.Reason = result.Reason;
             var kvp = result.FormData?.FirstOrDefault(f => f.Key == "ts");
-            var tnxDate = DateTime.Now;
+            var tnxDate = DateTime.UtcNow;
             if(kvp != null && !string.IsNullOrEmpty(kvp.Value.Value)) {
                 string tnx1 = kvp.Value.Value;
-                tnxDate = DateTimeOffset.FromUnixTimeSeconds(long.Parse(tnx1)).DateTime;
-
+                tnxDate = Terminal_BackEnd.Infrastructure.Helpers.DateTimeHelper.ToLocalTimeFromUnixSec(long.Parse(tnx1));
+            } else {
+                tnxDate = tnxDate.ToLocalTime();
             }
             tnx.TransactionDate = tnxDate;
             appDbContext.Update<Transaction>(tnx);
@@ -207,7 +225,7 @@ namespace Terminal_BackEnd.Web.Services {
         public List<Transaction> GetAllTransactionsById(long terminalId) {
             return appDbContext.Transactions
                 .Include(t => t.Terminal).ThenInclude(terminal => terminal.ApplicationUser)
-                .Where(t => t.Terminal != null && t.Terminal.ApplicationUser != null && t.Terminal.Id == terminalId)
+                .Where(t => t.Terminal != null && t.Terminal.ApplicationUser != null && t.Terminal.Id == terminalId && (t.EncargementId == null || t.EncargementId <= 0))
                 .ToList();
         }
 
@@ -273,7 +291,7 @@ namespace Terminal_BackEnd.Web.Services {
         }
 
         public List<Encashment> GetEncashmentsByTerminal(long terminalId) {
-            return appDbContext.Encashments.Where(e => e.TerminalId == terminalId).ToList();
+            return appDbContext.Encashments.Where(e => e.TerminalId == terminalId).Include(e => e.Terminal).ThenInclude(t => t.ApplicationUser).ToList();
         }
 
         public List<Transaction> GetEncashmentTransactions(long encashmentId) {

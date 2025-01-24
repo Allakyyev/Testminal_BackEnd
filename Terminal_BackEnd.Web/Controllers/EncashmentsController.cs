@@ -26,20 +26,21 @@ namespace Terminal_BackEnd.Web.Controllers {
                 TerminalName = terminal?.Name ?? String.Empty,
                 TerminalOwner = $"{terminal.ApplicationUser?.FamilyName ?? String.Empty} {terminal.ApplicationUser?.CompanyName ?? String.Empty}",
                 EncashmentSumFromTerminal = encashment.EncashmentSumFromTerminal,
-                BalanceDifference = encashment.EncashmentSum - encashment.EncashmentSumFromTerminal,
-                Status = encashment.Status
+                BalanceDifference = encashment.EncashmentSumFromTerminal - encashment.EncashmentSum,
+                Status = encashment.Status,
+                Remarks = encashment.Remarks
             };
             return View(enchargementViewModel);
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Cashier")]
         public IActionResult Create() {
             return View(new CreateEncashmentModel());
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Cashier")]
         public async Task<IActionResult> Create(CreateEncashmentModel model) {
             if(ModelState.IsValid) {
                 var result = await _transactionControllerService.CreateEncashment(model.TerminalId, model.TotalSum, model.EncashmentDate, model.Status);

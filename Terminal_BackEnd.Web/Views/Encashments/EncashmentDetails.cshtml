@@ -11,7 +11,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">@SharedLocalizer["Информация о инкассации"]: <strong>ID @Model.Id</strong> @(Model.Status == Terminal_BackEnd.Infrastructure.Entities.EncashmentStatus.Open ? "Open" :"Closed")</strong></h5>
-                   <form class="row g-3">
+                    <form class="row g-3">
                         <div class="col-md-3">
                             <label for="validationDefault01" class="form-label">@SharedLocalizer["Дата инкассации"]</label>
                             <input type="text" class="form-control" value="@Model.EncashmentDate" required disabled>
@@ -34,17 +34,29 @@
                                 <input type="text" class="form-control" value="@(Model.EncashmentSumFromTerminal)" required disabled>
                             </div>
                         }
-                        @if((User.IsInRole("Cashier") || User.IsInRole("Admin")) && Model.Status == Terminal_BackEnd.Infrastructure.Entities.EncashmentStatus.Open) {
+
                         <div class="row g-3">
-                            <div class="col-md-4">
+                            <div class="col-md-2">
                                 <label for="validationDefault02" class="form-label">@SharedLocalizer["Физическая Сумма"]</label>
                                 <input type="number" min="1" id="sumFromTerm" class="form-control" value="@(Model.EncashmentSumFromTerminal)" required>
                             </div>
-                            <div class="col-md-4" style="align-content: flex-end">
-                                <div id="closeButton"></div>
+                            <div class="col-md-4">
+                                <label for="validationDefault02" class="form-label">@SharedLocalizer["Заметка"]</label>
+                                <div id="remark"></div>
                             </div>
-                        </div>
-                        }
+                            @if (User.IsInRole("Cashier") && Model.Status == Terminal_BackEnd.Infrastructure.Entities.EncashmentStatus.Open)
+                            {
+                                <div class="col-md-4" style="align-content: flex-end">
+                                    <div id="closeButton"></div>
+                                </div>
+                            }else {
+
+                                <div class="col-md-4" style="align-content: flex-end">
+                                    <div id="editButton"></div>
+                                </div>
+
+                            }
+                        </div>                        
                     </form>
                 </div>
             </div>
@@ -103,6 +115,7 @@
                     mode: "multiple"
                 },
                 allowColumnReordering: true,
+                allowColumnResizing: true,
                 "export": {
                     enabled: true,
                     fileName: "Documents",
@@ -157,11 +170,13 @@
                         caption: '@SharedLocalizer["Сумма(TMT)"]',
                         dataField: "amount",
                         allowHeaderFiltering: true,
+                        width: 100
                     },
                     {
                         caption: '@SharedLocalizer["Дата транзакции"]',
                         dataField: "transactionDate",
                         dataType: 'date',
+                        format: "dd/MM/yyyy HH:mm",
                         allowHeaderFiltering: true,
                     },
                     {
@@ -204,115 +219,78 @@
                             }
                         ]
                     }
-                ]
-            });
-
-            let enchUrl = window.location.origin + '/' + 'api/TransactionsAPI/TerminalEnchargements/' + @(Model.Id);
-            let closeUrl = window.location.origin + '/' + 'api/TransactionsAPI/CloseEncashment';
-            
-            $("#gridEnchargements").dxDataGrid({
-                dataSource: DevExpress.data.AspNet.createStore({
-                    key: "id",
-                    loadUrl: enchUrl,
-                    insertUrl: enchUrl,
-                    updateUrl: enchUrl,
-                    deleteUrl: enchUrl,
-                    onBeforeSend: function (method, ajaxOptions) {
-                        ajaxOptions.xhrFields = { withCredentials: true };
-                    }
-                }),
-                onExporting: function (e) {
-                    var workbook = new ExcelJS.Workbook();
-                    var worksheet = workbook.addWorksheet('Main sheet');
-                    DevExpress.excelExporter.exportDataGrid({
-                        worksheet: worksheet,
-                        component: e.component,
-                        customizeCell: function (options) {
-                            options.excelCell.font = { name: 'Arial', size: 12 };
-                            options.excelCell.alignment = { horizontal: 'left' };
+                ],
+                summary: {
+                      totalItems: [
+                        {
+                            column: 'amount',
+                            summaryType: 'sum',
+                            customizeText(itemInfo) {
+                                return `Сумма продаж.: ${itemInfo.value} man.`;
+                            }
                         }
-                    }).then(function () {
-                        workbook.xlsx.writeBuffer().then(function (buffer) {
-                            saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'DataGrid.xlsx');
-                        });
-                    });
-                },
-                selection: {
-                    mode: "multiple"
-                },
-                allowColumnReordering: true,
-                allowColumnResizing: true,
-                "export": {
-                    enabled: true,
-                    fileName: "Documents",
-                    allowExportSelectedData: true
-                },
-                filterPanel: {
-                    visible: false
-                },
-                filterRow: { visible: false },
-                remoteOperations: true,
-                pager: {
-                    showPageSizeSelector: true,
-                    allowedPageSizes: [10, 20, 50],
-                    showNavigationButtons: true
-                },
-                editing: {
-                    useIcons: true,
-                    allowUpdating: false,
-                    allowDeleting: false,
-                    allowAdding: false
-                },
-                headerFilter: {
-                    visible: true
-                },
-                wordWrapEnabled: true,
-                showColumnLines: true,
-                showRowLines: true,
-                rowAlternationEnabled: true,
-                showBorders: true,
-                searchPanel: {
-                    visible: true
-                },
-
-                stateStoring: {
-                    enabled: true,
-                    type: "localStorage",
-                    storageKey: "TerminalEnchargements"
-                },
-
-                columns: [
-                    {
-                        caption: '@SharedLocalizer["ID инкассации"]',
-                        dataField: "id",
-                        allowHeaderFiltering: true
-                    },
-                    {
-                        caption: '@SharedLocalizer["Дата инкассации"]',
-                        dataField: "encashmentDate",
-                        dataType: 'date',
-                        allowHeaderFiltering: true
-                    },
-                    {
-                        caption: '@SharedLocalizer["Сумма инкассации(TMT)"]',
-                        dataField: "encashmentSum",
-                        allowHeaderFiltering: true,
-                    }                   
-                ]
+                      ]
+                }
             });
+            
+            let storedValues = JSON.parse(localStorage.getItem('autocompleteValues')) || [];
+            let remark = @Html.Raw(Json.Serialize(Model.Remarks));
+            $("#remark").dxAutocomplete({
+                dataSource: storedValues,
+                value: @Html.Raw(Json.Serialize(Model.Remarks)),
+                minSearchLength: 1,                     
+                placeholder: "Enter text...",
+                showClearButton: true,
+                onValueChanged: function(e) {
+                    remark = e.value.trim();
+                }
+            });
+
+            let closeUrl = window.location.origin + '/' + 'api/TransactionsAPI/CloseEncashment';
             $("#closeButton").dxButton({
                 text: '@SharedLocalizer["Закрыть инкассацию"]',
                 type: "success",
                 useSubmitBehavior: false,
                 onClick: function() {
-                    let sum = $("#sumFromTerm").val();
+                    let sum = $("#sumFromTerm").val();                    
+                    storedValues.push(remark);
+                    localStorage.setItem('autocompleteValues', JSON.stringify(storedValues));
                 $.ajax({
                     url: closeUrl,
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify({
                         id: @Model.Id,
-                        sumFromTerm: sum
+                        sumFromTerm: sum,
+                        remark: remark
+                    }),
+                    success: function(response) {
+                        alert("Инкассации закрыта успешно!");
+                        window.location.href = window.location.pathname + '?id=' + '@(Model.Id)';
+                    },
+                    error: function(error) {
+                        alert("Произошла ошибка!!");
+                    }
+                });
+            }
+            });
+
+            $("#editButton").dxButton({
+                text: '@SharedLocalizer["Сохранить"]',
+                type: "success",
+                useSubmitBehavior: false,
+                onClick: function() {
+                    let sum = $("#sumFromTerm").val();                    
+                    storedValues.push(remark);
+                    localStorage.setItem('autocompleteValues', JSON.stringify(storedValues));
+                $.ajax({
+                    url: closeUrl,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: @Model.Id,
+                        sumFromTerm: sum,
+                        remark: remark
                     }),
                     success: function(response) {
                         alert("Инкассации закрыта успешно!");

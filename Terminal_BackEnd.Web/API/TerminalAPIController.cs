@@ -23,7 +23,7 @@ namespace Terminal_BackEnd.Web.API {
         [HttpGet]
         public async Task<object?> Get(DataSourceLoadOptions loadOptions) {
             if(User.Identity != null && User.Identity.IsAuthenticated) {
-                if(User.IsInRole(ConstantsCommon.Role.Admin)) {
+                if(User.IsInRole(ConstantsCommon.Role.Admin) || User.IsInRole(ConstantsCommon.Role.Cashier)) {
                     return DataSourceLoader.Load<TerminalViewModel>(MapToViewModel(terminalService.GetAllTerminals()), loadOptions);
                 } else if(User.IsInRole(ConstantsCommon.Role.Standard)) {
                     return DataSourceLoader.Load<TerminalViewModel>(MapToViewModel(terminalService.GetAllTerminalsByUser(User.Identity.Name)), loadOptions);
@@ -42,7 +42,7 @@ namespace Terminal_BackEnd.Web.API {
 
         [HttpDelete()]
         public IActionResult Delete([FromForm] long key) {
-            if(!User.IsInRole("Admin")) return BadRequest();
+            if(!User.IsInRole(ConstantsCommon.Role.Admin)) return BadRequest();
             terminalService.DeleteTerminalById(key);
             return Ok();
         }

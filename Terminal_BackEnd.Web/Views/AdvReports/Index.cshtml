@@ -1,0 +1,165 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+@{
+    ViewData["Title"] = SharedLocalizer["Transactios Reports"];
+}
+
+<div class="container">
+    <h2>Отчет по датам</h2>
+
+    <div class="form-group">
+        <label for="dateRangeBox">Дата период:</label>
+        <div id="dateRangeBox"></div>
+    </div>
+
+    <div class="form-group">
+        <label for="tagBox">Select IDs:</label>
+        <div id="tagBox"></div>
+    </div>
+
+    <div class="form-group">
+        <div id="generateButton"></div>
+    </div>
+
+    <div class="form-group">
+        <div id="dataGrid"></div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        // Initialize dxDateRangeBox
+        $("#dateRangeBox").dxDateRangeBox({
+            width: 400,
+            value: [new Date(), new Date()],
+            displayFormat: "yyyy-MM-dd"
+        });
+
+        let terminalIdsUrl = window.location.origin + '/AdvReports/GetAvailableIds';
+        // Initialize dxTagBox
+        $("#tagBox").dxTagBox({
+            width: 300,
+            dataSource: terminalIdsUrl,
+            valueExpr: "id",
+            displayExpr: "name",
+            searchEnabled: true,
+            placeholder: "Select IDs",
+            showSelectionControls: true,
+            applyValueMode: "useButtons"
+        });
+
+        // Initialize dxButton
+        $("#generateButton").dxButton({
+            text: "Generate",
+            type: "success",
+            onClick: function () {
+                generateDataGrid();
+            }
+        });
+
+        let getReportsUrl = window.location.origin + '/AdvReports/GetReports';
+        // Initialize dxDataGrid
+        $("#dataGrid").dxDataGrid({
+            dataSource: {
+                store: {
+                    type: "odata",
+                    url: getReportsUrl,
+                    key: "id",
+                    version: 4
+                }
+            },
+            remoteOperations: true,
+            paging: {
+                pageSize: 10
+            },
+            pager: {
+                showPageSizeSelector: true,
+                allowedPageSizes: [5, 10, 20]
+            },
+            columns: [
+                { dataField: "terminal.name", caption: "Имя терминала", dataType: "string" },
+                { dataField: "remainingSum", caption: "Сумма остатка", dataType: "number" },
+                { dataField: "billingSum", caption: "Сумма биллинга", dataType: "number" },
+                { dataField: "encashmentSum", caption: "Сумма инкассации", dataType: "number" },
+            ],
+            masterDetail: {
+                enabled: true,
+                template(container, options) {
+                    const currentData = options.data;
+                    $('<div>').dxDataGrid({
+                        columnAutoWidth: true,
+                        showBorders: true,
+                        columns: [ {
+                            caption: 'Дата начало',
+                            dataField: 'dayStartTime',
+                            dataType: 'datetime',
+                        }, {
+                            caption: 'Дата конец',
+                            dataField: 'dayEndTime',
+                            dataType: 'datetime',
+                        }, {
+                            caption: 'Остаток',
+                            dataField: 'remainings'                            
+                        },
+                        {
+                            caption: 'Биллинг',
+                            dataField: 'billing'
+                        },
+                        {
+                            caption: 'Инкассация',
+                            dataField: 'enchashmentSum'
+                        }
+                        ],
+                        dataSource: new DevExpress.data.DataSource({
+                            store: new DevExpress.data.ArrayStore({                                
+                                data: currentData.data,
+                            }),              
+                        }),
+                        }).appendTo(container);
+                        },
+                        },
+            showBorders: true
+        });
+
+        // Function to handle Generate button click
+        function generateDataGrid() {
+            var dateRangeBox = $("#dateRangeBox").dxDateRangeBox("instance");
+            var selectedDates = dateRangeBox.option("value");
+            var startDate = selectedDates[0];
+            var endDate = selectedDates[1];
+
+            var tagBox = $("#tagBox").dxTagBox("instance");
+            var selectedIds = tagBox.option("value"); // Array of selected IDs
+
+            // Validate inputs
+            if (!startDate || !endDate) {
+                DevExpress.ui.notify("Пожалуйста выберите дата период.", "warning", 4000);
+                return;
+            }
+
+            if (!selectedIds || selectedIds.length === 0) {
+                DevExpress.ui.notify("Пожалуйста выберите терминал.", "warning", 4000);
+                return;
+            }
+
+            // Make AJAX request to fetch data
+            $.ajax({
+                url: getReportsUrl,
+                type: "GET",
+                data: {
+                    startDate: startDate.toISOString(),
+                    endDate: endDate.toISOString(),
+                    ids: selectedIds.join(",")
+                },
+                success: function (data) {
+                    var dataGrid = $("#dataGrid").dxDataGrid("instance");
+                    dataGrid.option("dataSource", data);
+                },
+                error: function (xhr, status, error) {
+                    DevExpress.ui.notify("Возникоа ощибка: " + error, "error", 4000);
+                }
+            });
+        }
+    });
+</script>

@@ -20,7 +20,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">@SharedLocalizer["Транзакции"]</h5>
+                    <h5 class="card-title">@SharedLocalizer["Текущие Транзакции"]</h5>
                     <div id="gridContainer">
                     </div>
                 </div>
@@ -91,6 +91,7 @@
                     mode: "multiple"
                 },
                 allowColumnReordering: true,
+                allowColumnResizing: true,
                 "export": {
                     enabled: true,
                     fileName: "Documents",
@@ -144,6 +145,7 @@
                         caption: '@SharedLocalizer["Дата транзакции"]',
                         dataField: "transactionDate",
                         dataType: 'datetime',
+                        format: "dd/MM/yyyy HH:mm",
                         allowHeaderFiltering: true,
                     },
                     {
@@ -196,11 +198,22 @@
                             }
                         ]
                     }
-                ]
+                ],
+                summary: {
+                      totalItems: [
+                        {
+                            column: 'amount',
+                            summaryType: 'sum',
+                            customizeText(itemInfo) {
+                                return `Сумма: ${itemInfo.value} man.`;
+                            }
+                        }
+                      ]
+                }
             });
 
             let enchUrl = window.location.origin + '/' + 'api/TransactionsAPI/TerminalEnchargements/' + @(Model.Id);
-            $("#gridEnchargements").dxDataGrid({
+                        $("#gridEnchargements").dxDataGrid({
                 dataSource: DevExpress.data.AspNet.createStore({
                     key: "id",
                     loadUrl: enchUrl,
@@ -227,11 +240,7 @@
                         });
                     });
                 },                
-                selection: {
-                    mode: "multiple"
-                },
                 allowColumnReordering: true,
-                allowColumnResizing: true,
                 "export": {
                     enabled: true,
                     fileName: "Documents",
@@ -242,16 +251,21 @@
                 },
                 filterRow: { visible: false },
                 remoteOperations: true,
+                allowColumnResizing: true,
                 pager: {
                     showPageSizeSelector: true,
                     allowedPageSizes: [10, 20, 50],
                     showNavigationButtons: true
                 },
+                onInitNewRow: function (e) {
+                    var url = `@Url.Action("Create", "Encashments")`;
+                    window.location = url;
+                },
                 editing: {
                     useIcons: true,
                     allowUpdating: false,
                     allowDeleting: false,
-                    allowAdding: false
+                    allowAdding: @(User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Cashier")) ? "true" : "false")
                 },
                 headerFilter: {
                     visible: true
@@ -259,32 +273,116 @@
                 wordWrapEnabled: true,
                 showColumnLines: true,
                 showRowLines: true,
-                rowAlternationEnabled: true,
+                rowAlternationEnabled: false,
                 showBorders: true,
                 searchPanel: {
                     visible: true
                 },
 
+                stateStoring: {
+                    enabled: true,
+                    type: "localStorage",
+                    storageKey: "EnchashmentIndex"
+                },
+                onRowPrepared: function (e) {
+                    if (e.rowType === "data") {
+                        if (e.data.status === 1) {
+                            e.rowElement.css("background-color", "#9ecd9e");
+                        }else if (e.data.balanceDifference !== 0) {
+                            e.rowElement.css("background-color", "#e8aaaa");
+                        }
+                    }
+                },
                 columns: [
                     {
-                        caption: '@SharedLocalizer["Id Инкассации"]',
+                        caption: '@SharedLocalizer["ID инкассации"]',
                         dataField: "id",
                         allowHeaderFiltering: true
                     },
                     {
-                        caption: '@SharedLocalizer["Дата Инкассации"]',
+                        caption: '@SharedLocalizer["Дата инкассации"]',
                         dataField: "encashmentDate",
                         dataType: 'datetime',
+                        format: "dd/MM/yyyy HH:mm", // Optional: Customize the format
                         allowHeaderFiltering: true
                     },
                     {
-                        caption: '@SharedLocalizer["Сумма (TMT)"]',
+                        caption: '@SharedLocalizer["Сумма успешных переводов(TMT)"]',
                         dataField: "encashmentSum",
                         allowHeaderFiltering: true,
-                    }                   
-                ]
-            });
+                    },
+                    {
+                        caption: '@SharedLocalizer["Сумма в терминале(TMT)"]',
+                        dataField: "encashmentSumFromTerminal",
+                        allowHeaderFiltering: true,
+                    },
+                    {
+                        caption: '@SharedLocalizer["Разница (TMT)"]',
+                        dataField: "balanceDifference",
+                        allowHeaderFiltering: true,
+                    },
+                    {
+                        caption: '@SharedLocalizer["Статус"]',
+                        dataField: "status",
+                        allowHeaderFiltering: true,
+                        calculateCellValue: function (data) {
+                            return data.status === 0 ? "Открыт" : "Закрыт";
+                        }
+                    },
+                    {
+                        caption: '@SharedLocalizer["Имя терминала"]',
+                        dataField: "terminalName",
+                        allowHeaderFiltering: true,
+                    },
+                    {
+                        caption: '@SharedLocalizer["Дилер"]',
+                        dataField: "terminalOwner",
+                        allowHeaderFiltering: true,
+                    },
 
+                    {
+                        type: "buttons",
+                        width: 110,
+                        buttons: [
+                            {
+                                hint: '@SharedLocalizer["Детальнее"]',
+                                icon: "info",
+                                onClick: function (e) {
+                                    var idString = e.row.data.id;
+                                    var url = `@Url.Action("EncashmentDetails", "Encashments")`;
+                                    window.location = url + '?id=' + idString;
+                                },
+                                visible: @(User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Cashier") ? "true" : "false")
+                            }
+                        ]
+                    }
+                ],
+                summary: {
+                      totalItems: [
+                        {
+                            column: 'encashmentSum',
+                            summaryType: 'sum',
+                            customizeText(itemInfo) {
+                                return `Всего продаж: ${itemInfo.value} man.`;
+                            }
+                        },
+                        {
+                            column: 'encashmentSumFromTerminal',
+                            summaryType: 'sum',
+                            customizeText(itemInfo) {
+                                return `Всего накоплено: ${itemInfo.value} man.`;
+                            }
+                        },
+                        {
+                            column: 'balanceDifference',
+                            summaryType: 'sum',
+                            customizeText(itemInfo) {
+                                return `Всего разниц: ${itemInfo.value} man.`;
+                            }
+                        }
+                      ]
+                }
+            });
             let logUrl = window.location.origin + '/' + 'api/TerminalAPI/Logs/' + @(Model.Id);
             $("#gridTerminalLogs").dxDataGrid({
                 dataSource: DevExpress.data.AspNet.createStore({
@@ -355,6 +453,7 @@
                         caption: '@SharedLocalizer["Дата"]',
                         dataField: "logDate",
                         dataType: 'datetime',
+                        format: "dd/MM/yyyy HH:mm",
                         allowHeaderFiltering: true
                     },
                     {

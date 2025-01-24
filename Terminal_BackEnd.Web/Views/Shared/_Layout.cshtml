@@ -159,25 +159,24 @@
                         </li>
                         <!-- End Dashboard Nav -->
                     }
-                    @if (User.IsInRole("Standard") || User.IsInRole("Admin"))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link collapsed" id="Transaction" href="@Url.Action("Index","Transaction")">
-                                <i class="bi bi-card-list"></i>
-                                <span>Транзакции</span>
-                            </a>
-                        </li>
 
-                        <!-- End Transactions Page Nav -->
-                        <li class="nav-item">
-                            <a class="nav-link collapsed" id="Terminal" href="@Url.Action("Index","Terminal")">
-                                <i class="bi bi-file-post"></i>
-                                <span>Терминалы</span>
-                            </a>
-                        </li>
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" id="Transaction" href="@Url.Action("Index","Transaction")">
+                            <i class="bi bi-card-list"></i>
+                            <span>Транзакции</span>
+                        </a>
+                    </li>
 
-                        <!-- End Terminals Page Nav -->
-                    }
+                    <!-- End Transactions Page Nav -->
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" id="Terminal" href="@Url.Action("Index","Terminal")">
+                            <i class="bi bi-file-post"></i>
+                            <span>Терминалы</span>
+                        </a>
+                    </li>
+
+                    <!-- End Terminals Page Nav -->
+
                     <li class="nav-item">
                         <a class="nav-link collapsed" id="Encashments" href="@Url.Action("Index","Encashments")">
                             <i class="bi bi-currency-dollar"></i>
@@ -191,8 +190,17 @@
                             <span>Отчеты</span>
                         </a>
                     </li>
+                    @if(User.IsInRole("Cashier")){
+                         <li class="nav-item">
+                            <a class="nav-link collapsed" id="Reports" href="@Url.Action("Index","AdvReports")">
+                                <i class="bi bi-clipboard-data-fill"></i>
+                                <span>Отчеты по датам</span>
+                            </a>
+                        </li>
+                    }
                     @if (User.IsInRole("Admin"))
                     {
+
                         <li class="nav-item">
                             <a class="nav-link collapsed" id="Reports" href="@Url.Action("Index","Reports")">
                                 <i class="bi bi-clipboard-data-fill"></i>
@@ -212,7 +220,7 @@
                         <!-- End Users Page Nav -->
                     }
                     @if (User.IsInRole("Standard"))
-                    {                        
+                    {
                         <!-- End Balance Page Nav -->
                         <li class="nav-item">
                             <a class="nav-link collapsed" id="Balance" href="@Url.Action("Index", "Balance")">
@@ -265,7 +273,7 @@
     <!-- Vendor JS Files -->
     <!-- Template Main JS File -->
     <script src="~/assets/js/main.js"></script>
-    
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -2,5 +2,6 @@
     public class CloseEncashmentModel {
         public int Id { get; set; }
         public int SumFromTerm { get; set; }
+        public string Remark { get; set; }
     }
 }

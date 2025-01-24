@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.SqlServer.Server;
 using Newtonsoft.Json;
 using Terminal_BackEnd.Infrastructure.Constants;
+using Terminal_BackEnd.Infrastructure.Helpers;
 using Terminal_BackEnd.Infrastructure.Services.ServiceTypes;
 
 namespace Terminal_BackEnd.Infrastructure.Services {
@@ -155,7 +156,7 @@ namespace Terminal_BackEnd.Infrastructure.Services {
 
         public async Task<RequestResponse> RequestForceAddTransactionAsync(string key, string localTransactionId, string serviceKey, int amount, string msisdn, Dictionary<string, string>? _formData = null) {
             if(_formData == null) {
-                long currentEpochTime = GetCurrentEpochTime();
+                long currentEpochTime = DateTimeHelper.GetCurrentEpochTime();
                 string message = $"{localTransactionId}:{serviceKey}:{amount}:{msisdn}:{currentEpochTime - 10}:{currentEpochTime}:{_endPoints.userName}";
                 string hMac = ComputeHMACSHA1(key, message);
                 var formData = new Dictionary<string, string>() {

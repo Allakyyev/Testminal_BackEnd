@@ -57,10 +57,7 @@
                             saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'DataGrid.xlsx');
                         });
                     });
-                },
-                selection: {
-                    mode: "multiple"
-                },
+                },                
                 allowColumnReordering: true,
                 "export": {
                     enabled: true,
@@ -105,15 +102,15 @@
                     type: "localStorage",
                     storageKey: "EnchashmentIndex"
                 },
-                onRowPrepared: function (e) {
-                    if (e.rowType === "data") {
-                        if (e.data.status === 1) {
-                            e.rowElement.css("background-color", "#9ecd9e");
-                        }else if (e.data.balanceDifference !== 0) {
-                            e.rowElement.css("background-color", "#e8aaaa");
-                        }
-                    }
-                },
+                // onRowPrepared: function (e) {
+                //     if (e.rowType === "data") {
+                //         if (e.data.status === 1) {
+                //             e.rowElement.css("background-color", "#9ecd9e");
+                //         }else if (e.data.balanceDifference !== 0) {
+                //             e.rowElement.css("background-color", "#e8aaaa");
+                //         }
+                //     }
+                // },
                 columns: [
                     {
                         caption: '@SharedLocalizer["ID инкассации"]',
@@ -141,6 +138,26 @@
                         caption: '@SharedLocalizer["Разница (TMT)"]',
                         dataField: "balanceDifference",
                         allowHeaderFiltering: true,
+                        cellTemplate: function(container, options) {
+                            var diff = options.value;
+                            var color = "";
+                            if (diff < 0) {
+                                color = "#ff000036"; // Light green for high scores
+                            } else if (diff > 0) {
+                                color = "#1f1fd561"; // Light yellow for medium scores
+                            } else {
+                                color = "#0080009e"; // Light red for low scores
+                            }
+
+                            // Create a div with the background color and display the score
+                            $("<div>")
+                                .text(diff)
+                                .css("background-color", color)
+                                .css("width", "100%")
+                                .css("height", "100%")
+                                .css("font-size", "large")
+                                .appendTo(container);
+                        }
                     },
                     {
                         caption: '@SharedLocalizer["Статус"]',
@@ -160,7 +177,11 @@
                         dataField: "terminalOwner",
                         allowHeaderFiltering: true,
                     },
-
+                    {
+                        caption: '@SharedLocalizer["Заметка"]',
+                        dataField: "remarks",
+                        allowHeaderFiltering: true,
+                    },
                     {
                         type: "buttons",
                         width: 110,
@@ -176,7 +197,32 @@
                             }
                         ]
                     }
-                ]
+                ],
+                summary: {
+                      totalItems: [
+                        {
+                            column: 'encashmentSum',
+                            summaryType: 'sum',
+                            customizeText(itemInfo) {
+                                return `Всего продаж: ${itemInfo.value} man.`;
+                            }
+                        },
+                        {
+                            column: 'encashmentSumFromTerminal',
+                            summaryType: 'sum',
+                            customizeText(itemInfo) {
+                                return `Всего накоплено: ${itemInfo.value} man.`;
+                            }
+                        },
+                        {
+                            column: 'balanceDifference',
+                            summaryType: 'sum',
+                            customizeText(itemInfo) {
+                                return `Всего разниц: ${itemInfo.value} man.`;
+                            }
+                        }
+                      ]
+                }
             });
 
         });

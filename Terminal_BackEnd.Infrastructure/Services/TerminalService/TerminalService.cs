@@ -140,6 +140,13 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
                 TerminalLog newLog = new TerminalLog() { TerminalId = terminalId, LogInfo = info, Type = type, LogDate = date };
                 _dbContex.TerminalLogs.Add(newLog);
                 _dbContex.SaveChanges();
+                var lastIds = _dbContex.TerminalLogs.OrderByDescending(e => e.LogDate)
+                    .Select(e => e.Id)
+                    .Take(15)
+                    .ToList();
+                var toDelete = _dbContex.TerminalLogs.Where(e => !lastIds.Contains(e.Id));
+                _dbContex.TerminalLogs.RemoveRange(toDelete);
+                _dbContex.SaveChanges();
                 return true;
             } catch(Exception ex) {
                 return false;
@@ -162,7 +169,7 @@ namespace Terminal_BackEnd.Infrastructure.Services.TerminalService {
                         });
                 });
             }
-            return result;
+            return result.OrderByDescending(l => l.LogDate).ToList();
         }
 
         public void UpdateTerminalPing(long terminalId) {
