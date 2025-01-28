@@ -66,6 +66,7 @@ namespace Terminal_BackEnd.Web {
             builder.Services.AddDevExpressControls();
             builder.Services.AddScoped<DashboardConfigurator>((IServiceProvider serviceProvider) => {
                 DashboardConfigurator configurator = new DashboardConfigurator();
+                configurator.AllowExecutingCustomSql = true;
                 configurator.SetDashboardStorage(new DashboardFileRepository(fileProvider.GetFileInfo("Data/Dashboards").PhysicalPath));
                 configurator.SetConnectionStringsProvider(new DashboardConnectionStringsProvider(configuration));
 

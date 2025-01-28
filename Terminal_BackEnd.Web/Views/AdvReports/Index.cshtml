@@ -31,7 +31,7 @@
     $(function () {
         // Initialize dxDateRangeBox
         $("#dateRangeBox").dxDateRangeBox({
-            width: 400,
+            width: 600,
             value: [new Date(), new Date()],
             displayFormat: "yyyy-MM-dd"
         });
@@ -51,7 +51,7 @@
 
         // Initialize dxButton
         $("#generateButton").dxButton({
-            text: "Generate",
+            text: "Генерировать отчет",
             type: "success",
             onClick: function () {
                 generateDataGrid();
@@ -148,8 +148,8 @@
                 url: getReportsUrl,
                 type: "GET",
                 data: {
-                    startDate: startDate.toISOString(),
-                    endDate: endDate.toISOString(),
+                    startDate: startDate.toLocaleDateString(),
+                    endDate: endDate.toLocaleDateString(),
                     ids: selectedIds.join(",")
                 },
                 success: function (data) {

@@ -4,6 +4,7 @@
 
 <div style="position: absolute; left:0;top:60px;right:0;bottom:0;">
     @(Html.DevExpress().Dashboard("clientDashboardControl1")
+        .Extensions(option => option.DataSourceWizard(wz => wz.EnableCustomSql(true)))
         .ControllerName("DefaultDashboard")
         .WorkingMode(WorkingMode.Designer)
         .Width("100%")

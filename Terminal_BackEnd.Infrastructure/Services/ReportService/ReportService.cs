@@ -1,4 +1,5 @@
-﻿using Terminal_BackEnd.Infrastructure.Data;
+﻿using System;
+using Terminal_BackEnd.Infrastructure.Data;
 using Terminal_BackEnd.Infrastructure.Services.ReportService.Models;
 
 namespace Terminal_BackEnd.Infrastructure.Services.ReportService {
@@ -41,6 +42,12 @@ namespace Terminal_BackEnd.Infrastructure.Services.ReportService {
             return result;
         }
 
+        private int GetRemaining(long terminalId, DateOnly endDate) {
+            var transactions = _dbContex.Transactions.Where(t => t.TerminalId == terminalId && DateOnly.FromDateTime(t.TransactionDate) < endDate && t.Status == "SUCCESS");
+            var enchashments = _dbContex.Encashments.Where(t => t.TerminalId == terminalId && DateOnly.FromDateTime(t.EncashmentDate) < endDate);
+            return (int)Math.Max(0, transactions.Sum(t => t.Amount/100) - enchashments.Sum(t => t.EncashmentSum));
+        }
+
         public TransactionsByDayReportModel? GetTransactionsByDayReport(long terminalId, DateOnly startDateOnly, DateOnly endDateOnly) {
             var terminal = _dbContex.Terminals.FirstOrDefault(t => t.Id == terminalId);
             if(terminal == null) return null;
@@ -49,7 +56,7 @@ namespace Terminal_BackEnd.Infrastructure.Services.ReportService {
                 Terminal = terminal                
             };
             DateOnly currentDate = startDateOnly;
-            long remaining = 0;
+            long remaining = GetRemaining(terminalId, startDateOnly);
             while(currentDate <= endDateOnly) {
                 var data = GetDayTransactionDataByTerminal(terminal.Id, currentDate, remaining);
                 result.Data.Add(data);
@@ -58,7 +65,10 @@ namespace Terminal_BackEnd.Infrastructure.Services.ReportService {
             }
             result.EncashmentSum = result.Data.Sum(r => r.EnchashmentSum);
             result.BillingSum = result.Data.Sum(r => r.Billing);
-            result.RemainingSum = result.Data.Sum(r => r.Remainings);
+            var last = result.Data.Last();
+            if(last != null) {
+                result.RemainingSum = Math.Max(0, last.Remainings + last.Billing  - last.EnchashmentSum);
+            }
             return result;
         }
     }
